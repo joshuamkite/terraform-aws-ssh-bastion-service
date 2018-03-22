@@ -1,7 +1,7 @@
 This Terraform deploys an sshd bastion service on AWS:
 ===================================
 
-#Overview
+# Overview
 
 This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. The actual call for public keys is made with a GO binary, downloaded from S3 to the host at deploy time and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user. 
 
@@ -29,11 +29,11 @@ etc. Sadly the -172 (digits will vary) part is an artefact of systemd unit templ
 
     sudo apt install -y curl; ssh -p2222 admin@`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
 
-##Subnets
+## Subnets
 
 `subnet_master` is required but any number of additional subnets may be specified as a list under `subnet_additional`. For each additional subnet an additional elastic network interface (NIC) is created, connected to this subnet with the bastion_service_host policy applied.
 
-#In Use
+# In Use
 
 ## IAM user names and Linux user names
 
@@ -65,7 +65,7 @@ this username would translate to `testplusequalcommaattest` and they would need 
 
 `ssh testplusequalcommaattest@dev-eu-west-1-bastion-service.yourdomain.com`
 
-##Users should be aware that:
+## Users should be aware that:
 
 * They are logging on _as themselves_ using their AWS IAM identity
 * They must manage their own ssh keys using the AWS interface(s), e.g. in the web console under **IAM/Users/Security credentials** and 'Upload SSH public key'.
@@ -78,7 +78,7 @@ The following is referenced in "message of the day" on the container:
 * When they close their connection that container terminates and is removed
 * If they leave their connection open then the host will kill the container after 12 hours
 
-##Logging
+## Logging
 
 The sshd-worker container is launched with `v /dev/log:/dev/log` This causes logging information to be recorded in the host systemd journal which is not directly accesible from the container. It is thus simple to see who logged in and when by interrogating the host, e.g.
 
@@ -88,12 +88,12 @@ gives information such as
 
 	April 27 14:05:02 dev-eu-west-1-bastion-host sshd[7294]: Accepted publickey for aws_user from UNKNOWN port 65535 ssh2: RSA SHA256:*****************************
 
-##Note that:
+## Note that:
 
 * ssh keys are called only at login- if an account or ssh public key is deleted from AWS whilst a user is logged in then that session will continue until otherwise terminated.
 * At present logging is confined to the host machine- if it is respawned then so are the logs
 
-#Notes for deployment
+# Notes for deployment
 
 * **Currently the s3 bucket creation and go binary upload is done manually** Bear in mind that S3 bucket names must be *DNS globally unique*, i.e. for *all* users *everywhere* so we cannot neccesarily rely on automatically creating a bucket given with a given name as it may altready be taken.
 
@@ -114,7 +114,7 @@ gives information such as
 > * aws_iam_policy.check_ssh_authorized_keys: Error creating IAM policy check_ssh_authorized_keys: EntityAlreadyExists: A policy called check_ssh_authorized_keys already exists. Duplicate names are not allowed.
 > 	status code: 409, request id: *********-*****-****-****-********
 
-##Components
+## Components
 
 **EC2 Host OS (debian) with:**
 
@@ -149,7 +149,7 @@ The files in question on the host deploy thus:
 * `ssh_populate.sh` is the container entry point and populates the local user accounts using the go binary
 * `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses a static release of Ubuntu (16.04 in dev) from the public Docker registry. 
 
-##Input Variables
+## Input Variables
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 

@@ -131,9 +131,7 @@ gives information such as
 
 **Docker container** 'sshd_worker' - built at host launch time using generic ubuntu image, we add sshd and sudo.
 
-**[Go binary](https://github.com/Fullscreen/iam-authorized-keys-command)**  manually made available in S3 for download to host- **be sure to make access read only to prevent people trojanning it!** For peace of mind the [upstream repo has been forked to **Placeholder **
-
-2018.
+**[Go binary](https://github.com/Fullscreen/iam-authorized-keys-command)**  manually made available in S3 for download to host- **be sure to make access read only to prevent people trojanning it!** For peace of mind the [upstream repo has been forked to a companion repo](https://github.com/joshuamkite/iam-authorized-keys-command).
 
 The files in question on the host deploy thus:
 

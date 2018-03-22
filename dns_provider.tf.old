@@ -1,0 +1,6 @@
+provider "aws" {
+  alias      = "dns"
+  access_key = "${var.dns_access_key}"
+  secret_key = "${var.dns_secret_key}"
+  region     = "${var.dns_region}"
+}

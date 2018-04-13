@@ -112,7 +112,7 @@ resource "aws_launch_configuration" "bastion-service-host" {
 
 resource "aws_autoscaling_group" "bastion-service-asg" {
   availability_zones   = ["${data.aws_availability_zones.available.names}"]
-  name                 = "bastion-service-asg"
+  name_prefix          = "bastion-service-asg"
   max_size             = "${var.asg_max}"
   min_size             = "${var.asg_min}"
   desired_capacity     = "${var.asg_desired}"

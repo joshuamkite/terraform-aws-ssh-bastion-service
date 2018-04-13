@@ -5,7 +5,7 @@ This Terraform deploys an sshd bastion service on AWS:
 
 This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. The actual call for public keys is made with a GO binary, downloaded from S3 to the host at deploy time and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user. 
 
-This plan creates a dns entry for the host of the format
+This plan creates a load balancer and autoscaling group with a dns entry for the service of the format
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-bastion-service.${var.dns_domain}"
 
@@ -25,13 +25,13 @@ and a subsequent container would have
 
 etc. Sadly the -172 (digits will vary) part is an artefact of systemd unit templating that appears difficult to avoid.
 
-**The host is set to run the latest patch release at deployment of Debian Stretch**. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 does not automatically set up dhcp for additional elastic network interfaces. **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with 
+**The host instance(s) are set to run the latest patch release at deployment of Debian Stretch**. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 does not automatically set up dhcp for additional elastic network interfaces. **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with 
 
     sudo apt install -y curl; ssh -p2222 admin@`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
 
-## Subnets
+# Changes from version 1.0
 
-`subnet_master` is required but any number of additional subnets may be specified as a list under `subnet_additional`. For each additional subnet an additional elastic network interface (NIC) is created, connected to this subnet with the bastion_service_host policy applied.
+In version 1.0 (download this release if you want it!) this plan deployed a simple static host. With the version 2 branch a move has been made to make this a high availabilty service with an autoscaling group, health checks and a load balancer. This has necessitated the removal of the feature in version 1.0 of creating and attaching to the container host an Elastic Network Interface for each additional subnet specified. With the new branch additional subnets are supplied instead to the autoscaling group. The expectation is that separation will be managed by vpc rather than segregated subnet. 
 
 # In Use
 
@@ -157,11 +157,20 @@ A template.tfvars file is included for convenience
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
+| asg_desired | Desired numbers of bastion-service hosts in ASG | string | `1` | no |
+| asg_max | Max numbers of bastion-service hosts in ASG | string | `2` | no |
+| asg_min | Min numbers of bastion-service hosts in ASG | string | `1` | no |
 | bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
 | bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | - | yes |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
+| create_iam_service_role | Whether or not we call the iam_service_role module to create the bastion)servce_role (Boolean value) | string | `1` | no |
 | dns_domain | The domain used for Route53 records | string | - | yes |
+| elb_healthy_threshold | Healthy threshold for ELB | string | `2` | no |
+| elb_idle_timeout | The time in seconds that the connection is allowed to be idle | string | `300` | no |
+| elb_interval | interval for ELB health check | string | `30` | no |
+| elb_timeout | timeout for ELB | string | `3` | no |
+| elb_unhealthy_threshold | Unhealthy threshold for ELB | string | `2` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
 | iam_authorized_keys_command_url | location for our compiled Go binary - see https://github.com/Fullscreen/iam-authorized-keys-command | string | - | yes |
 | route53_zone_id | Route53 zoneId | string | - | yes |
@@ -170,8 +179,8 @@ A template.tfvars file is included for convenience
 | subnet_master | The name for the main (or only!) subnet | string | - | yes |
 | vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | string | - | yes |
 
-### Outputs
+## Outputs
 
 | Name | Description |
 |------|-------------|
-| service_dns_entry | dns-registered url for service and host |
+| service_dns_entry | dns-registered url for bastion service |

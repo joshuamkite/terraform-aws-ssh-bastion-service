@@ -5,3 +5,4 @@
 terraform.tfstate
 terraform.tfstate.backup
 iam-authorized-keys-command
+.DS_Store

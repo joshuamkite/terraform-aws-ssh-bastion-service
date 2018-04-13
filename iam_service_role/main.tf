@@ -2,7 +2,8 @@
 #aws iam role for host
 ##############
 resource "aws_iam_role" "bastion_service_role" {
-  name = "bastion_service_role"
+  name  = "bastion_service_role"
+  count = "${var.create_iam_service_role}"
 
   assume_role_policy = <<EOF
 {
@@ -25,7 +26,9 @@ EOF
 #########################
 
 resource "aws_iam_instance_profile" "bastion_service_profile" {
-  name = "bastion_service_profile"
+  name  = "bastion_service_profile"
+  count = "${var.create_iam_service_role}"
+
   role = "${aws_iam_role.bastion_service_role.name}"
 }
 
@@ -34,7 +37,9 @@ resource "aws_iam_instance_profile" "bastion_service_profile" {
 #########################
 
 resource "aws_iam_policy" "check_ssh_authorized_keys" {
-  name        = "check_ssh_authorized_keys"
+  name  = "check_ssh_authorized_keys"
+  count = "${var.create_iam_service_role}"
+
   description = "Allow querying aws to obtain list of users with their ssh public keys"
 
   policy = <<EOF
@@ -64,7 +69,9 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "check_ssh_authorized_keys" {
-  role       = "${aws_iam_role.bastion_service_role.name}"
+  role  = "${aws_iam_role.bastion_service_role.name}"
+  count = "${var.create_iam_service_role}"
+
   policy_arn = "${aws_iam_policy.check_ssh_authorized_keys.arn}"
 }
 
@@ -72,7 +79,9 @@ resource "aws_iam_role_policy_attachment" "check_ssh_authorized_keys" {
 #s3 bucket access policy for host
 #########################
 resource "aws_iam_policy" "bastion-service-files-s3-bucket-read-only" {
-  name        = "bastion-service-files-s3-bucket-read-only"
+  name  = "bastion-service-files-s3-bucket-read-only"
+  count = "${var.create_iam_service_role}"
+
   description = "Allow read only access for bastion service host role to golang binary used for querying aws for users and public ssh ssh keys by role check_ssh_authorized_keys"
 
   policy = <<EOF
@@ -93,6 +102,8 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "bastion-service-files-s3-bucket-read-only" {
-  role       = "${aws_iam_role.bastion_service_role.name}"
+  role  = "${aws_iam_role.bastion_service_role.name}"
+  count = "${var.create_iam_service_role}"
+
   policy_arn = "${aws_iam_policy.bastion-service-files-s3-bucket-read-only.arn}"
 }

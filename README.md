@@ -97,7 +97,11 @@ gives information such as
 
 * **Currently the s3 bucket creation and go binary upload is done manually** Bear in mind that S3 bucket names must be *DNS globally unique*, i.e. for *all* users *everywhere* so we cannot neccesarily rely on automatically creating a bucket given with a given name as it may altready be taken.
 
-* This plan contains a submodule to create the IAM 'bastion_service' role and attached policies. If you are deploying to a new AWS account then you need to include this module. If you have already deployed to an AWS account but simply want to set up another bastion service host, e.g. in a different region, then you should comment out the module call near the top of 'main.tf'. If you do not then  be aware that when deploying to multiple regions within a single AWS account this plan will report 'failures' similar to the below. These are harmless but because IAM policies and roles span regions, this terraform plan 'as-is' tries to provision all resources in each region and generates failures if trying to create 'new' resources that already exist, e.g. as below. Unfortunately as at March 2018 It is not possible to use 'count' on Terraform *modules* and booleans are not otherwise supported.
+* This plan contains a submodule to create the IAM 'bastion_service' role and attached policies. If you are deploying to a new AWS account then you need to include this module. If you have already deployed to an AWS account but simply want to set up another bastion service host, e.g. in a different region, then you may wish to set the variable create_iam_service_role to "0". If you do not then  be aware that when deploying to multiple regions within a single AWS account this plan will report 'failures' similar to the below. These are harmless but because IAM policies and roles span regions, this terraform plan 'as-is' tries to provision all resources in each region and generates failures if trying to create 'new' resources that already exist, e.g. as below. You may wish to leave this repeat policy creation in place however because unless you have adequate segregated management of terraform remote state then this plan will try to destroy the previously created policies.
+
+ Unfortunately as at March 2018 It is not possible to use 'count' on Terraform *modules* and booleans are not otherwise supported. The effect is simulated here by passsing a boolean value into each resource _within_ the submodule...
+
+ ### Example of (harmless) error report from duplicate policy creation:
 
 > 3 error(s) occurred:
 

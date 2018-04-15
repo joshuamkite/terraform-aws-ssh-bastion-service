@@ -27,13 +27,9 @@ variable "bastion_service_host_key_name" {
   description = "AWS ssh key *.pem to be used for ssh access to the bastion service host"
 }
 
-variable "subnet_master" {
-  description = "The name for the main (or only!) subnet"
-}
-
-variable "subnet_additional" {
+variable "subnets" {
   type        = "list"
-  description = "list of names for any additional subnets"
+  description = "list of subnets for load balancer and autoscaling group"
   default     = []
 }
 

@@ -57,13 +57,13 @@ resource "aws_security_group" "instance" {
   }
 
   # Permissive egress policy because we want users to be able to install their own packages 
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   vpc_id = "${var.vpc}"
 }
 
@@ -75,8 +75,7 @@ data "aws_ami" "debian" {
   most_recent = true
 
   filter {
-    name = "name"
-
+    name   = "name"
     values = ["debian-stretch-hvm-x86_64-*"]
   }
 
@@ -117,7 +116,7 @@ resource "aws_autoscaling_group" "bastion-service-asg" {
   min_size             = "${var.asg_min}"
   desired_capacity     = "${var.asg_desired}"
   launch_configuration = "${aws_launch_configuration.bastion-service-host.name}"
-  vpc_zone_identifier  = ["${var.subnet_master}", "${var.subnet_additional}"]
+  vpc_zone_identifier  = "${var.subnets}"
   load_balancers       = ["${aws_elb.bastion-service-elb.name}"]
 
   lifecycle {
@@ -140,17 +139,17 @@ resource "aws_elb" "bastion-service-elb" {
 
   # Sadly can't use availabilty zones for classic load balancer - see https://github.com/terraform-providers/terraform-provider-aws/issues/1063
   # availability_zones = ["${data.aws_availability_zones.available.names}"]
-  subnets = ["${var.subnet_master}", "${var.subnet_additional}"]
-
-  #   subnet_id       = "${var.subnet_additional[count.index]}"
+  subnets = ["${var.subnets}"]
 
   security_groups = ["${aws_security_group.instance.id}"]
+
   listener {
     instance_port     = 22
     instance_protocol = "TCP"
     lb_port           = 22
     lb_protocol       = "TCP"
   }
+
   health_check {
     healthy_threshold   = "${var.elb_healthy_threshold}"
     unhealthy_threshold = "${var.elb_unhealthy_threshold}"
@@ -158,6 +157,7 @@ resource "aws_elb" "bastion-service-elb" {
     target              = "TCP:22"
     interval            = "${var.elb_interval}"
   }
+
   cross_zone_load_balancing   = true
   idle_timeout                = "${var.elb_idle_timeout}"
   connection_draining         = true
@@ -187,7 +187,6 @@ resource "aws_route53_record" "bastion_service" {
   name    = "${var.environment_name}-${data.aws_region.current.name}-bastion-service.${var.dns_domain}"
   type    = "A"
 
-  # records = ["${aws_instance.bastion_service_host.public_ip}"]
   alias {
     name                   = "${aws_elb.bastion-service-elb.dns_name}"
     zone_id                = "${aws_elb.bastion-service-elb.zone_id}"

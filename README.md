@@ -31,7 +31,7 @@ etc. Sadly the -172 (digits will vary) part is an artefact of systemd unit templ
 
 # Changes from version 1.0
 
-In version 1.0 (download this release if you want it!) this plan deployed a simple static host. With the version 2 branch a move has been made to make this a high availabilty service with an autoscaling group, health checks and a load balancer. This has necessitated the removal of the feature in version 1.0 of creating and attaching to the container host an Elastic Network Interface for each additional subnet specified. With the new branch additional subnets are supplied instead to the autoscaling group. The expectation is that separation will be managed by vpc rather than segregated subnet. 
+In version 1.0 (download this release if you want it!) this plan deployed a simple static host. With the version 2 branch a move has been made to make this a high availabilty service with an autoscaling group, health checks and a load balancer. This has necessitated the removal of the feature in version 1.0 of creating and attaching to the container host an Elastic Network Interface for each additional subnet specified. With the new branch additional subnets are supplied instead to the autoscaling group and load balancer. The expectation is that separation will be managed by vpc rather than segregated subnet. 
 
 # In Use
 
@@ -157,7 +157,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 A template.tfvars file is included for convenience
 
-### Inputs
+## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
@@ -179,8 +179,7 @@ A template.tfvars file is included for convenience
 | iam_authorized_keys_command_url | location for our compiled Go binary - see https://github.com/Fullscreen/iam-authorized-keys-command | string | - | yes |
 | route53_zone_id | Route53 zoneId | string | - | yes |
 | s3_bucket_name | the name of the s3 bucket where we are storing our go binary | string | - | yes |
-| subnet_additional | list of names for any additional subnets | list | `<list>` | no |
-| subnet_master | The name for the main (or only!) subnet | string | - | yes |
+| subnets | list of subnets for load balancer and autoscaling group | list | `<list>` | no |
 | vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | string | - | yes |
 
 ## Outputs

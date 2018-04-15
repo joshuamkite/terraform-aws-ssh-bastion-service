@@ -1,5 +1,5 @@
 vpc = ""
-subnet_master = ""
+subnets = [""]
 bastion_service_host_key_name = ""
 iam_authorized_keys_command_url = ""
 s3_bucket_name = ""

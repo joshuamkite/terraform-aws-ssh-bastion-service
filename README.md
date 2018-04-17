@@ -179,7 +179,8 @@ A template.tfvars file is included for convenience
 | iam_authorized_keys_command_url | location for our compiled Go binary - see https://github.com/Fullscreen/iam-authorized-keys-command | string | - | yes |
 | route53_zone_id | Route53 zoneId | string | - | yes |
 | s3_bucket_name | the name of the s3 bucket where we are storing our go binary | string | - | yes |
-| subnets | list of subnets for load balancer and autoscaling group | list | `<list>` | no |
+| subnets_asg | list of subnets for autoscaling group | list | `<list>` | no |
+| subnets_elb | list of subnets for load balancer | list | `<list>` | no |
 | vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | string | - | yes |
 
 ## Outputs

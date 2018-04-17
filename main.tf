@@ -116,7 +116,7 @@ resource "aws_autoscaling_group" "bastion-service-asg" {
   min_size             = "${var.asg_min}"
   desired_capacity     = "${var.asg_desired}"
   launch_configuration = "${aws_launch_configuration.bastion-service-host.name}"
-  vpc_zone_identifier  = "${var.subnets}"
+  vpc_zone_identifier  = ["${var.subnets_asg}"]
   load_balancers       = ["${aws_elb.bastion-service-elb.name}"]
 
   lifecycle {
@@ -139,7 +139,7 @@ resource "aws_elb" "bastion-service-elb" {
 
   # Sadly can't use availabilty zones for classic load balancer - see https://github.com/terraform-providers/terraform-provider-aws/issues/1063
   # availability_zones = ["${data.aws_availability_zones.available.names}"]
-  subnets = ["${var.subnets}"]
+  subnets = ["${var.subnets_elb}"]
 
   security_groups = ["${aws_security_group.instance.id}"]
 

@@ -50,10 +50,13 @@ variable "route53_zone_id" {
   description = "Route53 zoneId"
 }
 
-variable "iam_authorized_keys_command_url" {
-  description = "location for our compiled Go binary - see https://github.com/Fullscreen/iam-authorized-keys-command"
+variable "bastion_allowed_iam_group" {
+  type        = "string"
+  description = "Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile"
 }
 
-variable "s3_bucket_name" {
-  description = "the name of the s3 bucket where we are storing our go binary"
+variable "tags" {
+  type        = "map"
+  description = "AWS tags that should be associated with created resources"
+  default     = {}
 }

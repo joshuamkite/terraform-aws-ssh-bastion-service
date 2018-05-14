@@ -1,4 +1,4 @@
-#Get aws account number 
+#Get aws account number
 data "aws_caller_identity" "current" {}
 
 #get aws region for use later in plan
@@ -9,8 +9,18 @@ data "aws_region" "current" {}
 ##########################
 
 module "iam_service_role" {
-  source         = "./iam_service_role"
-  s3_bucket_name = "${var.s3_bucket_name}"
+  source       = "./iam_service_role"
+  bastion_name = "${var.environment_name}-${data.aws_region.current.name}"
+}
+
+##########################
+#Create user-data for bastion ec2 instance
+##########################
+
+module "bastion_user_data" {
+  source                    = "./user-data"
+  environment_name          = "${var.environment_name}"
+  bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
 }
 
 ##########################
@@ -36,10 +46,10 @@ data "aws_ami" "debian" {
 # # security group for bastion_host
 
 resource "aws_security_group" "instance" {
-  name        = "bastion_service_host"
-  description = "Allow ssh-host and ssh-bastion access to bastion_service_host"
+  name        = "${var.environment_name}-${data.aws_region.current.name}-bastion"
+  description = "Allow ssh-host and ssh-bastion access to ${var.environment_name}-${data.aws_region.current.name}"
 
-  # SSH access from whitelist IP ranges - to be used for sshd service containers 
+  # SSH access from whitelist IP ranges - to be used for sshd service containers
   ingress {
     from_port   = 22
     to_port     = 22
@@ -63,6 +73,7 @@ resource "aws_security_group" "instance" {
   }
 
   vpc_id = "${var.vpc}"
+  tags   = "${var.tags}"
 }
 
 ############################
@@ -96,27 +107,18 @@ resource "aws_instance" "bastion_service_host" {
   subnet_id                   = "${var.subnet_master}"
   associate_public_ip_address = "true"
   vpc_security_group_ids      = ["${aws_security_group.instance.id}"]
-  user_data                   = "${data.template_file.bastion_host.rendered}"
+  user_data                   = "${module.bastion_user_data.user_data}"
   key_name                    = "${var.bastion_service_host_key_name}"
-  iam_instance_profile        = "bastion_service_profile"
+  iam_instance_profile        = "${module.iam_service_role.instance_profile}"
 
-  tags {
-    Name = "bastion_service_host"
-  }
-}
-
-#######################
-# Copy templates files to bastion host
-####################
-
-# userdata for bastion host
-data "template_file" "bastion_host" {
-  template = "${file("${path.module}/user_data_template/bastion_host_cloudinit_config.tpl")}"
-
-  vars {
-    bastion_host_name               = "${var.environment_name}-${data.aws_region.current.name}"
-    iam_authorized_keys_command_url = "${var.iam_authorized_keys_command_url}"
-  }
+  tags = "${merge(
+      map(
+        "Name", "${var.environment_name}-${data.aws_region.current.name}-bastion",
+        "Environment", "${var.environment_name}",
+        "Region", "${data.aws_region.current.name}",
+      ),
+      "${var.tags}"
+    )}"
 }
 
 ####################################################

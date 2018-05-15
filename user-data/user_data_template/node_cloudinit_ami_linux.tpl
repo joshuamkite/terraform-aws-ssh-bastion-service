@@ -7,13 +7,7 @@ packages:
 write_files:
   -
     content: |
-      */15 * * * * root /opt/iam_helper/ssh_populate.sh
-    path: /etc/cron.d/ssh_populate
-
-  -
-    content: |
         #!/bin/bash
-        (
         count=1
         /opt/iam_helper/iam-authorized-keys-command | while read line
         do
@@ -30,9 +24,6 @@ write_files:
           chmod 700 /home/$username/.ssh
           chmod 0600 /home/$username/.ssh/authorized_keys
         done
-
-        ) > /dev/null 2>&1
-
     path: /opt/iam_helper/ssh_populate.sh
     permissions: '0754'
 
@@ -62,6 +53,8 @@ write_files:
         chown root /opt/iam_helper
         chmod -R 700 /opt/iam_helper
 
+        /opt/iam_helper/ssh_populate.sh
+        crontab -l | { cat; echo "*/15 * * * * /opt/iam_helper/ssh_populate.sh > /var/log/ssh_populate.log"; } | crontab -
     path: /var/lib/cloud/scripts/per-once/localinstall.sh
     permissions: '0754'
 

@@ -95,6 +95,22 @@ gives information such as
 
 # Notes for deployment
 
+Additionally this project contains helper module called `user-data` inside it there are two templates
+
+	/user-data
+	├── user_data_template
+	│   ├── bastion_host_cloudinit_config.tpl
+	│   └── node_cloudinit_ami_linux.tpl
+
+* `bastion_host_cloudinit_config` is user-data which will be used during bastion startup and is created for debian ec2 images(root module uses it). This config can be obtained as `user_data_bastion` output variable.
+* `node_cloudinit_ami_linux` is user-data which can be used by ecs or kubernetes nodes, you can append this user data to your instances and then you will be able to ssh into this nodes from bastion. This user-data file does not create docker image, so you are logged into directly into ec2 instances(not inside docker container). It is created for `ami_linux` optimized machines.  This config can be obtained as `user_data` output variable. This config can be obtained as `user_data_ami_linux` output variable. For now users are updated every 15 minutes, and old ones are not removed. Remember that instances using this user-data should have following policies:
+  * iam:ListUsers
+  * iam:GetGroup
+  * iam:GetSSHPublicKey
+  * iam:ListSSHPublicKeys
+  * iam:GetUser
+  * iam:ListGroups
+
 
 ## Components
 

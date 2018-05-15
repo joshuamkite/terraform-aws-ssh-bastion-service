@@ -107,7 +107,7 @@ resource "aws_instance" "bastion_service_host" {
   subnet_id                   = "${var.subnet_master}"
   associate_public_ip_address = "true"
   vpc_security_group_ids      = ["${aws_security_group.instance.id}"]
-  user_data                   = "${module.bastion_user_data.user_data}"
+  user_data                   = "${module.bastion_user_data.user_data_bastion}"
   key_name                    = "${var.bastion_service_host_key_name}"
   iam_instance_profile        = "${module.iam_service_role.instance_profile}"
 

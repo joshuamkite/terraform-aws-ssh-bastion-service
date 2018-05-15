@@ -71,10 +71,15 @@ func main() {
 						SSHPublicKeyId: k.SSHPublicKeyId,
 						UserName:       userName,
 					}
-					resp, _ := svc.GetSSHPublicKey(params)
+					resp, err := svc.GetSSHPublicKey(params)
+					if err != nil {
+						fmt.Fprintln(os.Stderr, err.Error())
+					}
 					fmt.Printf("# %s\n", *userName)
 					fmt.Println(*resp.SSHPublicKey.SSHPublicKeyBody)
 				}
+			} else {
+				fmt.Fprintln(os.Stderr, err.Error())
 			}
 			wg.Done()
 		}(u.UserName)

@@ -48,12 +48,10 @@ resource "aws_security_group" "instance" {
 
   # SSH access from anywhere within vpc to accomodate load balancer for sshd service containers 
   ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-
-    # See https://fishingcatblog.wordpress.com/2016/09/22/terraform-interpolation-cidrsubnet/
-    cidr_blocks = ["${cidrsubnet(data.aws_vpc.main.cidr_block, 4, 1)}", "10.0.0.0/8", "172.16.0.0/12"]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_vpc.main.cidr_block}"]
   }
 
   # Permissive egress policy because we want users to be able to install their own packages 
@@ -90,7 +88,7 @@ resource "aws_launch_configuration" "bastion-service-host" {
   name_prefix                 = "bastion-service-host"
   image_id                    = "${data.aws_ami.debian.id}"
   instance_type               = "${var.bastion_instance_type}"
-  iam_instance_profile        = "bastion_service_profile"
+  iam_instance_profile        = "bastion-assume-role-poc_in_dazndev"
   associate_public_ip_address = "true"
 
   #https://github.com/hashicorp/terraform/issues/575
@@ -173,8 +171,9 @@ data "template_file" "bastion_host" {
   template = "${file("${path.module}/user_data_template/bastion_host_cloudinit_config.tpl")}"
 
   vars {
-    bastion_host_name               = "${var.environment_name}-${data.aws_region.current.name}"
-    iam_authorized_keys_command_url = "${var.iam_authorized_keys_command_url}"
+    bastion_host_name                       = "${var.environment_name}-${data.aws_region.current.name}"
+    iam_authorized_keys_command_url         = "${var.iam_authorized_keys_command_url}"
+    iam_identities_account_bastion_role_arn = "${var.iam_identities_account_bastion_role_arn}"
   }
 }
 

@@ -1,8 +1,3 @@
-#variable "region" {}
-
-# variable "secret_key" {}
-# variable "access_key" {}
-
 variable "bastion_instance_type" {
   description = "The virtual hardware to be used for the bastion service host"
   default     = "t2.micro"

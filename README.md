@@ -3,7 +3,7 @@ This Terraform deploys an sshd bastion service on AWS:
 
 # Overview
 
-This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. The actual call for public keys is made with a GO binary,which is built during deployment and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. AWS group name to query for ssh keys should be passed in `bastion_allowed_iam_group` variable. When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user.
+This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. The actual call for public keys is made with a GO binary,which is built during deployment and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. The users who may access the bastion service must be members of a defined AWS IAM group which is not set up or managed by this plan.  When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user.
 
 This plan creates a dns entry for the host of the format
 
@@ -67,7 +67,7 @@ this username would translate to `testplusequalcommaattest` and they would need 
 
 ## Users should be aware that:
 
-* They are logging on _as themselves_ using their AWS IAM identity
+* They are logging on _as themselves_ using and identiy _based on_ their AWS IAM identity
 * They must manage their own ssh keys using the AWS interface(s), e.g. in the web console under **IAM/Users/Security credentials** and 'Upload SSH public key'.
 * The ssh server key is set at container build time. This means that it will change whenever the bastion host is respawned
 
@@ -95,34 +95,62 @@ gives information such as
 
 # Notes for deployment
 
-Additionally this project contains helper module called `user-data` inside it there are two templates
+## To Run:
 
-	/user-data
-	├── user_data_template
-	│   ├── bastion_host_cloudinit_config.tpl
-	│   └── node_cloudinit_ami_linux.tpl
+ If you are running this as a standalone plan then **You must _thoroughly_ reinitialise the terraform state before running the plan again in a different region of the same AWS account** Failure to do this will result in terraform destroying the IAM policies for the previous host. 
 
-* `bastion_host_cloudinit_config` is user-data which will be used during bastion startup and is created for debian ec2 images(root module uses it). This config can be obtained as `user_data_bastion` output variable.
-* `node_cloudinit_ami_linux` is user-data which can be used by ecs or kubernetes nodes, you can append this user data to your instances and then you will be able to ssh into this nodes from bastion. This user-data file does not create docker image, so you are logged into directly into ec2 instances(not inside docker container). It is created for `ami_linux` optimized machines.  This config can be obtained as `user_data` output variable. This config can be obtained as `user_data_ami_linux` output variable. For now users are updated every 15 minutes, and old ones are not removed. Remember that instances using this user-data should have following policies:
-  * iam:ListUsers
-  * iam:GetGroup
-  * iam:GetSSHPublicKey
-  * iam:ListSSHPublicKeys
-  * iam:GetUser
-  * iam:ListGroups
+* Set aws-profile for first region
+* Initialise backend 
 
+
+	terraform init -backend -backend-config=config/?/config.remote
+
+
+* Apply terraform plan
+
+
+	terraform apply -var-file=config/?/config.tfvars
+
+
+* next region (see note below)
+
+
+	rm -rf .terraform
+
+
+* Set aws-profile for next region
+* init backend for next region
+
+
+	terraform init -backend -backend-config=config/?/config.remote
+
+
+* run plan
+
+
+	terraform apply -var-file=config/?/config.tfvars
+
+**Note**
+During terraform init there can be the question:
+Do you want to copy existing state to the new backend?
+Just say "no"
+It isan issue when switching from different backend inside the same directory
+As alternative before you run terraform init you can run "rm -rf .terraform" then this question will not popup
 
 ## Components
 
 **EC2 Host OS (debian) with:**
 
-* awscli (for grabbing go binary)
+* awscli
 * Systemd docker unit
 * Systemd service template unit
 * IAM Profile connected to EC2 host
 * golang
+* go binary compiled from code included in plan and supplied as user data - [sourced from Fullscreen project](https://github.com/Fullscreen/iam-authorized-keys-command)
 
 **IAM Role module**
+
+All of the above are prefixed with the bastion service host name to ensure uniqueness
 
 * IAM role
 * IAM policies
@@ -145,6 +173,24 @@ The files in question on the host deploy thus:
 * `iam-authorized-keys-command` is the Go binary that gets the users and ssh public keys from aws it is built during bastion deployment
 * `ssh_populate.sh` is the container entry point and populates the local user accounts using the go binary
 * `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses a static release of Ubuntu (16.04 in dev) from the public Docker registry.
+
+## Outputs useful for other services
+
+Additionally this project contains helper module called `user-data` inside it there are two templates
+
+	/user-data
+	└── user_data_template
+	    ├── bastion_host_cloudinit_config.tpl
+	    └── node_cloudinit_ami_linux.tpl
+
+* `bastion_host_cloudinit_config` is user-data which will be used during bastion startup and is created for debian ec2 images(root module uses it). This config can be obtained as `user_data_bastion` output variable.
+* `node_cloudinit_ami_linux` is user-data which can be used by ecs or kubernetes nodes, you can append this user data to your instances and then you will be able to ssh into this nodes using an IAM identity simailr to the bastion service. This user-data file is intended for logging directly into ecs ec2 instances (not inside docker container). It is created for `ami_linux` optimized machines. For now users are updated every 15 minutes, and old ones are not removed. Remember that instances using this user-data should have following policies:
+  * iam:ListUsers
+  * iam:GetGroup
+  * iam:GetSSHPublicKey
+  * iam:ListSSHPublicKeys
+  * iam:GetUser
+  * iam:ListGroups
 
 ## Input Variables
 

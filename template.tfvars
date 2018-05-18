@@ -13,3 +13,5 @@ route53_zone_id = ""
 environment_name = ""
 
 tags = {}
+
+bastion_allowed_iam_group=""

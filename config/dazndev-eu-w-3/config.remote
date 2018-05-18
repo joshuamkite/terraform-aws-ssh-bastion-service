@@ -1,5 +1,0 @@
-region         = "eu-central-1"
-bucket         = "144992683770-tfstate"
-key            = "vpc/regions_all/dev_vpc.tfstate"
-dynamodb_table = "144992683770-tfstate-lock"
-profile        = "144992683770"

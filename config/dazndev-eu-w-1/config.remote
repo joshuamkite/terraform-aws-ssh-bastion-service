@@ -1,5 +1,0 @@
-region         = "eu-central-1"
-bucket         = "144992683770-tfstate"
-key            = "bastion/eu-west-1/dev_bastion.tfstate"
-dynamodb_table = "144992683770-tfstate-lock"
-profile        = "144992683770"

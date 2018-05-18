@@ -1,3 +1,5 @@
+# 1.1
+
 Thanks to Piotr Jaromin for implementing these features
 
 * S3 bucket is no longer necessary, golang script for iam-authorized-command is stored inside this repository.

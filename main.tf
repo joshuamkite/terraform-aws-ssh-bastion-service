@@ -132,12 +132,3 @@ resource "aws_route53_record" "bastion_service" {
   ttl     = "300"
   records = ["${aws_instance.bastion_service_host.public_ip}"]
 }
-
-####################################################
-# Outputs Section
-###################################################
-
-output "service_dns_entry" {
-  description = "dns-registered url for service and host"
-  value       = "${var.environment_name}-${data.aws_region.current.name}-bastion-service.${var.dns_domain}"
-}

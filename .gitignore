@@ -7,4 +7,3 @@ terraform.tfstate.backup
 iam-authorized-keys-command
 .DS_Store
 .terraform.old.eu-w-1/
-config/

@@ -152,8 +152,6 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 A template.tfvars file is included for convenience
 
-### Inputs
-
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -176,4 +174,5 @@ A template.tfvars file is included for convenience
 | Name | Description |
 |------|-------------|
 | service_dns_entry | dns-registered url for service and host |
-| user_data | cloud-config user data used to initialize bastion at start up |
+| user_data_ami_linux | cloud-config user data used to initialize ami linux instances which are run as ecs/k8s nodes |
+| user_data_bastion | cloud-config user data used to initialize bastion at start up |

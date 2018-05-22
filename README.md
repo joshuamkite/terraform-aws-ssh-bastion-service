@@ -5,6 +5,9 @@ This Terraform deploys an sshd bastion service on AWS:
 
 This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. The actual call for public keys is made with a GO binary,which is built during host launch and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. The users who may access the bastion service must be members of a defined AWS IAM group which is not set up or managed by this plan.  When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user.
 
+**With thanks to  Piotr Jaromin for his excellent contributions to this project**
+
+
 This plan creates a load balancer and autoscaling group with a dns entry for the service of the format
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
@@ -163,16 +166,16 @@ All of the above are prefixed with the bastion service host name to ensure uniqu
 
 The files in question on the host deploy thus:
 
-/opt
-├── golang
-│   ├── bin
-│   ├── pkg
-│   └── src
-├── iam_helper
-│   ├── iam-authorized-keys-command
-│   └── ssh_populate.sh
-└── sshd_worker
-    └── Dockerfile
+	/opt
+	├── golang
+	│   ├── bin
+	│   ├── pkg
+	│   └── src
+	├── iam_helper
+	│   ├── iam-authorized-keys-command
+	│   └── ssh_populate.sh
+	└── sshd_worker
+	    └── Dockerfile
 
 * `golang` is the source and build directory for the go binary
 * `iam-helper` is made available as a read-only volume to the docker container as /opt.

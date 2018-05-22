@@ -1,8 +1,7 @@
 .terraform/
-.terraform/plugins/linux_amd64/lock.json
-.terraform/plugins/linux_amd64/terraform-provider-aws_v1.9.0_x4
-.terraform/plugins/linux_amd64/terraform-provider-template_v1.0.0_x4
 terraform.tfstate
 terraform.tfstate.backup
-iam-authorized-keys-command
 .DS_Store
+run_commands
+iam_assume_role/
+config/

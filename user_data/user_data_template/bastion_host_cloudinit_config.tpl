@@ -1,4 +1,4 @@
-l#cloud-config
+#cloud-config
 ---
 package_update: true
 packages:
@@ -9,7 +9,7 @@ write_files:
     content: |
        FROM ubuntu:16.04
 
-        RUN apt-get update && apt-get install -y openssh-server sudo awscli && echo '\033[1;31mI am a one-time Ubuntu container with passwordless sudo. \033[1;37;41mI will terminate after 12 hours or else on exit\033[0m' > /etc/motd && mkdir /var/run/sshd
+        RUN apt-get update && apt-get install -y openssh-server sudo && echo '\033[1;31mI am a one-time Ubuntu container with passwordless sudo. \033[1;37;41mI will terminate after 12 hours or else on exit\033[0m' > /etc/motd && mkdir /var/run/sshd
 
         EXPOSE 22
         CMD ["/opt/ssh_populate.sh"]
@@ -18,7 +18,6 @@ write_files:
   -
     content: |
         #!/bin/bash
-        . /opt/assumerole.sh
         (
         count=1
         /opt/iam-authorized-keys-command | while read line
@@ -44,16 +43,6 @@ write_files:
     permissions: '0754'
 
   -
-
-    content: |
-          #!/bin/bash
-          unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_SECURITY_TOKEN
-          KST=(`aws sts assume-role --role-arn "${iam_identities_account_bastion_role_arn}" --role-session-name $(hostname) --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text`)
-          export AWS_ACCESS_KEY_ID=$${KST[0]}; export AWS_SECRET_ACCESS_KEY=$${KST[1]}; export AWS_SESSION_TOKEN=$${KST[2]}
-    path: /opt/iam_helper/assumerole.sh
-    permissions: '0754'
-
--
     content: |
         [Unit]
         Description=SSH Socket for Per-Connection docker ssh container
@@ -124,10 +113,8 @@ write_files:
         chown root /opt/iam_helper
         chmod -R 700 /opt/iam_helper
         #set hostname to match dns
-        hostname -b ${bastion_host_name}-bastion-host
+        hostname -b ${bastion_host_name}-${vpc}-bastion-host
         echo ${bastion_host_name}-bastion-host > /etc/hostname
         echo '127.0.0.1 ${bastion_host_name}-bastion-host' | sudo tee --append /etc/hosts
     path: /var/lib/cloud/scripts/per-once/localinstall.sh
     permissions: '0754'
-
-

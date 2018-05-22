@@ -18,7 +18,18 @@ data "aws_vpc" "main" {
 
 module "iam_service_role" {
   source       = "./iam_service_role"
-  bastion_name = "${var.environment_name}-${data.aws_region.current.name}"
+  bastion_name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+}
+
+##########################
+#Create user-data for bastion ec2 instance
+##########################
+
+module "bastion_user_data" {
+  source                    = "./user_data"
+  environment_name          = "${var.environment_name}"
+  bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
+  vpc                       = "${var.vpc}"
 }
 
 # ##################
@@ -26,8 +37,8 @@ module "iam_service_role" {
 # ##################
 
 resource "aws_security_group" "instance" {
-  name        = "${var.environment_name}-${data.aws_region.current.name}-bastion"
-  description = "Allow ssh-host and ssh-bastion access to ${var.environment_name}-${data.aws_region.current.name}"
+  name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
+  description = "Allow ssh-host and ssh-bastion access to ${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
 
   # SSH access from whitelist IP ranges for sshd service containers 
   ingress {
@@ -88,24 +99,15 @@ resource "aws_launch_configuration" "bastion-service-host" {
   name_prefix                 = "bastion-service-host"
   image_id                    = "${data.aws_ami.debian.id}"
   instance_type               = "${var.bastion_instance_type}"
-  iam_instance_profile        = "bastion-assume-role-poc_in_dazndev"
+  iam_instance_profile        = "${module.iam_service_role.instance_profile}"
   associate_public_ip_address = "true"
 
   #https://github.com/hashicorp/terraform/issues/575
   #https://github.com/hashicorp/terraform/commit/3b67537dfabc1a65eb17e92849da5e64737daae3
   security_groups = ["${aws_security_group.instance.id}"]
 
-  user_data = "${data.template_file.bastion_host.rendered}"
+  user_data = "${module.bastion_user_data.user_data_bastion}"
   key_name  = "${var.bastion_service_host_key_name}"
-
-  tags = "${merge(
-      map(
-        "Name", "${var.environment_name}-${data.aws_region.current.name}-bastion",
-        "Environment", "${var.environment_name}",
-        "Region", "${data.aws_region.current.name}",
-      ),
-      "${var.tags}"
-    )}"
 
   lifecycle {
     create_before_destroy = true
@@ -130,11 +132,22 @@ resource "aws_autoscaling_group" "bastion-service-asg" {
     create_before_destroy = true
   }
 
-  tag {
+  tags = [{
     key                 = "Name"
-    value               = "bastion-service-host"
-    propagate_at_launch = "true"
-  }
+    value               = "${var.environment_name}-${data.aws_region.current.name}-bastion"
+    propagate_at_launch = true
+  },
+    {
+      key                 = "Environment"
+      value               = "${var.environment_name}"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Region"
+      value               = "data.aws_region.current.name"
+      propagate_at_launch = true
+    },
+  ]
 }
 
 #######################################################
@@ -171,28 +184,13 @@ resource "aws_elb" "bastion-service-elb" {
   connection_draining_timeout = 300
 }
 
-#######################
-# Copy templates files to bastion host
-####################
-
-# userdata for bastion host
-data "template_file" "bastion_host" {
-  template = "${file("${path.module}/user_data_template/bastion_host_cloudinit_config.tpl")}"
-
-  vars {
-    bastion_host_name                       = "${var.environment_name}-${data.aws_region.current.name}"
-    iam_authorized_keys_command_url         = "${var.iam_authorized_keys_command_url}"
-    iam_identities_account_bastion_role_arn = "${var.iam_identities_account_bastion_role_arn}"
-  }
-}
-
 ####################################################
 # DNS Section
 ###################################################
 
 resource "aws_route53_record" "bastion_service" {
   zone_id = "${var.route53_zone_id}"
-  name    = "${var.environment_name}-${data.aws_region.current.name}-bastion-service.${var.dns_domain}"
+  name    = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
   type    = "A"
 
   alias {

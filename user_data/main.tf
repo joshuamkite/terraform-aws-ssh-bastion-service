@@ -13,6 +13,7 @@ data "template_file" "bastion_host" {
     bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}"
     authorized_command_code   = "${indent(8, file("${path.module}/iam_authorized_keys_code/main.go"))}"
     bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
+    vpc                       = "${var.vpc}"
   }
 }
 

@@ -1,6 +1,6 @@
 vpc = ""
 
-subnet_master = ""
+subnets = [""]
 
 bastion_service_host_key_name = ""
 

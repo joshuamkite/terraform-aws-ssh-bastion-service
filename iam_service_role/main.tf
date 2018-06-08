@@ -78,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "check_ssh_authorized_keys" {
 
 resource "aws_iam_role_policy_attachment" "assume_role_in_master_account" {
   role       = "${aws_iam_role.bastion_service_role.name}"
-  count      = "${local.assume_role_no}"
+  count      = "${local.assume_role_yes}"
   policy_arn = "${var.assume_role_arn}"
 }
 

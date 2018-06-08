@@ -114,7 +114,16 @@ variable "asg_desired" {
 #   description = "arn for role in identites account that bastion assumes"
 # }
 
-variable "create_iam_service_role" {
-  description = "create bastion service role and policies (standalone account) boolean"
-  default     = "0"
+# variable "create_iam_service_role" {
+#   description = "create bastion service role and policies (standalone account) boolean"
+#   default     = "0"
+# }
+
+variable "aws_region" {}
+
+variable "aws_profile" {}
+
+variable "assume_role_arn" {
+  description = "arn for role to assume in separate identity account if used"
+  default     = ""
 }

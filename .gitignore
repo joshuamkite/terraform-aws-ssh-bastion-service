@@ -5,3 +5,4 @@ terraform.tfstate.backup
 run_commands
 iam_assume_role/
 config/
+backend.tf

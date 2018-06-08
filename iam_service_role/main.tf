@@ -42,7 +42,7 @@ resource "aws_iam_policy" "check_ssh_authorized_keys" {
   name = "${var.bastion_name}_check_ssh_authorized_keys"
 
   description = "Allow querying aws to obtain list of users with their ssh public keys"
-  count       = "${local.assume_role_yes}"
+  count       = "${local.assume_role_no}"
 
   policy = <<EOF
 {
@@ -72,13 +72,13 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "check_ssh_authorized_keys" {
   role       = "${aws_iam_role.bastion_service_role.name}"
-  count      = "${local.assume_role_yes}"
+  count      = "${local.assume_role_no}"
   policy_arn = "${aws_iam_policy.check_ssh_authorized_keys.arn}"
 }
 
 resource "aws_iam_role_policy_attachment" "assume_role_in_master_account" {
   role       = "${aws_iam_role.bastion_service_role.name}"
-  count      = "${local.assume_role_yes}"
+  count      = "${local.assume_role_no}"
   policy_arn = "${var.assume_role_arn}"
 }
 

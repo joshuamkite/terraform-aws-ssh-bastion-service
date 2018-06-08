@@ -17,19 +17,44 @@ data "aws_vpc" "main" {
 ##########################
 
 module "iam_service_role" {
-  source       = "./iam_service_role"
-  bastion_name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+  source          = "./iam_service_role"
+  bastion_name    = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+  assume_role_arn = "${var.assume_role_arn}"
 }
 
 ##########################
-#Create user-data for bastion ec2 instance
+#Create user-data for bastion ec2 instance 
 ##########################
+locals {
+  assume_role_yes = "${var.assume_role_arn != "" ? 1 : 0}"
+  assume_role_no  = "${var.assume_role_arn == "" ? 1 : 0}"
+}
 
-module "bastion_user_data" {
-  source                    = "./user_data"
-  environment_name          = "${var.environment_name}"
-  bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
-  vpc                       = "${var.vpc}"
+data "template_file" "user_data_assume_role" {
+  count    = "${local.assume_role_yes}"
+  template = "${file("${path.module}/user_data/bastion_host_cloudinit_config_assume_role.tpl")}"
+
+  vars {
+    bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}"
+    authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
+    bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
+    authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
+    vpc                       = "${var.vpc}"
+    assume_role_arn           = "${var.assume_role_arn}"
+  }
+}
+
+data "template_file" "user_data_same_account" {
+  count    = "${local.assume_role_no}"
+  template = "${file("${path.module}/user_data/bastion_host_cloudinit_config.tpl")}"
+
+  vars {
+    bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}"
+    authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
+    bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
+    authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
+    vpc                       = "${var.vpc}"
+  }
 }
 
 # ##################
@@ -106,8 +131,12 @@ resource "aws_launch_configuration" "bastion-service-host" {
   #https://github.com/hashicorp/terraform/commit/3b67537dfabc1a65eb17e92849da5e64737daae3
   security_groups = ["${aws_security_group.instance.id}"]
 
-  user_data = "${module.bastion_user_data.user_data_bastion}"
-  key_name  = "${var.bastion_service_host_key_name}"
+  user_data = "${element(
+    concat(data.template_file.user_data_assume_role.*.rendered,
+           data.template_file.user_data_same_account.*.rendered),
+    0)}"
+
+  key_name = "${var.bastion_service_host_key_name}"
 
   lifecycle {
     create_before_destroy = true

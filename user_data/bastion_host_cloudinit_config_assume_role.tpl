@@ -98,7 +98,7 @@ write_files:
         cd /opt/sshd_worker
         systemctl start docker
         docker build -t sshd_worker .
-        mkdir /opt/iam_helper
+        # mkdir /opt/iam_helper
 
         # build iam-authorized-keys-command
         sudo apt-get install -y golang

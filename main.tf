@@ -35,7 +35,7 @@ data "template_file" "user_data_assume_role" {
   template = "${file("${path.module}/user_data/bastion_host_cloudinit_config_assume_role.tpl")}"
 
   vars {
-    bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}"
+    bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
     authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
     bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
     authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
@@ -49,7 +49,7 @@ data "template_file" "user_data_same_account" {
   template = "${file("${path.module}/user_data/bastion_host_cloudinit_config.tpl")}"
 
   vars {
-    bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}"
+    bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
     authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
     bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
     authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
@@ -163,7 +163,7 @@ resource "aws_autoscaling_group" "bastion-service-asg" {
 
   tags = [{
     key                 = "Name"
-    value               = "${var.environment_name}-${data.aws_region.current.name}-bastion"
+    value               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
     propagate_at_launch = true
   },
     {

@@ -13,16 +13,6 @@ data "aws_vpc" "main" {
 }
 
 ##########################
-#Create bastion service role with policies 
-##########################
-
-# module "iam_service_role" {
-#   source          = "./iam_service_role"
-#   bastion_name    = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
-#   assume_role_arn = "${var.assume_role_arn}"
-# }
-
-##########################
 #Create user-data for bastion ec2 instance 
 ##########################
 locals {

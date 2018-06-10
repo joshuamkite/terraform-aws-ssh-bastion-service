@@ -1,16 +1,9 @@
-# #get aws region for use later in plan
-# data "aws_region" "current" {}
+#aws iam role for host -same account queries
 
-# locals {
-#   assume_role_yes = "${var.assume_role_arn != "" ? 1 : 0}"
-#   assume_role_no  = "${var.assume_role_arn == "" ? 1 : 0}"
-# }
-
-###########
-#aws iam role for host
-##############
 resource "aws_iam_role" "bastion_service_role" {
   name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion_service_role"
+
+  count = "${local.assume_role_no}"
 
   assume_role_policy = <<EOF
 {
@@ -33,7 +26,8 @@ EOF
 #########################
 
 resource "aws_iam_instance_profile" "bastion_service_profile" {
-  name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion_service_profile"
+  name  = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion_service_profile"
+  count = "${local.assume_role_no}"
 
   role = "${aws_iam_role.bastion_service_role.name}"
 }
@@ -74,10 +68,4 @@ resource "aws_iam_role_policy_attachment" "check_ssh_authorized_keys" {
   role       = "${aws_iam_role.bastion_service_role.name}"
   count      = "${local.assume_role_no}"
   policy_arn = "${aws_iam_policy.check_ssh_authorized_keys.arn}"
-}
-
-resource "aws_iam_role_policy_attachment" "assume_role_in_master_account" {
-  role       = "${aws_iam_role.bastion_service_role.name}"
-  count      = "${local.assume_role_yes}"
-  policy_arn = "${var.assume_role_arn}"
 }

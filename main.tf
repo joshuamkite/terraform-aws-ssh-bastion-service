@@ -110,16 +110,41 @@ data "aws_ami" "debian" {
 #Launch configuration for service host
 ############################
 
-resource "aws_launch_configuration" "bastion-service-host" {
+resource "aws_launch_configuration" "bastion-service-host-local" {
+  count                = "${local.assume_role_no}"
+  name_prefix          = "bastion-service-host"
+  image_id             = "${data.aws_ami.debian.id}"
+  instance_type        = "${var.bastion_instance_type}"
+  iam_instance_profile = "${aws_iam_instance_profile.bastion_service_profile.arn}"
+
+  iam_instance_profile = "${element(
+    coalesce("${aws_iam_instance_profile.bastion_service_profile.arn}",
+    "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"),
+    0)}"
+
+  associate_public_ip_address = "true"
+  security_groups             = ["${aws_security_group.instance.id}"]
+
+  user_data = "${element(
+    concat(data.template_file.user_data_assume_role.*.rendered,
+           data.template_file.user_data_same_account.*.rendered),
+    0)}"
+
+  key_name = "${var.bastion_service_host_key_name}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_launch_configuration" "bastion-service-host-assume" {
+  count                       = "${local.assume_role_yes}"
   name_prefix                 = "bastion-service-host"
   image_id                    = "${data.aws_ami.debian.id}"
   instance_type               = "${var.bastion_instance_type}"
-  iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_profile.arn}"
+  iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"
   associate_public_ip_address = "true"
-
-  #https://github.com/hashicorp/terraform/issues/575
-  #https://github.com/hashicorp/terraform/commit/3b67537dfabc1a65eb17e92849da5e64737daae3
-  security_groups = ["${aws_security_group.instance.id}"]
+  security_groups             = ["${aws_security_group.instance.id}"]
 
   user_data = "${element(
     concat(data.template_file.user_data_assume_role.*.rendered,
@@ -137,13 +162,47 @@ resource "aws_launch_configuration" "bastion-service-host" {
 # ASG section
 #######################################################
 
-resource "aws_autoscaling_group" "bastion-service-asg" {
+resource "aws_autoscaling_group" "bastion-service-asg-local" {
+  count                = "${local.assume_role_no}"
   availability_zones   = ["${data.aws_availability_zones.available.names}"]
   name_prefix          = "bastion-service-asg"
   max_size             = "${var.asg_max}"
   min_size             = "${var.asg_min}"
   desired_capacity     = "${var.asg_desired}"
-  launch_configuration = "${aws_launch_configuration.bastion-service-host.name}"
+  launch_configuration = "${aws_launch_configuration.bastion-service-host-local.name}"
+  vpc_zone_identifier  = ["${var.subnets_asg}"]
+  load_balancers       = ["${aws_elb.bastion-service-elb.name}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = [{
+    key                 = "Name"
+    value               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
+    propagate_at_launch = true
+  },
+    {
+      key                 = "Environment"
+      value               = "${var.environment_name}"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Region"
+      value               = "data.aws_region.current.name"
+      propagate_at_launch = true
+    },
+  ]
+}
+
+resource "aws_autoscaling_group" "bastion-service-asg-assume" {
+  count                = "${local.assume_role_yes}"
+  availability_zones   = ["${data.aws_availability_zones.available.names}"]
+  name_prefix          = "bastion-service-asg"
+  max_size             = "${var.asg_max}"
+  min_size             = "${var.asg_min}"
+  desired_capacity     = "${var.asg_desired}"
+  launch_configuration = "${aws_launch_configuration.bastion-service-host-assume.name}"
   vpc_zone_identifier  = ["${var.subnets_asg}"]
   load_balancers       = ["${aws_elb.bastion-service-elb.name}"]
 

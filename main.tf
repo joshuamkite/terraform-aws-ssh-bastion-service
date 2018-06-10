@@ -16,11 +16,11 @@ data "aws_vpc" "main" {
 #Create bastion service role with policies 
 ##########################
 
-module "iam_service_role" {
-  source          = "./iam_service_role"
-  bastion_name    = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
-  assume_role_arn = "${var.assume_role_arn}"
-}
+# module "iam_service_role" {
+#   source          = "./iam_service_role"
+#   bastion_name    = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+#   assume_role_arn = "${var.assume_role_arn}"
+# }
 
 ##########################
 #Create user-data for bastion ec2 instance 
@@ -124,7 +124,7 @@ resource "aws_launch_configuration" "bastion-service-host" {
   name_prefix                 = "bastion-service-host"
   image_id                    = "${data.aws_ami.debian.id}"
   instance_type               = "${var.bastion_instance_type}"
-  iam_instance_profile        = "${module.iam_service_role.instance_profile}"
+  iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_profile.arn}"
   associate_public_ip_address = "true"
 
   #https://github.com/hashicorp/terraform/issues/575

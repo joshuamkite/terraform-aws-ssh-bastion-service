@@ -50,6 +50,7 @@ variable "route53_zone_id" {
 variable "bastion_allowed_iam_group" {
   type        = "string"
   description = "Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile"
+  default     = ""
 }
 
 variable "tags" {
@@ -108,16 +109,6 @@ variable "asg_desired" {
   description = "Desired numbers of bastion-service hosts in ASG"
   default     = "1"
 }
-
-# variable "iam_identities_account_bastion_role_arn" {
-#   type        = "string"
-#   description = "arn for role in identites account that bastion assumes"
-# }
-
-# variable "create_iam_service_role" {
-#   description = "create bastion service role and policies (standalone account) boolean"
-#   default     = "0"
-# }
 
 variable "aws_region" {}
 

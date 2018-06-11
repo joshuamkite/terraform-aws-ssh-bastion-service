@@ -11,7 +11,7 @@ With version 3 series (backward compatible with version 2) the ability to assume
 
 Also with version 3 the IAM policy generation and user data have been moved from modules back into the main plan. User data is no longer displayed. 
 
-If you are seeking a solution for ECS hosts then you are recommended to either the [Widdix project]((https://github.com/widdix/aws-ec2-ssh)) directly or my [Ansible-galaxy respin of it](https://galaxy.ansible.com/joshuamkite/aws-ecs-iam-users-tags/). This offers a range of features, suitable for a long-lived stateful host built.
+If you are seeking a solution for ECS hosts then you are recommended to either the [Widdix project](https://github.com/widdix/aws-ec2-ssh) directly or my [Ansible-galaxy respin of it](https://galaxy.ansible.com/joshuamkite/aws-ecs-iam-users-tags/). This offers a range of features, suitable for a long-lived stateful host built.
 
 # Breaking Changes from version 1.x series
 

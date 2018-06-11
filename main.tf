@@ -271,3 +271,16 @@ resource "aws_route53_record" "bastion_service" {
     evaluate_target_health = true
   }
 }
+
+####################################################
+# sample policy for parent account
+###################################################
+
+data "template_file" "sample_policies_for_parent_account" {
+  count    = "${local.assume_role_yes}"
+  template = "${file("${path.module}/sts_assumerole_example/policy_example.tpl")}"
+
+  vars {
+    assume_role_arn = "${var.assume_role_arn}"
+  }
+}

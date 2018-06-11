@@ -111,17 +111,11 @@ data "aws_ami" "debian" {
 ############################
 
 resource "aws_launch_configuration" "bastion-service-host-local" {
-  count                = "${local.assume_role_no}"
-  name_prefix          = "bastion-service-host"
-  image_id             = "${data.aws_ami.debian.id}"
-  instance_type        = "${var.bastion_instance_type}"
-  iam_instance_profile = "${aws_iam_instance_profile.bastion_service_profile.arn}"
-
-  iam_instance_profile = "${element(
-    coalesce("${aws_iam_instance_profile.bastion_service_profile.arn}",
-    "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"),
-    0)}"
-
+  count                       = "${local.assume_role_no}"
+  name_prefix                 = "bastion-service-host"
+  image_id                    = "${data.aws_ami.debian.id}"
+  instance_type               = "${var.bastion_instance_type}"
+  iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_profile.arn}"
   associate_public_ip_address = "true"
   security_groups             = ["${aws_security_group.instance.id}"]
 

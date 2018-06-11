@@ -1,7 +1,7 @@
 #aws iam role for host -same account queries
 
 resource "aws_iam_role" "bastion_service_role" {
-  name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion_service_role"
+  name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
 
   count = "${local.assume_role_no}"
 
@@ -26,7 +26,7 @@ EOF
 #########################
 
 resource "aws_iam_instance_profile" "bastion_service_profile" {
-  name  = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion_service_profile"
+  name  = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
   count = "${local.assume_role_no}"
 
   role = "${aws_iam_role.bastion_service_role.name}"

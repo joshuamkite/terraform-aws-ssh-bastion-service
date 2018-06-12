@@ -281,6 +281,8 @@ data "template_file" "sample_policies_for_parent_account" {
   template = "${file("${path.module}/sts_assumerole_example/policy_example.tpl")}"
 
   vars {
-    assume_role_arn = "${var.assume_role_arn}"
+    aws_profile               = "${var.aws_profile}"
+    bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
+    assume_role_arn           = "${var.assume_role_arn}"
   }
 }

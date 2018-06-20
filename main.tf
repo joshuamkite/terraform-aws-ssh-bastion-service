@@ -26,9 +26,8 @@ data "template_file" "user_data_assume_role" {
 
   vars {
     bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
-    authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
+    authorized_command_code   = "${indent(8, file("${path.module}/user_data/iam_authorized_keys_code/main.go"))}"
     bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
-    authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
     vpc                       = "${var.vpc}"
     assume_role_arn           = "${var.assume_role_arn}"
   }
@@ -40,9 +39,8 @@ data "template_file" "user_data_same_account" {
 
   vars {
     bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
-    authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
+    authorized_command_code   = "${indent(8, file("${path.module}/user_data/iam_authorized_keys_code/main.go"))}"
     bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
-    authorized_command_code   = "${indent(8, file("user_data/iam_authorized_keys_code/main.go"))}"
     vpc                       = "${var.vpc}"
   }
 }

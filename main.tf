@@ -225,7 +225,7 @@ resource "aws_autoscaling_group" "bastion-service-asg-assume" {
 #######################################################
 
 resource "aws_elb" "bastion-service-elb" {
-  name = "bastion-service-elb"
+  name = "bastion-${var.vpc}"
 
   # Sadly can't use availabilty zones for classic load balancer - see https://github.com/terraform-providers/terraform-provider-aws/issues/1063
   # availability_zones = ["${data.aws_availability_zones.available.names}"]

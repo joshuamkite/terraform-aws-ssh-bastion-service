@@ -25,6 +25,7 @@ variable "vpc" {
 
 variable "bastion_service_host_key_name" {
   description = "AWS ssh key *.pem to be used for ssh access to the bastion service host"
+  default     = ""
 }
 
 variable "subnets_elb" {

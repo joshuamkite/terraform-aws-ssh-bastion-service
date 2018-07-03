@@ -217,7 +217,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | aws_region |  | string | - | yes |
 | bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | string | `` | no |
 | bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
-| bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | - | yes |
+| bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
 | dns_domain | The domain used for Route53 records | string | - | yes |

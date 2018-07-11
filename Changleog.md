@@ -1,3 +1,7 @@
+# 3.5
+
+**Bugfix:** Remove parentheses from the name of the sample policy ouptut to make it parsable when called from module
+
 # 3.4
 
 **N.B. This change means that it is not possible to successfully apply module version 3.4 over version 3.3- you will need to terraform destroy; terraform apply in this case**

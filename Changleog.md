@@ -1,3 +1,21 @@
+# 3.4
+
+**N.B. This change means that it is not possible to successfully apply module version 3.4 over version 3.3- you will need to terraform destroy; terraform apply in this case**
+
+**Feature/Bugfix:** This version moves from using 'aws_security_group' to 'aws_security_group_rule' for ingress and egress rules. This supports the use of conditional logic in Terraform to evaluate creating a security group rule on ec2-host-sshd access. If a cidr range or list of ranges is given for cidr_blocks_whitelist_host then this rule will be created and appended to the security group. If no value is given then this rule will not be created. This resolves the undesirable behaviour where if no value was given for cidr_blocks_whitelist_host Terraform would want to recreate the security group each time. Although this worked it relied on silent failure which is inelegant and noisy. 
+
+# 3.3
+
+**Feature (backward compatible):** make service host pem key optional as supported by AWS
+
+# 3.2
+
+**Bugfix:** Correct template paths so that plan can be successfully called as a module and not just standalone.
+
+# 3.1
+
+**Feature (backward compatible):** Improvements to example asssume role policy generation - making it easier to copy and paste from Terraform output to AWS web console
+
 # 3.0
 
 With version 3 series (backward compatible with version 2) the ability to assume a role in another account has now been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. Since this is a high availabilty service, it is not envisaged that there would be reason for more than one independent deployment within such a combination. 

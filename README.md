@@ -15,7 +15,7 @@ If you are seeking a solution for ECS hosts then you are recommended to either t
 
 # Breaking Changes from version 1.x series
 
-In version 1.0 (download this release if you want it!) this plan deployed a simple static host. With the version 2 branch a move was made to make this a high availabilty service with an autoscaling group, health checks and a load balancer. This has necessitated the removal of the feature in version 1.x of creating and attaching to the container host an Elastic Network Interface for each additional subnet specified. With the new release series additional subnets are supplied instead to the autoscaling group and load balancer. The expectation is that separation will be managed by vpc rather than segregated subnet. 
+In version 1.x series (download this release if you want it!) this plan deployed a simple static host. With the version 2 branch a move was made to make this a high availabilty service with an autoscaling group, health checks and a load balancer. This has necessitated the removal of the feature in version 1.x of creating and attaching to the container host an Elastic Network Interface for each additional subnet specified. With the new release series additional subnets are supplied instead to the autoscaling group and load balancer. The expectation is that separation will be managed by vpc rather than segregated subnet. 
 
 # Service deployed by this plan
 

@@ -51,7 +51,7 @@ data "template_file" "user_data_same_account" {
 
 resource "aws_security_group" "bastion_service" {
   name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service"
-  description = "Allow ssh-bastion-serivce access to ${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+  description = "Allow ssh-bastion-service access to ${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
 
   vpc_id = "${var.vpc}"
   tags   = "${var.tags}"

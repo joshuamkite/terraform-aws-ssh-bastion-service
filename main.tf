@@ -97,7 +97,7 @@ resource "aws_security_group_rule" "ssh_service_egress" {
 # SSH access from whitelist IP ranges for host sshd (conditional)
 
 resource "aws_security_group_rule" "ssh_whitelist_host" {
-  count             = "${(join(",", var.cidr_blocks_whitelist_host) ==1 ? 1 : 0)}"
+  count             = "${(join(",", var.cidr_blocks_whitelist_host) !="" ? 1 : 0)}"
   type              = "ingress"
   from_port         = 2222
   to_port           = 2222

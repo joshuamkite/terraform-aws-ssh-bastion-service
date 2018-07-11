@@ -46,47 +46,64 @@ data "template_file" "user_data_same_account" {
 }
 
 # ##################
-# # security group for bastion_host
+# # security group for bastion_service
 # ##################
 
-resource "aws_security_group" "instance" {
-  name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
-  description = "Allow ssh-host and ssh-bastion access to ${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
-
-  # SSH access from whitelist IP ranges for sshd service containers 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = "${var.cidr_blocks_whitelist_service}"
-  }
-
-  # SSH access from whitelist IP ranges - to be used for host sshd
-  ingress {
-    from_port   = 2222
-    to_port     = 2222
-    protocol    = "tcp"
-    cidr_blocks = ["${var.cidr_blocks_whitelist_host}"]
-  }
-
-  # SSH access from anywhere within vpc to accomodate load balancer for sshd service containers 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.main.cidr_block}"]
-  }
-
-  # Permissive egress policy because we want users to be able to install their own packages 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group" "bastion_service" {
+  name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service"
+  description = "Allow ssh-bastion-service access to ${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
 
   vpc_id = "${var.vpc}"
   tags   = "${var.tags}"
+}
+
+##################
+# security group rules for bastion_service
+##################
+
+# SSH access from whitelist IP ranges for sshd service containers 
+
+resource "aws_security_group_rule" "ssh_service_whitelist" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = "${var.cidr_blocks_whitelist_service}"
+  security_group_id = "${aws_security_group.bastion_service.id}"
+}
+
+# SSH access from anywhere within vpc to accomodate load balancer for sshd service containers 
+
+resource "aws_security_group_rule" "ssh_service_vpc" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["${data.aws_vpc.main.cidr_block}"]
+  security_group_id = "${aws_security_group.bastion_service.id}"
+}
+
+# Permissive egress policy because we want users to be able to install their own packages 
+
+resource "aws_security_group_rule" "ssh_service_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.bastion_service.id}"
+}
+
+# SSH access from whitelist IP ranges for host sshd (conditional)
+
+resource "aws_security_group_rule" "ssh_whitelist_host" {
+  count             = "${(join(",", var.cidr_blocks_whitelist_host) !="" ? 1 : 0)}"
+  type              = "ingress"
+  from_port         = 2222
+  to_port           = 2222
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.cidr_blocks_whitelist_host}"]
+  security_group_id = "${aws_security_group.bastion_service.id}"
 }
 
 ##########################
@@ -115,7 +132,7 @@ resource "aws_launch_configuration" "bastion-service-host-local" {
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_profile.arn}"
   associate_public_ip_address = "true"
-  security_groups             = ["${aws_security_group.instance.id}"]
+  security_groups             = ["${aws_security_group.bastion_service.id}"]
 
   user_data = "${element(
     concat(data.template_file.user_data_assume_role.*.rendered,
@@ -136,7 +153,7 @@ resource "aws_launch_configuration" "bastion-service-host-assume" {
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"
   associate_public_ip_address = "true"
-  security_groups             = ["${aws_security_group.instance.id}"]
+  security_groups             = ["${aws_security_group.bastion_service.id}"]
 
   user_data = "${element(
     concat(data.template_file.user_data_assume_role.*.rendered,
@@ -231,7 +248,7 @@ resource "aws_elb" "bastion-service-elb" {
   # availability_zones = ["${data.aws_availability_zones.available.names}"]
   subnets = ["${var.subnets_elb}"]
 
-  security_groups = ["${aws_security_group.instance.id}"]
+  security_groups = ["${aws_security_group.bastion_service.id}"]
 
   listener {
     instance_port     = 22

@@ -1,8 +1,21 @@
-# 3.5
+**N.B. It is not possible to successfully apply module version >/=3.4 over version </=3.3 due to change from 'aws_security_group' to aws_security_group_rules' you will need to terraform destroy; terraform apply in this case**
+
+# 3.6 (tested!) 
+## With special thanks to Luis Silva for his excellent contributions
+
+**Bugfix:** This version fixes breakage bugs in 3.4; 3.5 and has been tested!
+
+**Feature:** This release introduces separate security groups for the load balancer and for the service EC2 host. It is now only possible to reach the ec2 host via the load balancer, even on a public subnet. This is true for both the containerised ssh service on port 22 and the ecs host sshd on port 2222 (if enabled). No public IP address is assigned.
+
+**Feature:** New output: bastion_sg_id gives the Security Group id of the bastion host which may be useful for other services
+
+**Documentation:** update readme to reflect new ouptputs and names; acknowledgements
+
+# 3.5 (broken, withdrawn)
 
 **Bugfix:** Remove parentheses from the name of the sample policy ouptut to make it parsable when called from module
 
-# 3.4
+# 3.4 (broken, withdrawn)
 
 **N.B. This change means that it is not possible to successfully apply module version 3.4 over version 3.3- you will need to terraform destroy; terraform apply in this case**
 
@@ -35,7 +48,7 @@ In version 1.0 (download this release if you want it!) this plan deployed a simp
 
 # 1.1
 
-Thanks to Piotr Jaromin for implementing these features
+## Thanks to Piotr Jaromin for implementing these features
 
 * S3 bucket is no longer necessary, golang script for iam-authorized-command is stored inside this repository.
 * IAM roles are generated based on region and environment role, so there should be no more conflicts.

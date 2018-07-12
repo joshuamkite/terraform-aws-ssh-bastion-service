@@ -1,9 +1,13 @@
 This Terraform deploys an sshd bastion service on AWS:
 ===================================
 
+**N.B. If you are using a newer version of this module when you have an older version deployed, please review the changelog!**
+
 # Overview
 
 This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. The actual call for public keys is made with a [GO binary](https://github.com/Fullscreen/iam-authorized-keys-command), which is built during host intial launch and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. The users who may access the bastion service may be restricted to membership of a defined AWS IAM group which is not set up or managed by this plan.  When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user. Asides from the resources provided by AWS and remote repositories this plan is entirely self contained. There is no reliance on registries, build chains etc.
+
+## With thanks to  Piotr Jaromin and Luis Silva for their excellent contributions to this project
 
 # Ability to assume a role in another account (New in Version 3)
 
@@ -18,8 +22,6 @@ If you are seeking a solution for ECS hosts then you are recommended to either t
 In version 1.x series (download this release if you want it!) this plan deployed a simple static host. With the version 2 branch a move was made to make this a high availabilty service with an autoscaling group, health checks and a load balancer. This has necessitated the removal of the feature in version 1.x of creating and attaching to the container host an Elastic Network Interface for each additional subnet specified. With the new release series additional subnets are supplied instead to the autoscaling group and load balancer. The expectation is that separation will be managed by vpc rather than segregated subnet. 
 
 # Service deployed by this plan
-
-**With thanks to  Piotr Jaromin for his excellent contributions to this project**
 
 This plan creates a load balancer and autoscaling group with a dns entry for the service of the format
 
@@ -237,5 +239,6 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 | Name | Description |
 |------|-------------|
-| policy_example_for_parent_account_(empty_if_not_used) | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
+| bastion_sg_id | Security Group id of the bastion host |
+| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
 | service_dns_entry | dns-registered url for service and host |

@@ -176,7 +176,7 @@ resource "aws_launch_configuration" "bastion-service-host-local" {
   image_id                    = "${data.aws_ami.debian.id}"
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_profile.arn}"
-  associate_public_ip_address = "true"
+  associate_public_ip_address = "false"
   security_groups             = ["${aws_security_group.bastion_service.id}"]
 
   user_data = "${element(
@@ -197,7 +197,7 @@ resource "aws_launch_configuration" "bastion-service-host-assume" {
   image_id                    = "${data.aws_ami.debian.id}"
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"
-  associate_public_ip_address = "true"
+  associate_public_ip_address = "false"
   security_groups             = ["${aws_security_group.bastion_service.id}"]
 
   user_data = "${element(

@@ -51,7 +51,15 @@ data "template_file" "user_data_same_account" {
 
 resource "aws_security_group" "bastion_service" {
   name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service"
-  description = "Allow ssh-bastion-service access to ${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+  description = "Allow access from the SSH Load Balancer to the Bastion Host"
+
+  vpc_id = "${var.vpc}"
+  tags   = "${var.tags}"
+}
+
+resource "aws_security_group" "bastion_lb" {
+  name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-lb"
+  description = "Allow access from the Internet to the SSH Load Balancer"
 
   vpc_id = "${var.vpc}"
   tags   = "${var.tags}"
@@ -61,50 +69,87 @@ resource "aws_security_group" "bastion_service" {
 # security group rules for bastion_service
 ##################
 
-# SSH access from whitelist IP ranges for sshd service containers 
+# SSH access in from whitelist IP ranges to LB
 
-resource "aws_security_group_rule" "ssh_service_whitelist" {
+resource "aws_security_group_rule" "lb_ssh_in" {
   type              = "ingress"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = "${var.cidr_blocks_whitelist_service}"
-  security_group_id = "${aws_security_group.bastion_service.id}"
+  security_group_id = "${aws_security_group.bastion_lb.id}"
 }
 
-# SSH access from anywhere within vpc to accomodate load balancer for sshd service containers 
+# SSH access in from whitelist IP ranges to LB for VMs Host (conditional)
 
-resource "aws_security_group_rule" "ssh_service_vpc" {
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  cidr_blocks       = ["${data.aws_vpc.main.cidr_block}"]
-  security_group_id = "${aws_security_group.bastion_service.id}"
-}
-
-# Permissive egress policy because we want users to be able to install their own packages 
-
-resource "aws_security_group_rule" "ssh_service_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.bastion_service.id}"
-}
-
-# SSH access from whitelist IP ranges for host sshd (conditional)
-
-resource "aws_security_group_rule" "ssh_whitelist_host" {
+resource "aws_security_group_rule" "lb_ssh_in_cond" {
   count             = "${(join(",", var.cidr_blocks_whitelist_host) !="" ? 1 : 0)}"
   type              = "ingress"
   from_port         = 2222
   to_port           = 2222
   protocol          = "tcp"
   cidr_blocks       = ["${var.cidr_blocks_whitelist_host}"]
-  security_group_id = "${aws_security_group.bastion_service.id}"
+  security_group_id = "${aws_security_group.bastion_lb.id}"
 }
+
+# SSH access out from Load Balancer to VMs containers
+
+resource "aws_security_group_rule" "lb_ssh_out" {
+  type                     = "egress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.bastion_lb.id}"
+  source_security_group_id = "${aws_security_group.bastion_service.id}"
+}
+
+# SSH access from Load Balancer to VMs Host (conditional)
+
+resource "aws_security_group_rule" "lb_ssh_out_out" {
+  count                    = "${length(var.cidr_blocks_whitelist_host) > 0 ? 1 : 0}"
+  type                     = "egress"
+  from_port                = 2222
+  to_port                  = 2222
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.bastion_lb.id}"
+  security_group_id        = "${aws_security_group.bastion_service.id}"
+}
+
+# SSH access from LB to sshd service containers
+
+resource "aws_security_group_rule" "vm_ssh_in" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.bastion_lb.id}"
+  security_group_id        = "${aws_security_group.bastion_service.id}"
+}
+
+# SSH access from Load Balancer to VMs Host (conditional)
+
+resource "aws_security_group_rule" "vm_ssh_in_cond" {
+  count                    = "${length(var.cidr_blocks_whitelist_host) > 0 ? 1 : 0}"
+  type                     = "ingress"
+  from_port                = 2222
+  to_port                  = 2222
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.bastion_lb.id}"
+  security_group_id        = "${aws_security_group.bastion_service.id}"
+}
+
+# Permissive egress policy because we want users to be able to install their own packages 
+
+resource "aws_security_group_rule" "vm_ssh_out" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  security_group_id = "${aws_security_group.bastion_service.id}"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+
 
 ##########################
 #Query for most recent AMI of type debian for use as host
@@ -248,12 +293,19 @@ resource "aws_elb" "bastion-service-elb" {
   # availability_zones = ["${data.aws_availability_zones.available.names}"]
   subnets = ["${var.subnets_elb}"]
 
-  security_groups = ["${aws_security_group.bastion_service.id}"]
+  security_groups = ["${aws_security_group.bastion_lb.id}"]
 
   listener {
     instance_port     = 22
     instance_protocol = "TCP"
     lb_port           = 22
+    lb_protocol       = "TCP"
+  }
+
+  listener {
+    instance_port     = 2222
+    instance_protocol = "TCP"
+    lb_port           = 2222
     lb_protocol       = "TCP"
   }
 

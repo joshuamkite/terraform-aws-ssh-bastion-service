@@ -69,7 +69,7 @@ resource "aws_security_group" "bastion_lb" {
 # security group rules for bastion_service
 ##################
 
-# SSH access in from whitelist IP ranges to LB
+# SSH access in from whitelist IP ranges to Load Balancer
 
 resource "aws_security_group_rule" "lb_ssh_in" {
   type              = "ingress"
@@ -80,7 +80,7 @@ resource "aws_security_group_rule" "lb_ssh_in" {
   security_group_id = "${aws_security_group.bastion_lb.id}"
 }
 
-# SSH access in from whitelist IP ranges to LB for VMs Host (conditional)
+# SSH access in from whitelist IP ranges to Load Balancer (for Bastion Host - conditional)
 
 resource "aws_security_group_rule" "lb_ssh_in_cond" {
   count             = "${(join(",", var.cidr_blocks_whitelist_host) !="" ? 1 : 0)}"
@@ -92,7 +92,7 @@ resource "aws_security_group_rule" "lb_ssh_in_cond" {
   security_group_id = "${aws_security_group.bastion_lb.id}"
 }
 
-# SSH access out from Load Balancer to VMs containers
+# SSH access out from Load Balancer to Bastion containers
 
 resource "aws_security_group_rule" "lb_ssh_out" {
   type                     = "egress"
@@ -103,7 +103,7 @@ resource "aws_security_group_rule" "lb_ssh_out" {
   source_security_group_id = "${aws_security_group.bastion_service.id}"
 }
 
-# SSH access from Load Balancer to VMs Host (conditional)
+# SSH access out from Load Balancer to Bastion Host (conditional)
 
 resource "aws_security_group_rule" "lb_ssh_out_out" {
   count                    = "${length(var.cidr_blocks_whitelist_host) > 0 ? 1 : 0}"
@@ -115,7 +115,7 @@ resource "aws_security_group_rule" "lb_ssh_out_out" {
   security_group_id        = "${aws_security_group.bastion_service.id}"
 }
 
-# SSH access from LB to sshd service containers
+# SSH access in from Load Balancer to Bastion containers
 
 resource "aws_security_group_rule" "vm_ssh_in" {
   type                     = "ingress"
@@ -126,7 +126,7 @@ resource "aws_security_group_rule" "vm_ssh_in" {
   security_group_id        = "${aws_security_group.bastion_service.id}"
 }
 
-# SSH access from Load Balancer to VMs Host (conditional)
+# SSH access in from Load Balancer to Bastion Host (conditional)
 
 resource "aws_security_group_rule" "vm_ssh_in_cond" {
   count                    = "${length(var.cidr_blocks_whitelist_host) > 0 ? 1 : 0}"
@@ -144,7 +144,7 @@ resource "aws_security_group_rule" "vm_ssh_out" {
   type              = "egress"
   from_port         = 0
   to_port           = 65535
-  protocol          = "tcp"
+  protocol          = -1
   security_group_id = "${aws_security_group.bastion_service.id}"
   cidr_blocks       = ["0.0.0.0/0"]
 }

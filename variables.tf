@@ -119,3 +119,8 @@ variable "assume_role_arn" {
   description = "arn for role to assume in separate identity account if used"
   default     = ""
 }
+
+variable "elb_healthcheck" {
+  description = "port and protocol to conduct elb healthchecks. Acceptable values are 'TCP:22' or 'TCP:2222'"
+  default     = "TCP:22"
+}

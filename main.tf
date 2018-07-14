@@ -95,6 +95,7 @@ resource "aws_security_group_rule" "lb_ssh_in_cond" {
 # Access from Load Balancer to Bastion Host sshd for health check
 
 resource "aws_security_group_rule" "lb_healthcheck_out" {
+  count                    = "${(( (length(var.cidr_blocks_whitelist_host)) + (var.elb_healthcheck_port)) > 2221 ? 1 : 0)}"
   type                     = "egress"
   from_port                = 2222
   to_port                  = 2222
@@ -128,6 +129,7 @@ resource "aws_security_group_rule" "service_ssh_in" {
 # SSH access in from Load Balancer to Bastion Host 
 
 resource "aws_security_group_rule" "host_ssh_in" {
+  count                    = "${(( (length(var.cidr_blocks_whitelist_host)) + (var.elb_healthcheck_port)) > 2221 ? 1 : 0)}"
   type                     = "ingress"
   from_port                = 2222
   to_port                  = 2222

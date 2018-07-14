@@ -1,5 +1,9 @@
 **N.B. It is not possible to successfully apply module version >/=3.4 over version </=3.3 due to change from 'aws_security_group' to aws_security_group_rules' you will need to terraform destroy; terraform apply in this case**
 
+# 3.7
+
+**Feature:** Make ELB health check port optionally either port 22 (containerised service) or port 2222 (EC2 host sshd). This addresses the issue where a large number of bastions checking into the same parent account for IAM queries health checks causes rate limiting from AWS.
+
 # 3.6 (tested!) 
 ## With special thanks to Luis Silva for his excellent contributions
 

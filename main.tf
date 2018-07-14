@@ -309,7 +309,7 @@ resource "aws_elb" "bastion-service-elb" {
     healthy_threshold   = "${var.elb_healthy_threshold}"
     unhealthy_threshold = "${var.elb_unhealthy_threshold}"
     timeout             = "${var.elb_timeout}"
-    target              = "${var.elb_healthcheck}"
+    target              = "TCP:${var.elb_healthcheck_port}"
     interval            = "${var.elb_interval}"
   }
 

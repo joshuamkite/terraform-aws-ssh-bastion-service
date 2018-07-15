@@ -112,6 +112,8 @@ gives information such as
 
 # Notes for deployment
 
+Starting with version 3.7, ELB health check port may be optionally set to either port 22 (containerised service; default) or port 2222 (EC2 host sshd). If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue and is recommended for larger deployments. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules are conditionally created to support any combination of access/healthceck on port 2222 or not.
+
 ## To Run:
 
  If you are running this as a standalone plan then **You must _thoroughly_ reinitialise the terraform state before running the plan again in a different region of the same AWS account** Failure to do this will result in terraform destroying the IAM policies for the previous host. 
@@ -212,24 +214,24 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | asg_desired | Desired numbers of bastion-service hosts in ASG | string | `1` | no |
-| asg_max | Max numbers of bastion-service hosts in ASG | string | `2`| no |
-| asg_min | Min numbers of bastion-service hosts in ASG | string | `1`| no |
+| asg_max | Max numbers of bastion-service hosts in ASG | string | `2` | no |
+| asg_min | Min numbers of bastion-service hosts in ASG | string | `1` | no |
 | assume_role_arn | arn for role to assume in separate identity account if used | string | `` | no |
 | aws_profile |  | string | - | yes |
 | aws_region |  | string | - | yes |
-| bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | string | `` | no |
+| bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh keyin their profile | string | `` | no |
 | bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
-| bastion_service_host_key_name | AWS ssh key *.pem to be used for sshaccess to the bastion service host | string | `` | no |
+| bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
-| cidr_blocks_whitelist_service | range(s) of incoming IP addresses towhitelist for the SERVICE | list | - | yes |
+| cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
 | dns_domain | The domain used for Route53 records | string | - | yes |
-| elb_healthcheck_port | TCP port to conduct elb healthchecks. Acceptable values are '22' or '2222' | string | `22` | no |
+| elb_healthcheck_port | TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222 | string | `22` | no |
 | elb_healthy_threshold | Healthy threshold for ELB | string | `2` | no |
 | elb_idle_timeout | The time in seconds that the connection is allowed to be idle | string | `300` | no |
 | elb_interval | interval for ELB health check | string | `30` | no |
 | elb_timeout | timeout for ELB | string | `3` | no |
-| elb_unhealthy_threshold | Unhealthy threshold for ELB | string | `2`| no |
-| environment_name | the name of the environment that we are deployingto | string | `staging` | no |
+| elb_unhealthy_threshold | Unhealthy threshold for ELB | string | `2` | no |
+| environment_name | the name of the environment that we are deploying to | string | `staging` | no |
 | route53_zone_id | Route53 zoneId | string | - | yes |
 | subnets_asg | list of subnets for autoscaling group | list | `<list>` | no |
 | subnets_elb | list of subnets for load balancer | list | `<list>` | no |
@@ -241,5 +243,5 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | Name | Description |
 |------|-------------|
 | bastion_sg_id | Security Group id of the bastion host |
-| policy_example_for_parent_account_empty_if_not_used | You must applyan IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
+| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
 | service_dns_entry | dns-registered url for service and host |

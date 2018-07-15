@@ -2,7 +2,7 @@
 
 # 3.7
 
-**Feature:** Make ELB health check port optionally either port 22 (containerised service) or port 2222 (EC2 host sshd). This addresses the issue where a large number of bastions checking into the same parent account for IAM queries health checks causes rate limiting from AWS. Security group rules are conditinoally created to support any combination of access/healthceck on port 2222 or not.
+**Feature:** ELB health check port may be optionally set to either port 22 (containerised service; default) or port 2222 (EC2 host sshd). If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue and is recommended for larger deployments. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules are conditionally created to support any combination of access/healthceck on port 2222 or not.
 
 # 3.6 (tested!) 
 ## With special thanks to Luis Silva for his excellent contributions

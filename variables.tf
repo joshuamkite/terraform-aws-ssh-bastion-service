@@ -42,10 +42,12 @@ variable "subnets_asg" {
 
 variable "dns_domain" {
   description = "The domain used for Route53 records"
+  default     = ""
 }
 
 variable "route53_zone_id" {
   description = "Route53 zoneId"
+  default     = ""
 }
 
 variable "bastion_allowed_iam_group" {
@@ -123,4 +125,9 @@ variable "assume_role_arn" {
 variable "elb_healthcheck_port" {
   description = "TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222"
   default     = "22"
+}
+
+variable "bastion_vpc_name" {
+  description = "define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this"
+  default     = "vpc_id"
 }

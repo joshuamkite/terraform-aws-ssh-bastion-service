@@ -4,6 +4,15 @@
 
 **Feature:** ELB health check port may be optionally set to either port 22 (containerised service; default) or port 2222 (EC2 host sshd). If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue and is recommended for larger deployments. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules are conditionally created to support any combination of access/healthceck on port 2222 or not.
 
+**Feature:** Friendlier DNS and hostnaming. You can now define the last part of the hostname. By default this is the vpc ID via the magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this. e.g. 
+
+ default: dev-ap-northeast-1-vpc-1a23b456d7890-bastion-service.yourdomain.com
+ 
+  `bastion_vpc_name  = "compute"` gives `dev-ap-northeast-1-compute-bastion-service.yourdomain.com`
+
+
+**Feature:** Route 53 record creation is now optional. If you do not supply a value for route53_zone_id then no record will be created. Value for dns_domain has also been made optional in support of this. New outputs: elb_dns_name and elb_zone_id have been made available to support alternative options.
+
 # 3.6 (tested!) 
 ## With special thanks to Luis Silva for his excellent contributions
 

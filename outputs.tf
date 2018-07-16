@@ -1,6 +1,6 @@
 output "service_dns_entry" {
   description = "dns-registered url for service and host"
-  value       = "${var.environment_name}-${data.aws_region.current.name}-${data.aws_vpc.main.id}-bastion-service.${var.dns_domain}"
+  value       = "${aws_route53_record.bastion_service.*.name[0]}"
 }
 
 output "policy_example_for_parent_account_empty_if_not_used" {
@@ -10,5 +10,13 @@ output "policy_example_for_parent_account_empty_if_not_used" {
 
 output "bastion_sg_id" {
   description = "Security Group id of the bastion host"
-  value = "${aws_security_group.bastion_service.id}"
+  value       = "${aws_security_group.bastion_service.id}"
+}
+
+output "elb_dns_name" {
+  value = "${aws_elb.bastion-service-elb.dns_name}"
+}
+
+output "elb_zone_id" {
+  value = "${aws_elb.bastion-service-elb.zone_id}"
 }

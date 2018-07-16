@@ -13,6 +13,18 @@ data "aws_vpc" "main" {
 }
 
 ##########################
+#Create local for bastion hostname
+##########################
+
+locals {
+  # vpc = "${map("vpc_id", data.aws_vpc.main.id, "vpc_name", lookup(data.aws_vpc.main.tags, "Name"))}"
+  bastion_vpc_name  = "${var.bastion_vpc_name == "vpc_id" ? var.vpc : var.bastion_vpc_name}"
+  bastion_host_name = "${join("-", compact(list(var.environment_name, data.aws_region.current.name, local.bastion_vpc_name)))}"
+
+  # bastion_host_name = "${join("-", compact(list(var.environment_name, data.aws_region.current.name, contains(list("name","id"), var.bastion_vpc_name) ? lookup(data.aws_vpc["main"],var.bastion_vpc_name) : var.bastion_vpc_name)))}"
+}
+
+##########################
 #Create user-data for bastion ec2 instance 
 ##########################
 locals {
@@ -25,7 +37,8 @@ data "template_file" "user_data_assume_role" {
   template = "${file("${path.module}/user_data/bastion_host_cloudinit_config_assume_role.tpl")}"
 
   vars {
-    bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+    # bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+    bastion_host_name         = "${local.bastion_host_name}"
     authorized_command_code   = "${indent(8, file("${path.module}/user_data/iam_authorized_keys_code/main.go"))}"
     bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
     vpc                       = "${var.vpc}"
@@ -38,7 +51,8 @@ data "template_file" "user_data_same_account" {
   template = "${file("${path.module}/user_data/bastion_host_cloudinit_config.tpl")}"
 
   vars {
-    bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+    # bastion_host_name         = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}"
+    bastion_host_name         = "${local.bastion_host_name}"
     authorized_command_code   = "${indent(8, file("${path.module}/user_data/iam_authorized_keys_code/main.go"))}"
     bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
     vpc                       = "${var.vpc}"
@@ -333,8 +347,9 @@ resource "aws_elb" "bastion-service-elb" {
 ###################################################
 
 resource "aws_route53_record" "bastion_service" {
+  count   = "${(var.route53_zone_id !="" ? 1 : 0) }"
   zone_id = "${var.route53_zone_id}"
-  name    = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
+  name    = "${local.bastion_host_name}-bastion-service.${var.dns_domain}"
   type    = "A"
 
   alias {

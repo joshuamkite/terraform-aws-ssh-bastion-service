@@ -7,7 +7,11 @@ This Terraform deploys an sshd bastion service on AWS:
 
 This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. The actual call for public keys is made with a [GO binary](https://github.com/Fullscreen/iam-authorized-keys-command), which is built during host intial launch and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. The users who may access the bastion service may be restricted to membership of a defined AWS IAM group which is not set up or managed by this plan.  When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user. Asides from the resources provided by AWS and remote repositories this plan is entirely self contained. There is no reliance on registries, build chains etc.
 
-## With thanks to  Piotr Jaromin and Luis Silva for their excellent contributions to this project
+# This Terraform is also published on the Terraform Community Module Registry
+
+You may find it more convenient to call it in your plan [directly from the Terraform Community Module Registry](https://registry.terraform.io/modules/joshuamkite/ssh-bastion-service/aws/3.6.0)
+
+## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project
 
 # Ability to assume a role in another account (New in Version 3)
 
@@ -23,15 +27,21 @@ In version 1.x series (download this release if you want it!) this plan deployed
 
 # Service deployed by this plan
 
-This plan creates a load balancer and autoscaling group with a dns entry for the service of the format
+This plan creates a load balancer and autoscaling group with an **optional (from version 3.7) dns entry for the service. You can now define the last part of the hostname. By default this is the vpc ID via the magic default value of 'vpc_id' with the format
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
 
 e.g.
 
-	dev-eu-west-1-vpc_12345688-bastion-service.yourdomain.com
+   module default: `dev-ap-northeast-1-vpc-1a23b456d7890-bastion-service.yourdomain.com`
+   
+but you can pass a custom string, or an empty value to omit this. e.g.    
+ 
+  `bastion_vpc_name  = "compute"` gives `dev-ap-northeast-1-compute-bastion-service.yourdomain.com`
 
-this ensures a consistent and obvious naming format for each combination of AWS account and region that does not collide if multiple vpcs are deployed per region.
+  `bastion_vpc_name = ""` gives ` dev-ap-northeast-1-bastion-service.yourdomain.com`
+
+In any event this ensures a consistent and obvious naming format for each combination of AWS account and region that does not collide if multiple vpcs are deployed per region.
 
 The container shell prompt is set similarly but with a systemd incremented counter, e.g. for 'aws_user'
 	
@@ -41,7 +51,9 @@ and a subsequent container might have
 
 	aws_user@dev-eu-west-1-vpc_12345688-180:~$
 
-etc. Sadly the -172 (digits will vary) part is an artefact of systemd unit templating that appears difficult to avoid. Since the load balancer is conducting health checks every 30 seconds on the service port and authentication is handled within the container, it is considered normal to see very highly incremented counters.
+In the case that `bastion_vpc_name = ""` the service container shell prompt is set similar to `you@dev-ap-northeast-1_3`
+
+ Sadly the -172 (digits will vary) part is an artefact of systemd unit templating that appears difficult to avoid. It is considered normal to see very highly incremented counters.
 **It is essential to limit incoming traffic to whitelisted ports** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
 **The host is set to run the latest patch release at deployment of Debian Stretch**. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 does not automatically set up dhcp for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with
@@ -219,12 +231,14 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | assume_role_arn | arn for role to assume in separate identity account if used | string | `` | no |
 | aws_profile |  | string | - | yes |
 | aws_region |  | string | - | yes |
-| bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh keyin their profile | string | `` | no |
+| bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | string| `` | no |
 | bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
 | bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
+| bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
-| dns_domain | The domain used for Route53 records | string | - | yes |
+| container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
+| dns_domain | The domain used for Route53 records | string | `` | no |
 | elb_healthcheck_port | TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222 | string | `22` | no |
 | elb_healthy_threshold | Healthy threshold for ELB | string | `2` | no |
 | elb_idle_timeout | The time in seconds that the connection is allowed to be idle | string | `300` | no |
@@ -232,7 +246,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | elb_timeout | timeout for ELB | string | `3` | no |
 | elb_unhealthy_threshold | Unhealthy threshold for ELB | string | `2` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
-| route53_zone_id | Route53 zoneId | string | - | yes |
+| route53_zone_id | Route53 zoneId | string | `` | no |
 | subnets_asg | list of subnets for autoscaling group | list | `<list>` | no |
 | subnets_elb | list of subnets for load balancer | list | `<list>` | no |
 | tags | AWS tags that should be associated with created resources (except autoscaling group!) | map | `<map>` | no |
@@ -243,5 +257,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | Name | Description |
 |------|-------------|
 | bastion_sg_id | Security Group id of the bastion host |
+| elb_dns_name |  |
+| elb_zone_id |  |
 | policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
 | service_dns_entry | dns-registered url for service and host |

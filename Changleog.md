@@ -6,12 +6,17 @@
 
 **Feature:** Friendlier DNS and hostnaming. You can now define the last part of the hostname. By default this is the vpc ID via the magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this. e.g. 
 
- default: dev-ap-northeast-1-vpc-1a23b456d7890-bastion-service.yourdomain.com
+ module default: `dev-ap-northeast-1-vpc-1a23b456d7890-bastion-service.yourdomain.com`
  
   `bastion_vpc_name  = "compute"` gives `dev-ap-northeast-1-compute-bastion-service.yourdomain.com`
 
+  `bastion_vpc_name = ""` gives ` dev-ap-northeast-1-bastion-service.yourdomain.com`
+
+  In the last case the service container shell prompt is set similar to `you@dev-ap-northeast-1_3`
 
 **Feature:** Route 53 record creation is now optional. If you do not supply a value for route53_zone_id then no record will be created. Value for dns_domain has also been made optional in support of this. New outputs: elb_dns_name and elb_zone_id have been made available to support alternative options.
+
+**Feature:** Service container Ubuntu version is now a variable. Tested with 16.04 (default) and 18.04. With other releases YMMV.
 
 # 3.6 (tested!) 
 ## With special thanks to Luis Silva for his excellent contributions

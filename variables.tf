@@ -131,3 +131,8 @@ variable "bastion_vpc_name" {
   description = "define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this"
   default     = "vpc_id"
 }
+
+variable "container_ubuntu_version" {
+  description = "ubuntu version to use for service container. Tested with 16.04 and 18.04"
+  default     = "16.04"
+}

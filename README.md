@@ -1,3 +1,5 @@
+# This is a backup copy of code primarily maintained at joshuamkite/terraform-aws-ssh-bastion-service and should generally not be used
+
 This Terraform deploys an sshd bastion service on AWS:
 ===================================
 

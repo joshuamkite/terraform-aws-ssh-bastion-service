@@ -124,7 +124,7 @@ variable "assume_role_arn" {
 
 variable "elb_healthcheck_port" {
   description = "TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222"
-  default     = "22"
+  default     = "2222"
 }
 
 variable "bastion_vpc_name" {

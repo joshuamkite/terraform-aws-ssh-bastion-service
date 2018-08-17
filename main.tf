@@ -62,7 +62,7 @@ data "template_cloudinit_config" "config" {
 
   part {
     filename     = "module_user_data"
-    content_type = "text/x-shellscript"
+    content_type = "text/cloud-config"
 
     content = "${element(
     concat(data.template_file.user_data_assume_role.*.rendered,

@@ -22,9 +22,11 @@ output "elb_zone_id" {
 }
 
 output "bastion_service_assume_role_name" {
-  value = "${aws_iam_role.bastion_service_assume_role.*.name}"
+  description = "role created for service host asg - if created with assume role"
+  value       = "${aws_iam_role.bastion_service_assume_role.*.name}"
 }
 
 output "bastion_service_role" {
-  value = "${aws_iam_role.bastion_service_role.*.name}"
+  description = "role created for service host asg - if created without assume role"
+  value       = "${aws_iam_role.bastion_service_role.*.name}"
 }

@@ -56,6 +56,30 @@ data "template_file" "user_data_same_account" {
   }
 }
 
+data "template_cloudinit_config" "config" {
+  gzip          = false
+  base64_encode = false
+
+  part {
+    filename     = "module_user_data"
+    content_type = "text/x-shellscript"
+
+    content = "${element(
+    concat(data.template_file.user_data_assume_role.*.rendered,
+           data.template_file.user_data_same_account.*.rendered),
+    0)}"
+
+    # "${data.template_file.user_data.rendered}"
+  }
+
+  part {
+    filename     = "extra_user_data"
+    content_type = "${var.extra_user_data_content_type}"
+    content      = "${var.extra_user_data_content}"
+    merge_type   = "${var.extra_user_data_merge_type}"
+  }
+}
+
 # ##################
 # # security group for bastion_service
 # ##################
@@ -194,14 +218,14 @@ resource "aws_launch_configuration" "bastion-service-host-local" {
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_profile.arn}"
   associate_public_ip_address = "false"
   security_groups             = ["${aws_security_group.bastion_service.id}"]
+  user_data                   = "${data.template_cloudinit_config.config.rendered}"
 
-  user_data = "${element(
-    concat(data.template_file.user_data_assume_role.*.rendered,
-           data.template_file.user_data_same_account.*.rendered),
-    0)}"
+  # user_data = "${element(
+  #   concat(data.template_file.user_data_assume_role.*.rendered,
+  #          data.template_file.user_data_same_account.*.rendered),
+  #   0)}"
 
   key_name = "${var.bastion_service_host_key_name}"
-
   lifecycle {
     create_before_destroy = true
   }
@@ -215,14 +239,14 @@ resource "aws_launch_configuration" "bastion-service-host-assume" {
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"
   associate_public_ip_address = "false"
   security_groups             = ["${aws_security_group.bastion_service.id}"]
+  user_data                   = "${data.template_cloudinit_config.config.rendered}"
 
-  user_data = "${element(
-    concat(data.template_file.user_data_assume_role.*.rendered,
-           data.template_file.user_data_same_account.*.rendered),
-    0)}"
+  # user_data = "${element(
+  #   concat(data.template_file.user_data_assume_role.*.rendered,
+  #          data.template_file.user_data_same_account.*.rendered),
+  #   0)}"
 
   key_name = "${var.bastion_service_host_key_name}"
-
   lifecycle {
     create_before_destroy = true
   }

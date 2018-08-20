@@ -268,7 +268,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | Name | Description |
 |------|-------------|
 | bastion_service_assume_role_name | role created for service host asg - if created with assume role |
-| bastion_service_role | role created for service host asg - if created without assume role |
+| bastion_service_role_name | role created for service host asg - if created without assume role |
 | bastion_sg_id | Security Group id of the bastion host |
 | elb_dns_name |  |
 | elb_zone_id |  |

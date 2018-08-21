@@ -116,10 +116,5 @@ write_files:
         chmod -R 700 /opt/iam_helper
         #set hostname to match dns
         hostnamectl set-hostname ${bastion_host_name}-${vpc}-bastion-host
-        # hostname -b ${bastion_host_name}-${vpc}-bastion-host
-        # echo ${bastion_host_name}-bastion-host > /etc/hostname
-        # echo '127.0.0.1 ${bastion_host_name}-bastion-host' | sudo tee --append /etc/hosts
     path: /var/lib/cloud/scripts/per-once/localinstall.sh
     permissions: '0754'
-
-    

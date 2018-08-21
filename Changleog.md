@@ -6,7 +6,6 @@
 
 **Bugfix:** Region now correctly interpolated for autoscaling group tag
 
-
 # 3.8
 
 **Feature:** Implement appendable user data - you can now add userdata from an encompassing plan

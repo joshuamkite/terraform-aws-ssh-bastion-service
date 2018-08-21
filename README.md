@@ -260,7 +260,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | route53_zone_id | Route53 zoneId | string | `` | no |
 | subnets_asg | list of subnets for autoscaling group | list | `<list>` | no |
 | subnets_elb | list of subnets for load balancer | list | `<list>` | no |
-| tags | AWS tags that should be associated with created resources (except autoscaling group!) | map | `<map>` | no |
+| tags | AWS tags that should be associated with created resources | map | `<map>` | no |
 | vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | string | - | yes |
 
 ## Outputs

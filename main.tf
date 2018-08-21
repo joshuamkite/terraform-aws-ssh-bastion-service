@@ -281,11 +281,12 @@ resource "aws_autoscaling_group" "bastion-service-asg-local" {
     create_before_destroy = true
   }
 
-  tags = [{
-    key                 = "Name"
-    value               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
-    propagate_at_launch = true
-  },
+  tags = [
+    {
+      key                 = "Name"
+      value               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
+      propagate_at_launch = true
+    },
     {
       key                 = "Environment"
       value               = "${var.environment_name}"
@@ -327,9 +328,10 @@ resource "aws_autoscaling_group" "bastion-service-asg-assume" {
     },
     {
       key                 = "Region"
-      value               = "data.aws_region.current.name"
+      value               = "${data.aws_region.current.name}"
       propagate_at_launch = true
     },
+    "${data.null_data_source.asg-tags.*.outputs}",
   ]
 }
 

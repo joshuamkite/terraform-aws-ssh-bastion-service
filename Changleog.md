@@ -1,5 +1,12 @@
 **N.B. It is not possible to successfully apply module version >/=3.4 over version </=3.3 due to change from 'aws_security_group' to aws_security_group_rules' you will need to terraform destroy; terraform apply in this case**
 
+# 3.9
+
+**Feature:** Extensible tagging for Autoscaling groups
+
+**Bugfix:** Region now correctly interpolated for autoscaling group tag
+
+
 # 3.8
 
 **Feature:** Implement appendable user data - you can now add userdata from an encompassing plan

@@ -58,7 +58,7 @@ variable "bastion_allowed_iam_group" {
 
 variable "tags" {
   type        = "map"
-  description = "AWS tags that should be associated with created resources (except autoscaling group!)"
+  description = "AWS tags that should be associated with created resources"
   default     = {}
 }
 

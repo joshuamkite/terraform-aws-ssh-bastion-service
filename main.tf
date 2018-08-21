@@ -256,6 +256,16 @@ resource "aws_launch_configuration" "bastion-service-host-assume" {
 # ASG section
 #######################################################
 
+data "null_data_source" "asg-tags" {
+  count = "${length(keys(var.tags))}"
+
+  inputs = {
+    key                 = "${element(keys(var.tags), count.index)}"
+    value               = "${element(values(var.tags), count.index)}"
+    propagate_at_launch = true
+  }
+}
+
 resource "aws_autoscaling_group" "bastion-service-asg-local" {
   count                = "${local.assume_role_no}"
   availability_zones   = ["${data.aws_availability_zones.available.names}"]
@@ -271,11 +281,12 @@ resource "aws_autoscaling_group" "bastion-service-asg-local" {
     create_before_destroy = true
   }
 
-  tags = [{
-    key                 = "Name"
-    value               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
-    propagate_at_launch = true
-  },
+  tags = [
+    {
+      key                 = "Name"
+      value               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
+      propagate_at_launch = true
+    },
     {
       key                 = "Environment"
       value               = "${var.environment_name}"
@@ -283,9 +294,10 @@ resource "aws_autoscaling_group" "bastion-service-asg-local" {
     },
     {
       key                 = "Region"
-      value               = "data.aws_region.current.name"
+      value               = "${data.aws_region.current.name}"
       propagate_at_launch = true
     },
+    "${data.null_data_source.asg-tags.*.outputs}",
   ]
 }
 
@@ -316,9 +328,10 @@ resource "aws_autoscaling_group" "bastion-service-asg-assume" {
     },
     {
       key                 = "Region"
-      value               = "data.aws_region.current.name"
+      value               = "${data.aws_region.current.name}"
       propagate_at_launch = true
     },
+    "${data.null_data_source.asg-tags.*.outputs}",
   ]
 }
 

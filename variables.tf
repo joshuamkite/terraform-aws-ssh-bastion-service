@@ -124,7 +124,7 @@ variable "assume_role_arn" {
 
 variable "elb_healthcheck_port" {
   description = "TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222"
-  default     = "22"
+  default     = "2222"
 }
 
 variable "bastion_vpc_name" {
@@ -135,4 +135,20 @@ variable "bastion_vpc_name" {
 variable "container_ubuntu_version" {
   description = "ubuntu version to use for service container. Tested with 16.04 and 18.04"
   default     = "16.04"
+}
+
+variable "extra_user_data_content" {
+  default     = ""
+  description = "Extra user-data to add to the default built-in"
+}
+
+variable "extra_user_data_content_type" {
+  default     = "text/x-shellscript"
+  description = "What format is content in - eg 'text/cloud-config' or 'text/x-shellscript'"
+}
+
+variable "extra_user_data_merge_type" {
+  # default     = "list(append)+dict(recurse_array)+str()"
+  default     = "str(append)"
+  description = "Control how cloud-init merges user-data sections"
 }

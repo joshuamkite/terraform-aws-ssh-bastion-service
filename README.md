@@ -9,7 +9,7 @@ This plan provides socket-activated sshd-containers with one container instantia
 
 # This plan is also published on the Terraform Community Module Registry
 
-You may find it more convenient to call it in your plan [directly from the Terraform Community Module Registry](https://registry.terraform.io/modules/joshuamkite/ssh-bastion-service/aws/3.6.0)
+You may find it more convenient to call it in your plan [directly from the Terraform Community Module Registry](https://registry.terraform.io/modules/joshuamkite/ssh-bastion-service/)
 
 ## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project
 
@@ -53,12 +53,18 @@ and a subsequent container might have
 
 In the case that `bastion_vpc_name = ""` the service container shell prompt is set similar to `you@dev-ap-northeast-1_3`
 
- Sadly the -172 (digits will vary) part is an artefact of systemd unit templating that appears difficult to avoid. It is considered normal to see very highly incremented counters.
+It is considered normal to see very highly incremented counters.
+
 **It is essential to limit incoming traffic to whitelisted ports** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
-**The host is set to run the latest patch release at deployment of Debian Stretch**. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 does not automatically set up dhcp for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with
+**The host is set to run the latest patch release at deployment of Debian Stretch**. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up dhcp for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with
 
     sudo apt install -y curl; ssh -p2222 admin@`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
+
+It is not possible to use Amazon Linux 2 because we need (from Systemd):
+
+* RunTimeMaxSec to limit the service container lifetime. This was introduced with Systemd version 229 (feb 2016) whereas Amazon Linux 2 uses version 219 (Feb 2015) This is a critical requirement.
+* Ability to pass through hostname and increment (-- hostname foo%i) from systemd to docker, which does not appear to be supported on Amazon Linux 2. Ths is a 'nice to have' feature.
 
 **Make sure that your agent forwarding is active before attempting this!**
 
@@ -117,14 +123,15 @@ gives information such as
 
 	April 27 14:05:02 dev-eu-west-1-bastion-host sshd[7294]: Accepted publickey for aws_user from UNKNOWN port 65535 ssh2: RSA SHA256:*****************************
 
+Starting with release 3.8 it is possible to use the output giving the name of the role created for the service and to appeand addtional user data. This means that you can call this module from a plan specifiying your preferred logging solution, e.g. AWS cloudwatch.
+
 ## Note that:
 
 * ssh keys are called only at login- if an account or ssh public key is deleted from AWS whilst a user is logged in then that session will continue until otherwise terminated.
-* At present logging is confined to the host machine- if it is respawned then so are the logs. A remote logging solution is considered beyond the scope of this plan.
 
 # Notes for deployment
 
-Starting with version 3.7, ELB health check port may be optionally set to either port 22 (containerised service; default) or port 2222 (EC2 host sshd). If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue and is recommended for larger deployments. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules are conditionally created to support any combination of access/healthceck on port 2222 or not.
+Starting with version 3.8, ELB health check port may be optionally set to either port 22 (containerised service; default) or port 2222 (EC2 host sshd). If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules are conditionally created to support any combination of access/healthceck on port 2222 or not.
 
 ## To Run:
 
@@ -172,6 +179,7 @@ As alternative before you run terraform init you can run "rm -rf .terraform" the
 **EC2 Host OS (debian) with:**
 
 * awscli
+* Docker container
 * Systemd docker unit
 * Systemd service template unit
 * IAM Profile connected to EC2 host
@@ -213,11 +221,11 @@ The files in question on the host deploy thus:
  
 If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then a matching sample policy and trust relationship is given as an output from the plan to assist with application in that other account. 
 
-The dns entry for the service is also displayed as an output of the format
+The dns entry (if created) for the service is also displayed as an output of the format
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
 
-## Input Variables
+## Inputs and OUtputs
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 
@@ -231,7 +239,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | assume_role_arn | arn for role to assume in separate identity account if used | string | `` | no |
 | aws_profile |  | string | - | yes |
 | aws_region |  | string | - | yes |
-| bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | string| `` | no |
+| bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | string | `` | no |
 | bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
 | bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
 | bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
@@ -239,13 +247,16 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
-| elb_healthcheck_port | TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222 | string | `22` | no |
+| elb_healthcheck_port | TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
 | elb_healthy_threshold | Healthy threshold for ELB | string | `2` | no |
 | elb_idle_timeout | The time in seconds that the connection is allowed to be idle | string | `300` | no |
 | elb_interval | interval for ELB health check | string | `30` | no |
 | elb_timeout | timeout for ELB | string | `3` | no |
 | elb_unhealthy_threshold | Unhealthy threshold for ELB | string | `2` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
+| extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |
+| extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript` | no |
+| extra_user_data_merge_type | Control how cloud-init merges user-data sections | string | `str(append)` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
 | subnets_asg | list of subnets for autoscaling group | list | `<list>` | no |
 | subnets_elb | list of subnets for load balancer | list | `<list>` | no |
@@ -256,6 +267,8 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 | Name | Description |
 |------|-------------|
+| bastion_service_assume_role_name | role created for service host asg - if created with assume role |
+| bastion_service_role_name | role created for service host asg - if created without assume role |
 | bastion_sg_id | Security Group id of the bastion host |
 | elb_dns_name |  |
 | elb_zone_id |  |

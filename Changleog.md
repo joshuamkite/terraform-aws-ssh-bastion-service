@@ -2,13 +2,13 @@
 
 # 3.8
 
-* Implement appendable user data - you can now add userdata from an encompassing plan
+**Feature:** Implement appendable user data - you can now add userdata from an encompassing plan
 
-* The role created by this module is now available as an output so that an encompassing plan may use it e.g. for additional policies attachment
+**Feature:** The role created by this module is now available as an output so that an encompassing plan may use it e.g. for additional policies attachment
 
 * Both changes make it easier to set up your logging solution of choice, e.g. cloudwatch
 
-* EC2 healthcheck port now defaults to 2222 - this avoids scaling issues with IAM in large deployments
+**Change:**  EC2 healthcheck port now defaults to 2222 - this avoids scaling issues with IAM in large deployments
 
 # 3.7
 

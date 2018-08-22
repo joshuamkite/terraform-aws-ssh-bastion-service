@@ -68,8 +68,6 @@ data "template_cloudinit_config" "config" {
     concat(data.template_file.user_data_assume_role.*.rendered,
            data.template_file.user_data_same_account.*.rendered),
     0)}"
-
-    # "${data.template_file.user_data.rendered}"
   }
 
   part {
@@ -219,13 +217,8 @@ resource "aws_launch_configuration" "bastion-service-host-local" {
   associate_public_ip_address = "false"
   security_groups             = ["${aws_security_group.bastion_service.id}"]
   user_data                   = "${data.template_cloudinit_config.config.rendered}"
+  key_name                    = "${var.bastion_service_host_key_name}"
 
-  # user_data = "${element(
-  #   concat(data.template_file.user_data_assume_role.*.rendered,
-  #          data.template_file.user_data_same_account.*.rendered),
-  #   0)}"
-
-  key_name = "${var.bastion_service_host_key_name}"
   lifecycle {
     create_before_destroy = true
   }
@@ -240,13 +233,8 @@ resource "aws_launch_configuration" "bastion-service-host-assume" {
   associate_public_ip_address = "false"
   security_groups             = ["${aws_security_group.bastion_service.id}"]
   user_data                   = "${data.template_cloudinit_config.config.rendered}"
+  key_name                    = "${var.bastion_service_host_key_name}"
 
-  # user_data = "${element(
-  #   concat(data.template_file.user_data_assume_role.*.rendered,
-  #          data.template_file.user_data_same_account.*.rendered),
-  #   0)}"
-
-  key_name = "${var.bastion_service_host_key_name}"
   lifecycle {
     create_before_destroy = true
   }

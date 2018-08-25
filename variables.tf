@@ -77,22 +77,10 @@ variable "elb_unhealthy_threshold" {
   default     = "2"
 }
 
-variable "elb_timeout" {
-  type        = "string"
-  description = "timeout for ELB"
-  default     = "3"
-}
-
 variable "elb_interval" {
   type        = "string"
   description = "interval for ELB health check"
   default     = "30"
-}
-
-variable "elb_idle_timeout" {
-  type        = "string"
-  description = "The time in seconds that the connection is allowed to be idle"
-  default     = "300"
 }
 
 variable "asg_max" {

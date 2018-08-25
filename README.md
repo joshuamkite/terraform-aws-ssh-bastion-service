@@ -230,7 +230,6 @@ The dns entry (if created) for the service is also displayed as an output of the
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 
 ## Inputs
-
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | asg_desired | Desired numbers of bastion-service hosts in ASG | string | `1` | no |
@@ -245,13 +244,11 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
-| container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
+| container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04`| no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
 | elb_healthcheck_port | TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
 | elb_healthy_threshold | Healthy threshold for ELB | string | `2` | no |
-| elb_idle_timeout | The time in seconds that the connection is allowed to be idle | string | `300` | no |
 | elb_interval | interval for ELB health check | string | `30` | no |
-| elb_timeout | timeout for ELB | string | `3` | no |
 | elb_unhealthy_threshold | Unhealthy threshold for ELB | string | `2` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
 | extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |
@@ -272,5 +269,5 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_sg_id | Security Group id of the bastion host |
 | elb_dns_name |  |
 | elb_zone_id |  |
-| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
+| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users tologin |
 | service_dns_entry | dns-registered url for service and host |

@@ -1,33 +1,12 @@
-#Get aws account number
-data "aws_caller_identity" "current" {}
-
 #get aws region for use later in plan
 data "aws_region" "current" {}
 
 #get list of AWS Availability Zones which can be accessed by an AWS account within the region for use later in plan
 data "aws_availability_zones" "available" {}
 
-#get vpc data to whitelist internal CIDR range for Load Balanacer
-data "aws_vpc" "main" {
-  id = "${var.vpc}"
-}
-
-##########################
-#Create local for bastion hostname
-##########################
-
-locals {
-  bastion_vpc_name  = "${var.bastion_vpc_name == "vpc_id" ? var.vpc : var.bastion_vpc_name}"
-  bastion_host_name = "${join("-", compact(list(var.environment_name, data.aws_region.current.name, local.bastion_vpc_name)))}"
-}
-
 ##########################
 #Create user-data for bastion ec2 instance 
 ##########################
-locals {
-  assume_role_yes = "${var.assume_role_arn != "" ? 1 : 0}"
-  assume_role_no  = "${var.assume_role_arn == "" ? 1 : 0}"
-}
 
 data "template_file" "user_data_assume_role" {
   count    = "${local.assume_role_yes}"
@@ -76,117 +55,6 @@ data "template_cloudinit_config" "config" {
     content      = "${var.extra_user_data_content}"
     merge_type   = "${var.extra_user_data_merge_type}"
   }
-}
-
-# ##################
-# # security group for bastion_service
-# ##################
-
-resource "aws_security_group" "bastion_service" {
-  name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service"
-  description = "Allow access from the SSH Load Balancer to the Bastion Host"
-
-  vpc_id = "${var.vpc}"
-  tags   = "${var.tags}"
-}
-
-resource "aws_security_group" "bastion_lb" {
-  name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-lb"
-  description = "Allow access from the Internet to the SSH Load Balancer"
-
-  vpc_id = "${var.vpc}"
-  tags   = "${var.tags}"
-}
-
-##################
-# security group rules for bastion_service
-##################
-
-# Logic tests for security group rules 
-
-locals {
-  hostport_whitelisted = "${(join(",", var.cidr_blocks_whitelist_host) !="") }"
-  hostport_healthcheck = "${(var.elb_healthcheck_port == "2222")}"
-}
-
-# SSH access in from whitelist IP ranges to Load Balancer
-
-resource "aws_security_group_rule" "lb_ssh_in" {
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  cidr_blocks       = "${var.cidr_blocks_whitelist_service}"
-  security_group_id = "${aws_security_group.bastion_lb.id}"
-}
-
-# SSH access in from whitelist IP ranges to Load Balancer (for Bastion Host - conditional)
-
-resource "aws_security_group_rule" "lb_ssh_in_cond" {
-  count             = "${(local.hostport_whitelisted ? 1 : 0) }"
-  type              = "ingress"
-  from_port         = 2222
-  to_port           = 2222
-  protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks_whitelist_host}"]
-  security_group_id = "${aws_security_group.bastion_lb.id}"
-}
-
-# Access from Load Balancer to Bastion Host sshd for health check
-
-resource "aws_security_group_rule" "lb_healthcheck_out" {
-  count                    = "${((local.hostport_healthcheck || local.hostport_whitelisted) ? 1 : 0) }"
-  type                     = "egress"
-  from_port                = 2222
-  to_port                  = 2222
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.bastion_service.id}"
-  security_group_id        = "${aws_security_group.bastion_lb.id}"
-}
-
-#  Access from Load Balancer to Bastion containers
-
-resource "aws_security_group_rule" "lb_ssh_out" {
-  type                     = "egress"
-  from_port                = 22
-  to_port                  = 22
-  protocol                 = "tcp"
-  security_group_id        = "${aws_security_group.bastion_lb.id}"
-  source_security_group_id = "${aws_security_group.bastion_service.id}"
-}
-
-# SSH access in from Load Balancer to Bastion containers
-
-resource "aws_security_group_rule" "service_ssh_in" {
-  type                     = "ingress"
-  from_port                = 22
-  to_port                  = 22
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.bastion_lb.id}"
-  security_group_id        = "${aws_security_group.bastion_service.id}"
-}
-
-# SSH access in from Load Balancer to Bastion Host 
-
-resource "aws_security_group_rule" "host_ssh_in" {
-  count                    = "${((local.hostport_healthcheck || local.hostport_whitelisted) ? 1 : 0) }"
-  type                     = "ingress"
-  from_port                = 2222
-  to_port                  = 2222
-  protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.bastion_lb.id}"
-  security_group_id        = "${aws_security_group.bastion_service.id}"
-}
-
-# Permissive egress policy because we want users to be able to install their own packages 
-
-resource "aws_security_group_rule" "bastion_host_out" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = -1
-  security_group_id = "${aws_security_group.bastion_service.id}"
-  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 ##########################
@@ -264,6 +132,7 @@ resource "aws_autoscaling_group" "bastion-service-asg-local" {
   launch_configuration = "${aws_launch_configuration.bastion-service-host-local.name}"
   vpc_zone_identifier  = ["${var.subnets_asg}"]
   load_balancers       = ["${aws_elb.bastion-service-elb.name}"]
+  target_group_arns    = ["${aws_lb_target_group.bastion-service.arn}"]
 
   lifecycle {
     create_before_destroy = true
@@ -323,46 +192,6 @@ resource "aws_autoscaling_group" "bastion-service-asg-assume" {
   ]
 }
 
-#######################################################
-# ELB section
-#######################################################
-
-resource "aws_elb" "bastion-service-elb" {
-  name = "bastion-${var.vpc}"
-
-  # Sadly can't use availabilty zones for classic load balancer - see https://github.com/terraform-providers/terraform-provider-aws/issues/1063
-  subnets = ["${var.subnets_elb}"]
-
-  security_groups = ["${aws_security_group.bastion_lb.id}"]
-
-  listener {
-    instance_port     = 22
-    instance_protocol = "TCP"
-    lb_port           = 22
-    lb_protocol       = "TCP"
-  }
-
-  listener {
-    instance_port     = 2222
-    instance_protocol = "TCP"
-    lb_port           = 2222
-    lb_protocol       = "TCP"
-  }
-
-  health_check {
-    healthy_threshold   = "${var.elb_healthy_threshold}"
-    unhealthy_threshold = "${var.elb_unhealthy_threshold}"
-    timeout             = "${var.elb_timeout}"
-    target              = "TCP:${var.elb_healthcheck_port}"
-    interval            = "${var.elb_interval}"
-  }
-
-  cross_zone_load_balancing   = true
-  idle_timeout                = "${var.elb_idle_timeout}"
-  connection_draining         = true
-  connection_draining_timeout = 300
-}
-
 ####################################################
 # DNS Section
 ###################################################
@@ -374,7 +203,7 @@ resource "aws_route53_record" "bastion_service" {
   type    = "A"
 
   alias {
-    name                   = "${aws_elb.bastion-service-elb.dns_name}"
+    name                   = "${aws_lb.bastion-service-elb.dns_name}"
     zone_id                = "${aws_elb.bastion-service-elb.zone_id}"
     evaluate_target_health = true
   }

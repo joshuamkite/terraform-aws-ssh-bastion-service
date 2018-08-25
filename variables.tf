@@ -30,13 +30,13 @@ variable "bastion_service_host_key_name" {
 
 variable "subnets_elb" {
   type        = "list"
-  description = "list of subnets for load balancer"
+  description = "list of subnets for load balancer - avaiability zones must match subnets_asg"
   default     = []
 }
 
 variable "subnets_asg" {
   type        = "list"
-  description = "list of subnets for autoscaling group"
+  description = "list of subnets for autoscaling group - avaiability zones must match subnets_elb"
   default     = []
 }
 

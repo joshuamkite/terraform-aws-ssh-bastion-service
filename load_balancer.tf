@@ -44,7 +44,7 @@ resource "aws_lb_listener" "bastion-host" {
 # Target group 
 #######################################################
 resource "aws_lb_target_group" "bastion-service" {
-  name     = "bastion-service"
+  name     = "bastion-${var.vpc}"
   protocol = "TCP"
   port     = 22
   vpc_id   = "${var.vpc}"

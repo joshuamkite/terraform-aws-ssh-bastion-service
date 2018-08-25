@@ -56,4 +56,6 @@ resource "aws_lb_target_group" "bastion-service" {
     protocol            = "TCP"
     port                = "${var.elb_healthcheck_port}"
   }
+
+  tags = "${var.tags}"
 }

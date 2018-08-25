@@ -14,11 +14,11 @@ output "bastion_sg_id" {
 }
 
 output "elb_dns_name" {
-  value = "${aws_elb.bastion-service-elb.dns_name}"
+  value = "${aws_elb.bastion-service-lb.dns_name}"
 }
 
 output "elb_zone_id" {
-  value = "${aws_elb.bastion-service-elb.zone_id}"
+  value = "${aws_elb.bastion-service-lb.zone_id}"
 }
 
 output "bastion_service_assume_role_name" {

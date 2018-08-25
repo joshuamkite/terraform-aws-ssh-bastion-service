@@ -1,5 +1,11 @@
 **N.B. It is not possible to successfully apply module version >/=3.4 over version </=3.3 due to change from 'aws_security_group' to aws_security_group_rules' you will need to terraform destroy; terraform apply in this case**
 
+# 3.10
+
+**Feature:** Move from Classic Load Balancer to Network Load Balancer. elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration.
+
+**Change:**  New code now in seperate files to asssit readabilty. locals also moved to seperate file.
+
 # 3.9
 
 **Feature:** Extensible tagging for Autoscaling groups

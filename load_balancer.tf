@@ -22,20 +22,20 @@ resource "aws_lb_listener" "bastion-service" {
   port              = "22"
 
   default_action {
-    target_group_arn = "${aws_lb_target_group.tunnel-service.arn}"
+    target_group_arn = "${aws_lb_target_group.bastion-service.arn}"
     type             = "forward"
   }
 }
 
 # Port 2222
-resource "aws_lb_listener" "bastion-service" {
+resource "aws_lb_listener" "bastion-host" {
   count             = "${(local.hostport_whitelisted ? 1 : 0) }"
   load_balancer_arn = "${aws_lb.bastion-service.arn}"
   protocol          = "TCP"
   port              = "2222"
 
   default_action {
-    target_group_arn = "${aws_lb_target_group.tunnel-service.arn}"
+    target_group_arn = "${aws_lb_target_group.bastion-service.arn}"
     type             = "forward"
   }
 }

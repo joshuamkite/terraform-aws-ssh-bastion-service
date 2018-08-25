@@ -131,7 +131,7 @@ resource "aws_autoscaling_group" "bastion-service-asg-local" {
   desired_capacity     = "${var.asg_desired}"
   launch_configuration = "${aws_launch_configuration.bastion-service-host-local.name}"
   vpc_zone_identifier  = ["${var.subnets_asg}"]
-  load_balancers       = ["${aws_elb.bastion-service-elb.name}"]
+  load_balancers       = ["${aws_lb.bastion-service.name}"]
   target_group_arns    = ["${aws_lb_target_group.bastion-service.arn}"]
 
   lifecycle {
@@ -167,7 +167,7 @@ resource "aws_autoscaling_group" "bastion-service-asg-assume" {
   desired_capacity     = "${var.asg_desired}"
   launch_configuration = "${aws_launch_configuration.bastion-service-host-assume.name}"
   vpc_zone_identifier  = ["${var.subnets_asg}"]
-  load_balancers       = ["${aws_elb.bastion-service-elb.name}"]
+  load_balancers       = ["${aws_lb.bastion-service.name}"]
 
   lifecycle {
     create_before_destroy = true
@@ -203,8 +203,8 @@ resource "aws_route53_record" "bastion_service" {
   type    = "A"
 
   alias {
-    name                   = "${aws_lb.bastion-service-elb.dns_name}"
-    zone_id                = "${aws_elb.bastion-service-elb.zone_id}"
+    name                   = "${aws_lb.bastion-service.dns_name}"
+    zone_id                = "${aws_lb.bastion-service.zone_id}"
     evaluate_target_health = true
   }
 }

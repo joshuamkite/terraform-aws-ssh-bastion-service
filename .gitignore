@@ -6,3 +6,5 @@ run_commands
 iam_assume_role/
 config/
 backend.tf
+.gitignore§
+.vscode/

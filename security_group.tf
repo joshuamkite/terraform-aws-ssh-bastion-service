@@ -4,7 +4,7 @@
 
 resource "aws_security_group" "bastion_service" {
   name        = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service"
-  description = "Allow access from the SSH Load Balancer to the Bastion Host"
+  description = "Bastion service"
 
   vpc_id = "${var.vpc}"
   tags   = "${var.tags}"
@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "host_ssh_in_cond" {
   protocol          = "tcp"
   cidr_blocks       = ["${var.cidr_blocks_whitelist_host}"]
   security_group_id = "${aws_security_group.bastion_service.id}"
-  description       = "bastion host access"
+  description       = "bastion HOST access"
 }
 
 # Permissive egress policy because we want users to be able to install their own packages 
@@ -48,6 +48,7 @@ resource "aws_security_group_rule" "bastion_host_out" {
   protocol          = -1
   security_group_id = "${aws_security_group.bastion_service.id}"
   cidr_blocks       = ["0.0.0.0/0"]
+  description       = "bastion service and host egress"
 }
 
 # access from lb cidr ranges for healthchecks 
@@ -64,5 +65,5 @@ resource "aws_security_group_rule" "lb_healthcheck_in" {
   to_port           = "${var.elb_healthcheck_port}"
   protocol          = "tcp"
   type              = "ingress"
-  description       = "access from lb cidr ranges for healthchecks"
+  description       = "access from load balancer CIDR ranges for healthchecks"
 }

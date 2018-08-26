@@ -2,8 +2,9 @@
 # LB section
 #######################################################
 
-resource "aws_lb" "bastion-service" {
-  name                             = "bastion-service-${var.vpc}"
+resource "aws_lb" "bastion-host" {
+  count                            = "${(local.hostport_whitelisted ? 1 : 0) }"
+  name                             = "bastion-host-${var.vpc}"
   load_balancer_type               = "network"
   internal                         = false
   subnets                          = ["${var.subnets_elb}"]
@@ -15,14 +16,15 @@ resource "aws_lb" "bastion-service" {
 # Listener 
 #######################################################
 
-# Port 22 only
-resource "aws_lb_listener" "bastion-service" {
-  load_balancer_arn = "${aws_lb.bastion-service.arn}"
+# Port 2222
+resource "aws_lb_listener" "bastion-host" {
+  count             = "${(local.hostport_whitelisted ? 1 : 0) }"
+  load_balancer_arn = "${aws_lb.bastion-host.arn}"
   protocol          = "TCP"
-  port              = "22"
+  port              = "2222"
 
   default_action {
-    target_group_arn = "${aws_lb_target_group.bastion-service.arn}"
+    target_group_arn = "${aws_lb_target_group.bastion-host.arn}"
     type             = "forward"
   }
 }
@@ -30,10 +32,11 @@ resource "aws_lb_listener" "bastion-service" {
 ######################################################
 # Target group 
 #######################################################
-resource "aws_lb_target_group" "bastion-service" {
-  name     = "bastion-service-${var.vpc}"
+resource "aws_lb_target_group" "bastion-host" {
+  count    = "${(local.hostport_whitelisted ? 1 : 0) }"
+  name     = "bastion-host-${var.vpc}"
   protocol = "TCP"
-  port     = 22
+  port     = 2222
   vpc_id   = "${var.vpc}"
 
   health_check {

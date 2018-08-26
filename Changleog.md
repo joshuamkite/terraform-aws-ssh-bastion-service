@@ -1,7 +1,7 @@
 **N.B. It is not possible to successfully apply module version >/=3.4 over version </=3.3 due to change from 'aws_security_group' to aws_security_group_rules' you will need to terraform destroy; terraform apply in this case**
 # 4.0
 
-**Feature:** Move from Classic Load Balancer to Network Load Balancer. elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration.
+**Feature:** Move from Classic Load Balancer to Network Load Balancer. elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration. Configurable variables retain 'elb' naming for backward compatibilty with earlier versions. security group rules apply 'description' tag
 
 **Change:**  New code now in seperate files to assist readabilty. locals also moved to seperate file.
 

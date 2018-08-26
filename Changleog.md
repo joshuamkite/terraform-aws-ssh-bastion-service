@@ -2,7 +2,7 @@
 
 # 3.10
 
-**Feature:** Move from Classic Load Balancer to Network Load Balancer. elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration.
+**Feature:** Move from Classic Load Balancer to Network Load Balancer. elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration. Configurable variables retain 'elb' naming for backward compatibilty with earlier versions. security group rules apply 'description' tag
 
 **Change:**  New code now in seperate files to assist readabilty. locals also moved to seperate file.
 

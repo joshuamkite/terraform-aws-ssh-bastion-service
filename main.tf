@@ -131,7 +131,7 @@ resource "aws_autoscaling_group" "bastion-service-asg-local" {
   desired_capacity     = "${var.asg_desired}"
   launch_configuration = "${aws_launch_configuration.bastion-service-host-local.name}"
   vpc_zone_identifier  = ["${var.subnets_asg}"]
-  target_group_arns    = ["${aws_lb_target_group.bastion-service.arn}"]
+  target_group_arns    = ["${aws_lb_target_group.bastion-service.arn}", "${aws_lb_target_group.bastion-host.*.arn}"]
 
   lifecycle {
     create_before_destroy = true
@@ -166,7 +166,7 @@ resource "aws_autoscaling_group" "bastion-service-asg-assume" {
   desired_capacity     = "${var.asg_desired}"
   launch_configuration = "${aws_launch_configuration.bastion-service-host-assume.name}"
   vpc_zone_identifier  = ["${var.subnets_asg}"]
-  target_group_arns    = ["${aws_lb_target_group.bastion-service.arn}"]
+  target_group_arns    = ["${aws_lb_target_group.bastion-service.arn}", "${aws_lb_target_group.bastion-host.*.arn}"]
 
   lifecycle {
     create_before_destroy = true

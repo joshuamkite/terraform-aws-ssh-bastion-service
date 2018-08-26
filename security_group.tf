@@ -14,20 +14,21 @@ resource "aws_security_group" "bastion_service" {
 # security group rules for bastion_service
 ##################
 
-# SSH access in from whitelist IP ranges to Load Balancer
+# SSH access in from whitelist IP ranges
 
-resource "aws_security_group_rule" "lb_ssh_in" {
+resource "aws_security_group_rule" "service_ssh_in" {
   type              = "ingress"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = "${var.cidr_blocks_whitelist_service}"
   security_group_id = "${aws_security_group.bastion_service.id}"
+  description       = "bastion service access"
 }
 
-# SSH access in from whitelist IP ranges to Load Balancer (for Bastion Host - conditional)
+# SSH access in from whitelist IP ranges for Bastion Host - conditional
 
-resource "aws_security_group_rule" "lb_ssh_in_cond" {
+resource "aws_security_group_rule" "host_ssh_in_cond" {
   count             = "${(local.hostport_whitelisted ? 1 : 0) }"
   type              = "ingress"
   from_port         = 2222
@@ -35,6 +36,7 @@ resource "aws_security_group_rule" "lb_ssh_in_cond" {
   protocol          = "tcp"
   cidr_blocks       = ["${var.cidr_blocks_whitelist_host}"]
   security_group_id = "${aws_security_group.bastion_service.id}"
+  description       = "bastion host access"
 }
 
 # Permissive egress policy because we want users to be able to install their own packages 
@@ -46,4 +48,21 @@ resource "aws_security_group_rule" "bastion_host_out" {
   protocol          = -1
   security_group_id = "${aws_security_group.bastion_service.id}"
   cidr_blocks       = ["0.0.0.0/0"]
+}
+
+# access from lb cidr ranges for healthchecks 
+
+data "aws_subnet" "lb_subnets" {
+  count = "${length(var.subnets_elb)}"
+  id    = "${var.subnets_elb[count.index]}"
+}
+
+resource "aws_security_group_rule" "lb_healthcheck_in" {
+  security_group_id = "${aws_security_group.bastion_service.id}"
+  cidr_blocks       = ["${data.aws_subnet.lb_subnets.*.cidr_block}"]
+  from_port         = "${var.elb_healthcheck_port}"
+  to_port           = "${var.elb_healthcheck_port}"
+  protocol          = "tcp"
+  type              = "ingress"
+  description       = "access from lb cidr ranges for healthchecks"
 }

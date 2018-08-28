@@ -2,9 +2,8 @@
 # LB section
 #######################################################
 
-resource "aws_lb" "bastion-host" {
-  count                            = "${(local.hostport_whitelisted ? 1 : 0) }"
-  name                             = "bastion-host-${var.vpc}"
+resource "aws_lb" "bastion-service" {
+  name                             = "bastion-service-${var.vpc}"
   load_balancer_type               = "network"
   internal                         = false
   subnets                          = ["${var.subnets_elb}"]
@@ -16,15 +15,27 @@ resource "aws_lb" "bastion-host" {
 # Listener 
 #######################################################
 
-# Port 2222
+# Port 22 -service only
+resource "aws_lb_listener" "bastion-service" {
+  load_balancer_arn = "${aws_lb.bastion-service.arn}"
+  protocol          = "TCP"
+  port              = "22"
+
+  default_action {
+    target_group_arn = "${aws_lb_target_group.bastion-service.arn}"
+    type             = "forward"
+  }
+}
+
+# Ports 22 & 2222 - service and host - conditional
 resource "aws_lb_listener" "bastion-host" {
   count             = "${(local.hostport_whitelisted ? 1 : 0) }"
-  load_balancer_arn = "${aws_lb.bastion-host.arn}"
+  load_balancer_arn = "${aws_lb.bastion-service.arn}"
   protocol          = "TCP"
   port              = "2222"
 
   default_action {
-    target_group_arn = "${aws_lb_target_group.bastion-host.arn}"
+    target_group_arn = "${aws_lb_target_group.bastion-service.arn}"
     type             = "forward"
   }
 }
@@ -32,11 +43,10 @@ resource "aws_lb_listener" "bastion-host" {
 ######################################################
 # Target group 
 #######################################################
-resource "aws_lb_target_group" "bastion-host" {
-  count    = "${(local.hostport_whitelisted ? 1 : 0) }"
-  name     = "bastion-host-${var.vpc}"
+resource "aws_lb_target_group" "bastion-service" {
+  name     = "bastion-service-${var.vpc}"
   protocol = "TCP"
-  port     = 2222
+  port     = 22
   vpc_id   = "${var.vpc}"
 
   health_check {

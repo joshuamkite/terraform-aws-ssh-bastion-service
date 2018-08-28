@@ -12,10 +12,9 @@ resource "aws_lb" "bastion-service" {
 }
 
 ######################################################
-# Listener 
-#######################################################
+# Listener- Port 22 -service only
+######################################################
 
-# Port 22 -service only
 resource "aws_lb_listener" "bastion-service" {
   load_balancer_arn = "${aws_lb.bastion-service.arn}"
   protocol          = "TCP"
@@ -27,7 +26,10 @@ resource "aws_lb_listener" "bastion-service" {
   }
 }
 
-# Ports 22 & 2222 - service and host - conditional
+######################################################
+# Listener- Ports 22 & 2222 - service and host - conditional
+######################################################
+
 resource "aws_lb_listener" "bastion-host" {
   count             = "${(local.hostport_whitelisted ? 1 : 0) }"
   load_balancer_arn = "${aws_lb.bastion-service.arn}"

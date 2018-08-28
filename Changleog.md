@@ -1,5 +1,9 @@
 **N.B. It is not possible to successfully apply module version >/=3.4 over version </=3.3 due to change from 'aws_security_group' to aws_security_group_rules' you will need to terraform destroy; terraform apply in this case**
 
+# 3.10
+
+**Bugfix:**  Join bastion_service names to prevent error when route53_zone_id is not defined. With thanks to tpesce
+
 # 3.9
 
 **Feature:** Extensible tagging for Autoscaling groups

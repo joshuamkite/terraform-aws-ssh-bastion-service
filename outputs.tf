@@ -1,6 +1,6 @@
 output "service_dns_entry" {
   description = "dns-registered url for service and host"
-  value       = "${join(",", aws_route53_record.bastion_service.*.name)}"
+  value       = "${join("", aws_route53_record.bastion_service.*.name)}"
 }
 
 output "policy_example_for_parent_account_empty_if_not_used" {

@@ -55,7 +55,7 @@ In the case that `bastion_vpc_name = ""` the service container shell prompt is s
 
 It is considered normal to see very highly incremented counters.
 
-**It is essential to limit incoming traffic to whitelisted ports** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
+**It is essential to limit incoming service traffic to whitelisted ports** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
 **The host is set to run the latest patch release at deployment of Debian Stretch**. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up dhcp for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with
 
@@ -102,7 +102,7 @@ this username would translate to `testatplusequalcommatest` and they would need 
 
 ## Users should be aware that:
 
-* They are logging on _as themselves_ using an identiy _based on_ their AWS IAM identity
+* They are logging on _as themselves_ using an identity _based on_ their AWS IAM identity
 * They must manage their own ssh keys using the AWS interface(s), e.g. in the web console under **IAM/Users/Security credentials** and 'Upload SSH public key'.
 * The ssh server key is set at container build time. This means that it will change whenever the bastion host is respawned
 
@@ -131,48 +131,7 @@ Starting with release 3.8 it is possible to use the output giving the name of th
 
 # Notes for deployment
 
-Starting with version 3.8, ELB health check port may be optionally set to either port 22 (containerised service; default) or port 2222 (EC2 host sshd). If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules are conditionally created to support any combination of access/healthceck on port 2222 or not.
-
-## To Run:
-
- If you are running this as a standalone plan then **You must _thoroughly_ reinitialise the terraform state before running the plan again in a different region of the same AWS account** Failure to do this will result in terraform destroying the IAM policies for the previous host. 
-
-* Set aws-profile for first region
-* Initialise backend (for remote state)
-
-
-	terraform init -backend -backend-config=config/?/config.remote
-
-
-* Apply terraform plan
-
-
-	terraform apply -var-file=config/?/config.tfvars
-
-
-* next region (see note below)
-
-	rm -rf .terraform
-
-
-* Set aws-profile for next region
-* init backend for next region
-
-
-	terraform init -backend -backend-config=config/?/config.remote
-
-
-* run plan
-
-
-	terraform apply -var-file=config/?/config.tfvars
-
-**Note**
-During terraform init there can be the question:
-Do you want to copy existing state to the new backend?
-Just say "no"
-It is an issue when switching from different backend inside the same directory
-As alternative before you run terraform init you can run "rm -rf .terraform" then this question will not popup
+Starting with version 3.7, ELB health check port may be optionally set to either port 22 (containerised service) or port 2222 (EC2 host sshd). From version 3.8 port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthceck on port 2222 or not.
 
 ## Components
 
@@ -217,7 +176,7 @@ The files in question on the host deploy thus:
 * `ssh_populate.sh` is the container entry point and populates the local user accounts using the go binary
 * `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses Ubuntu (16.04) from the public Docker registry.
 
-## Outputs useful for other services
+## Sample policy for other accounts
  
 If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then a matching sample policy and trust relationship is given as an output from the plan to assist with application in that other account. 
 
@@ -225,11 +184,12 @@ The dns entry (if created) for the service is also displayed as an output of the
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
 
-## Inputs and OUtputs
+## Inputs and Outputs
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 
 ## Inputs
+
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | asg_desired | Desired numbers of bastion-service hosts in ASG | string | `1` | no |
@@ -244,7 +204,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
-| container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04`| no |
+| container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
 | elb_healthcheck_port | TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
 | elb_healthy_threshold | Healthy threshold for ELB | string | `2` | no |
@@ -255,8 +215,8 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript` | no |
 | extra_user_data_merge_type | Control how cloud-init merges user-data sections | string | `str(append)` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
-| subnets_asg | list of subnets for autoscaling group | list | `<list>` | no |
-| subnets_elb | list of subnets for load balancer | list | `<list>` | no |
+| subnets_asg | list of subnets for autoscaling group - availability zones must match subnets_elb | list | `<list>` | no |
+| subnets_elb | list of subnets for load balancer - availability zones must match subnets_asg | list | `<list>` | no |
 | tags | AWS tags that should be associated with created resources | map | `<map>` | no |
 | vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | string | - | yes |
 
@@ -269,5 +229,5 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_sg_id | Security Group id of the bastion host |
 | elb_dns_name |  |
 | elb_zone_id |  |
-| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users tologin |
+| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your otherAWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
 | service_dns_entry | dns-registered url for service and host |

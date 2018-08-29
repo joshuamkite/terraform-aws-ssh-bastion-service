@@ -1,8 +1,19 @@
-**N.B. It is not possible to successfully apply module version >/=3.4 over version </=3.3 due to change from 'aws_security_group' to aws_security_group_rules' you will need to terraform destroy; terraform apply in this case**
+**N.B.**
 
-# 3.10
+* **It is not possible to successfully apply module version >/= 4.0 over earlier versions due to chang from classic to network load balancer**
+* **It is not possible to successfully apply module version 3.4 thru 3.10 over earlier versions due to change from 'aws_security_group' to aws_security_group_rules'** 
+**You will need to terraform destroy; terraform apply in such cases**
 
-**Feature:** Move from Classic Load Balancer to Network Load Balancer. elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration. Configurable variables retain 'elb' naming for backward compatibilty with earlier versions. security group rules apply 'description' tag
+# 4.0
+
+**New major version increment because of breaking changes** It is not possible to apply this version of this module over earlier versions
+
+**Feature:** Move from Classic Load Balancer to Network Load Balancer. 
+* elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration. 
+* Configurable load balancer variables naming now prefixed 'lb'. Unfortunately the change in load balancer type breaks backward compatibilty with deployments using earlier versions of this module anyway so the opoprtunity is being taken to update the variable names for future sanity.
+* Output "service_dns_entry" now a list as would be xpected using splat syntax
+
+**Feature:** Security group rules apply 'description' tag
 
 **Change:**  New code now in seperate files to assist readabilty. locals also moved to seperate file.
 

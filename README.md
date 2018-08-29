@@ -206,17 +206,17 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
-| elb_healthcheck_port | TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
-| elb_healthy_threshold | Healthy threshold for ELB | string | `2` | no |
-| elb_interval | interval for ELB health check | string | `30` | no |
-| elb_unhealthy_threshold | Unhealthy threshold for ELB | string | `2` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
 | extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |
 | extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript` | no |
 | extra_user_data_merge_type | Control how cloud-init merges user-data sections | string | `str(append)` | no |
+| lb_healthcheck_port | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
+| lb_healthy_threshold | Healthy threshold for lb target group | string | `2` | no |
+| lb_interval | interval for lb target group health check | string | `30` | no |
+| lb_unhealthy_threshold | Unhealthy threshold for lb target group | string | `2` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
-| subnets_asg | list of subnets for autoscaling group - availability zones must match subnets_elb | list | `<list>` | no |
-| subnets_elb | list of subnets for load balancer - availability zones must match subnets_asg | list | `<list>` | no |
+| subnets_asg | list of subnets for autoscaling group - availability zones must match subnets_lb | list | `<list>` | no |
+| subnets_lb | list of subnets for load balancer - availability zones must match subnets_asg | list | `<list>` | no |
 | tags | AWS tags that should be associated with created resources | map | `<map>` | no |
 | vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | string | - | yes |
 
@@ -227,7 +227,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_service_assume_role_name | role created for service host asg - if created with assume role |
 | bastion_service_role_name | role created for service host asg - if created without assume role |
 | bastion_sg_id | Security Group id of the bastion host |
-| elb_dns_name |  |
-| elb_zone_id |  |
-| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your otherAWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
+| lb_dns_name |  |
+| lb_zone_id |  |
+| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
 | service_dns_entry | dns-registered url for service and host |

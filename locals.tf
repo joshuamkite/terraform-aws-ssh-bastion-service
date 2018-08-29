@@ -11,7 +11,7 @@ locals {
 
 locals {
   hostport_whitelisted = "${(join(",", var.cidr_blocks_whitelist_host) !="") }"
-  hostport_healthcheck = "${(var.elb_healthcheck_port == "2222")}"
+  hostport_healthcheck = "${(var.lb_healthcheck_port == "2222")}"
 }
 
 ##########################

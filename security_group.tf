@@ -54,15 +54,15 @@ resource "aws_security_group_rule" "bastion_host_out" {
 # access from lb cidr ranges for healthchecks 
 
 data "aws_subnet" "lb_subnets" {
-  count = "${length(var.subnets_elb)}"
-  id    = "${var.subnets_elb[count.index]}"
+  count = "${length(var.subnets_lb)}"
+  id    = "${var.subnets_lb[count.index]}"
 }
 
 resource "aws_security_group_rule" "lb_healthcheck_in" {
   security_group_id = "${aws_security_group.bastion_service.id}"
   cidr_blocks       = ["${data.aws_subnet.lb_subnets.*.cidr_block}"]
-  from_port         = "${var.elb_healthcheck_port}"
-  to_port           = "${var.elb_healthcheck_port}"
+  from_port         = "${var.lb_healthcheck_port}"
+  to_port           = "${var.lb_healthcheck_port}"
   protocol          = "tcp"
   type              = "ingress"
   description       = "access from load balancer CIDR ranges for healthchecks"

@@ -6,7 +6,7 @@ resource "aws_lb" "bastion-service" {
   name                             = "bastion-service-${var.vpc}"
   load_balancer_type               = "network"
   internal                         = false
-  subnets                          = ["${var.subnets_elb}"]
+  subnets                          = ["${var.subnets_lb}"]
   enable_cross_zone_load_balancing = true
   tags                             = "${var.tags}"
 }
@@ -52,11 +52,11 @@ resource "aws_lb_target_group" "bastion-service" {
   vpc_id   = "${var.vpc}"
 
   health_check {
-    healthy_threshold   = "${var.elb_healthy_threshold}"
-    unhealthy_threshold = "${var.elb_unhealthy_threshold}"
-    interval            = "${var.elb_interval}"
+    healthy_threshold   = "${var.lb_healthy_threshold}"
+    unhealthy_threshold = "${var.lb_unhealthy_threshold}"
+    interval            = "${var.lb_interval}"
     protocol            = "TCP"
-    port                = "${var.elb_healthcheck_port}"
+    port                = "${var.lb_healthcheck_port}"
   }
 
   tags = "${var.tags}"
@@ -73,11 +73,11 @@ resource "aws_lb_target_group" "bastion-host" {
   vpc_id   = "${var.vpc}"
 
   health_check {
-    healthy_threshold   = "${var.elb_healthy_threshold}"
-    unhealthy_threshold = "${var.elb_unhealthy_threshold}"
-    interval            = "${var.elb_interval}"
+    healthy_threshold   = "${var.lb_healthy_threshold}"
+    unhealthy_threshold = "${var.lb_unhealthy_threshold}"
+    interval            = "${var.lb_interval}"
     protocol            = "TCP"
-    port                = "${var.elb_healthcheck_port}"
+    port                = "${var.lb_healthcheck_port}"
   }
 
   tags = "${var.tags}"

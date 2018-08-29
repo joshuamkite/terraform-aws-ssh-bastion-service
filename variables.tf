@@ -28,7 +28,7 @@ variable "bastion_service_host_key_name" {
   default     = ""
 }
 
-variable "subnets_elb" {
+variable "subnets_lb" {
   type        = "list"
   description = "list of subnets for load balancer - availability zones must match subnets_asg"
   default     = []
@@ -36,7 +36,7 @@ variable "subnets_elb" {
 
 variable "subnets_asg" {
   type        = "list"
-  description = "list of subnets for autoscaling group - availability zones must match subnets_elb"
+  description = "list of subnets for autoscaling group - availability zones must match subnets_lb"
   default     = []
 }
 
@@ -63,23 +63,23 @@ variable "tags" {
 }
 
 ##############################
-#ELB ASG variables
+#LB ASG variables
 ##############################
-variable "elb_healthy_threshold" {
+variable "lb_healthy_threshold" {
   type        = "string"
-  description = "Healthy threshold for ELB"
+  description = "Healthy threshold for lb target group"
   default     = "2"
 }
 
-variable "elb_unhealthy_threshold" {
+variable "lb_unhealthy_threshold" {
   type        = "string"
-  description = "Unhealthy threshold for ELB"
+  description = "Unhealthy threshold for lb target group"
   default     = "2"
 }
 
-variable "elb_interval" {
+variable "lb_interval" {
   type        = "string"
-  description = "interval for ELB health check"
+  description = "interval for lb target group health check"
   default     = "30"
 }
 
@@ -110,8 +110,8 @@ variable "assume_role_arn" {
   default     = ""
 }
 
-variable "elb_healthcheck_port" {
-  description = "TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222"
+variable "lb_healthcheck_port" {
+  description = "TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222"
   default     = "2222"
 }
 

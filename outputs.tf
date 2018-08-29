@@ -1,6 +1,6 @@
 output "service_dns_entry" {
   description = "dns-registered url for service and host"
-  value       = "${join("", aws_route53_record.bastion_service.*.name)}"
+  value       = "[${aws_route53_record.bastion_service.*.name}]"
 }
 
 output "policy_example_for_parent_account_empty_if_not_used" {
@@ -13,11 +13,11 @@ output "bastion_sg_id" {
   value       = "${aws_security_group.bastion_service.id}"
 }
 
-output "elb_dns_name" {
+output "lb_dns_name" {
   value = "${aws_lb.bastion-service.dns_name}"
 }
 
-output "elb_zone_id" {
+output "lb_zone_id" {
   value = "${aws_lb.bastion-service.zone_id}"
 }
 

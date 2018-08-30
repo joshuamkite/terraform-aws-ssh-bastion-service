@@ -15,7 +15,7 @@ resource "aws_security_group" "bastion_service" {
 }
 
 ##################
-# empty security group to assist upgrade from classic_load_blanacer to network_load_balancer
+# empty security group to assist upgrade from classic_load_balancer to network_load_balancer
 ##################
 resource "aws_security_group" "bastion_lb" {
   name_prefix            = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-lb"

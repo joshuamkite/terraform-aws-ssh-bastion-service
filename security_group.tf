@@ -1,10 +1,25 @@
-# ##################
-# # security group for bastion_service
-# ##################
+##################
+# security group for bastion_service
+##################
 
 resource "aws_security_group" "bastion_service" {
   name_prefix            = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service"
   description            = "Bastion service"
+  revoke_rules_on_delete = true
+  vpc_id                 = "${var.vpc}"
+  tags                   = "${var.tags}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+##################
+# empty security group to assist upgrade from classic_load_blanacer to network_load_balancer
+##################
+resource "aws_security_group" "bastion_lb" {
+  name_prefix            = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-lb"
+  description            = "Allow access from the Internet to the SSH Load Balancer"
   revoke_rules_on_delete = true
   vpc_id                 = "${var.vpc}"
   tags                   = "${var.tags}"

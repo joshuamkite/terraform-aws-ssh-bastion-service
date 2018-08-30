@@ -3,7 +3,7 @@
 #######################################################
 
 resource "aws_lb" "bastion-service" {
-  name                             = "bastion-service-${var.vpc}"
+  name                             = "bastion-${var.bastion_vpc_name}"
   load_balancer_type               = "network"
   internal                         = false
   subnets                          = ["${var.subnets_lb}"]
@@ -27,7 +27,7 @@ resource "aws_lb_listener" "bastion-service" {
 }
 
 ######################################################
-# Listener- Ports 22 & 2222 - service and host - conditional
+# Listener- Port 2222 - service and host - conditional
 ######################################################
 
 resource "aws_lb_listener" "bastion-host" {

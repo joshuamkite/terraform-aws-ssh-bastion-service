@@ -3,7 +3,7 @@
 #######################################################
 
 resource "aws_lb" "bastion-service" {
-  name                             = "bastion-${var.bastion_vpc_name}"
+  name                             = "bastion-service"
   load_balancer_type               = "network"
   internal                         = false
   subnets                          = ["${var.subnets_lb}"]
@@ -46,7 +46,7 @@ resource "aws_lb_listener" "bastion-host" {
 # Target group service
 #######################################################
 resource "aws_lb_target_group" "bastion-service" {
-  name     = "bastion-service-${var.vpc}"
+  name     = "bastion-service"
   protocol = "TCP"
   port     = 22
   vpc_id   = "${var.vpc}"
@@ -67,7 +67,7 @@ resource "aws_lb_target_group" "bastion-service" {
 #######################################################	
 resource "aws_lb_target_group" "bastion-host" {
   count    = "${(local.hostport_whitelisted ? 1 : 0) }"
-  name     = "bastion-host-${var.vpc}"
+  name     = "bastion-host"
   protocol = "TCP"
   port     = 2222
   vpc_id   = "${var.vpc}"

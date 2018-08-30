@@ -3,7 +3,8 @@
 ##################
 
 resource "aws_security_group" "bastion_service" {
-  name                   = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service"
+  # name                   = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service"
+  name_prefix            = "${var.environment_name}-${var.vpc}-bastion-service"
   description            = "Bastion service"
   revoke_rules_on_delete = true
   vpc_id                 = "${var.vpc}"

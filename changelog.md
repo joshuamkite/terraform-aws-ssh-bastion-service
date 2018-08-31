@@ -11,8 +11,7 @@
 **Feature:** Move from Classic Load Balancer to Network Load Balancer. 
 * elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration. 
 
-* Configurable load balancer variables naming now prefixed 'lb'. Unfortunately the change in load balancer type breaks backward compatibilty with deployments using earlier versions of this module anyway so the opoprtunity is being taken to update the variable names for future sanity.
-* Output "service_dns_entry" now a list as would be xpected using splat syntax
+* Configurable load balancer variables naming now prefixed 'lb'. Unfortunately the change in load balancer type breaks backward compatibilty with deployments using earlier versions of this module anyway so the opportunity is being taken to update the variable names for future sanity.
 
 **Feature:** Security group rules apply 'description' tag
 

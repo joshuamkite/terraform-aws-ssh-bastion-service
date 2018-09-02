@@ -9,7 +9,7 @@ write_files:
     content: |
        FROM ubuntu:${container_ubuntu_version}
 
-        RUN apt-get update && apt-get install -y openssh-server sudo && echo '\033[1;31mI am a one-time Ubuntu container with passwordless sudo. \033[1;37;41mI will terminate after 12 hours or else on exit\033[0m' > /etc/motd && mkdir /var/run/sshd
+        RUN apt-get update && apt-get install -y openssh-server sudo awscli && echo '\033[1;31mI am a one-time Ubuntu container with passwordless sudo. \033[1;37;41mI will terminate after 12 hours or else on exit\033[0m' > /etc/motd && mkdir /var/run/sshd
 
         EXPOSE 22
         CMD ["/opt/ssh_populate.sh"]
@@ -92,12 +92,9 @@ write_files:
         systemctl enable sshd_worker.socket
         systemctl start sshd_worker.socket
         systemctl daemon-reload
-        #Build sshd service container
-        cd /opt/sshd_worker
         systemctl start docker
-        docker build -t sshd_worker .
-        # mkdir /opt/iam_helper
-
+        #Build sshd service container
+        ${container_build}
         # build iam-authorized-keys-command
         sudo apt-get install -y golang
         export GOPATH=/opt/golang

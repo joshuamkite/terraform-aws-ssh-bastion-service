@@ -94,12 +94,9 @@ write_files:
         systemctl enable sshd_worker.socket
         systemctl start sshd_worker.socket
         systemctl daemon-reload
-        #Build sshd service container
-        cd /opt/sshd_worker
         systemctl start docker
-        docker build -t sshd_worker .
-        # mkdir /opt/iam_helper
-
+        #Build sshd service container
+        ${container_build}
         # build iam-authorized-keys-command
         sudo apt-get install -y golang
         export GOPATH=/opt/golang

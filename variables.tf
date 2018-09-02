@@ -140,3 +140,8 @@ variable "extra_user_data_merge_type" {
   default     = "str(append)"
   description = "Control how cloud-init merges user-data sections"
 }
+
+variable "custom_container" {
+  description = "command to download your own docker container"
+  default     = ""
+}

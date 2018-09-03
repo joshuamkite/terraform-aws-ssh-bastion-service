@@ -1,3 +1,6 @@
+############################
+# Templates section
+############################
 data "template_file" "header_all" {
   template = "${file("${path.module}/user_data/header_all.tpl")}"
 }
@@ -40,6 +43,9 @@ data "template_file" "user_data_same_account" {
   }
 }
 
+############################
+# Templates combined section
+############################
 data "template_cloudinit_config" "config" {
   gzip          = false
   base64_encode = false
@@ -55,6 +61,7 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "module_dockerfile"
     content_type = "text/part-handler"
+    merge_type   = "str(append)"
 
     content = "${element(
     concat(data.template_file.dockerfile.*.rendered),
@@ -65,6 +72,7 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "module_user_data"
     content_type = "text/part-handler"
+    merge_type   = "str(append)"
 
     content = "${element(
     concat(data.template_file.user_data_assume_role.*.rendered,

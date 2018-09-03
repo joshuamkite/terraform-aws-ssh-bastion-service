@@ -1,6 +1,3 @@
-#cloud-config
----
-
 write_files:
 
   -

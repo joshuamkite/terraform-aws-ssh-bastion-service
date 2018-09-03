@@ -13,6 +13,20 @@ You may find it more convenient to call it in your plan [directly from the Terra
 
 ## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project
 
+# Ability to define your own seperate docker image (New in version 4.1)
+
+ You can now specify a custom docker container if you wish with ${var.custom_container}. If you do not supply a value to this variable then the container will be built on the host as in previous versions. If you do supply a value then this will be substituted into the bash script written to `/var/lib/cloud/scripts/per-once/localinstall.sh`. **Note that** although the docker daemon will be running when this command is run, your string must contain _all_ of the information needed to get your docker image onto the service host, including any registry or repo specific commands and credentials not otherwise accounted for. **alternatively put a hash in here and install your container as part of extra user data**
+
+In order to work correctly with the rest of the configuration here your custom docker container _must_:
+* Be called `sshd_worker` - see https://docs.docker.com/engine/reference/commandline/tag/ for aliasing
+* Include 
+  * openssh-server
+  * sudo
+  * BASH
+  * awscli
+* Expose port 22
+* Have the entry point `CMD ["/opt/ssh_populate.sh"]` As seen in user data, this script is mounted from the service host and uses terraform and bash variable interpolation. 
+
 # Network Load Balancer from version 4.0
 
 From version 4.0 this module implements a network_load_balancer rather than a classic_load_balancer in accordance with advised best practice for AWS. Sadly this is unavoidably a breaking change. The principal immediate benefit is that logs on the host will now show the remote ip address of the connecting client rather than the load balancer.

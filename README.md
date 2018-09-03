@@ -233,5 +233,5 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_sg_id | Security Group id of the bastion host |
 | lb_dns_name |  |
 | lb_zone_id |  |
-| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust realtionship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
+| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust relationship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
 | service_dns_entry | dns-registered url for service and host |

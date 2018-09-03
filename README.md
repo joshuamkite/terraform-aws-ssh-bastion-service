@@ -16,6 +16,19 @@ You may find it more convenient to call it in your plan [directly from the Terra
 # Network Load Balancer from version 4.0
 
 From version 4.0 this module implements a network_load_balancer rather than a classic_load_balancer in accordance with advised best practice for AWS. Sadly this is unavoidably a breaking change. The principal immediate benefit is that logs on the host will now show the remote ip address of the connecting client rather than the load balancer.
+# Ability to define your own seperate docker image (New in version 4.1)
+
+ You can now specify a custom docker container if you wish with ${var.custom_container}. If you do not supply a value to this variable then the container will be built on the host as in previous versions. If you do supply a value then this will be substituted into the bash script written to `/var/lib/cloud/scripts/per-once/localinstall.sh`. **Note that** although the docker daemon will be running when this command is run, your string must contain _all_ of the information needed to get your docker image onto the service host, including any registry or repo specific commands and credentials not otherwise accounted for. **alternatively put a hash in here and install your container as part of extra user data**
+
+In order to work correctly with the rest of the configuration here your custom docker container _must_:
+* Be called `sshd_worker` - see https://docs.docker.com/engine/reference/commandline/tag/ for aliasing
+* Include 
+  * openssh-server
+  * sudo
+  * BASH
+  * awscli
+* Expose port 22
+* Have the entry point `CMD ["/opt/ssh_populate.sh"]` As seen in user data, this script is mounted from the service host and uses terraform and bash variable interpolation. 
 
 # Ability to assume a role in another account (New in Version 3)
 
@@ -178,7 +191,7 @@ The files in question on the host deploy thus:
 * `iam-helper` is made available as a read-only volume to the docker container as /opt.
 * `iam-authorized-keys-command` is the Go binary that gets the users and ssh public keys from aws - it is built during bastion deployment
 * `ssh_populate.sh` is the container entry point and populates the local user accounts using the go binary
-* `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses Ubuntu (16.04) from the public Docker registry.
+* `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses Ubuntu 16.04/18.04 from the public Docker registry and installs additional public packages. This file is not used if you specify a custom docker image.
 
 ## Sample policy for other accounts
  
@@ -192,7 +205,7 @@ The dns entry (if created) for the service is also displayed as an output of the
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 
-## Inputs
+# Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
@@ -209,6 +222,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
+| custom_container | command to download your own docker container | string | `` | no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
 | extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |

@@ -4,6 +4,10 @@
 * **It is not possible to successfully apply module version 3.4 thru 3.10 over earlier versions due to change from 'aws_security_group' to aws_security_group_rules'** 
 **You will need to terraform destroy; terraform apply in such cases**
 
+# 4.1
+
+**Feature:** You can now specify a custom docker container if you wish with ${var.custom_container} or alternatively put a hash as its value and install your container as part of extra user data. See README.md for details
+
 # 4.0
 
 **New major version increment because of breaking changes** It is not possible to apply this version of this module over earlier versions

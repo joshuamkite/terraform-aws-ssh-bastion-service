@@ -13,6 +13,10 @@ You may find it more convenient to call it in your plan [directly from the Terra
 
 ## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project
 
+# Network Load Balancer from version 4.0
+
+From version 4.0 this module implements a network_load_balancer rather than a classic_load_balancer in accordance with advised best practice for AWS. Sadly this is unavoidably a breaking change. The principal immediate benefit is that logs on the host will now show the remote ip address of the connecting client rather than the load balancer.
+
 # Ability to assume a role in another account (New in Version 3)
 
 With version 3 series (backward compatible with version 2) the ability to assume a role in another account has now been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. Since this is a high availabilty service, it is not envisaged that there would be reason for more than one independent deployment within such a combination. 

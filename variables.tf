@@ -28,15 +28,15 @@ variable "bastion_service_host_key_name" {
   default     = ""
 }
 
-variable "subnets_elb" {
+variable "subnets_lb" {
   type        = "list"
-  description = "list of subnets for load balancer"
+  description = "list of subnets for load balancer - availability zones must match subnets_asg"
   default     = []
 }
 
 variable "subnets_asg" {
   type        = "list"
-  description = "list of subnets for autoscaling group"
+  description = "list of subnets for autoscaling group - availability zones must match subnets_lb"
   default     = []
 }
 
@@ -63,36 +63,24 @@ variable "tags" {
 }
 
 ##############################
-#ELB ASG variables
+#LB ASG variables
 ##############################
-variable "elb_healthy_threshold" {
+variable "lb_healthy_threshold" {
   type        = "string"
-  description = "Healthy threshold for ELB"
+  description = "Healthy threshold for lb target group"
   default     = "2"
 }
 
-variable "elb_unhealthy_threshold" {
+variable "lb_unhealthy_threshold" {
   type        = "string"
-  description = "Unhealthy threshold for ELB"
+  description = "Unhealthy threshold for lb target group"
   default     = "2"
 }
 
-variable "elb_timeout" {
+variable "lb_interval" {
   type        = "string"
-  description = "timeout for ELB"
-  default     = "3"
-}
-
-variable "elb_interval" {
-  type        = "string"
-  description = "interval for ELB health check"
+  description = "interval for lb target group health check"
   default     = "30"
-}
-
-variable "elb_idle_timeout" {
-  type        = "string"
-  description = "The time in seconds that the connection is allowed to be idle"
-  default     = "300"
 }
 
 variable "asg_max" {
@@ -122,8 +110,8 @@ variable "assume_role_arn" {
   default     = ""
 }
 
-variable "elb_healthcheck_port" {
-  description = "TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222"
+variable "lb_healthcheck_port" {
+  description = "TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222"
   default     = "2222"
 }
 

@@ -3,6 +3,19 @@
 ############################
 data "template_file" "header_all" {
   template = "${file("${path.module}/user_data/header_all.tpl")}"
+
+  vars {
+    bastion_host_name = "${local.bastion_host_name}"
+  }
+}
+
+data "template_file" "ssh_populate" {
+  count    = "${local.custom_populate_no}"
+  template = "${file("${path.module}/user_data/ssh_populate.tpl")}"
+
+  vars {
+    assume_role_arn = "${var.assume_role_arn}"
+  }
 }
 
 data "template_file" "dockerfile" {
@@ -55,6 +68,17 @@ data "template_cloudinit_config" "config" {
     filename     = "module_header"
     content_type = "text/cloud-config"
     content      = "${data.template_file.header_all.rendered}"
+  }
+
+  # ssh_populate section
+  part {
+    filename     = "module_ssh_populate"
+    content_type = "text/x-shellscript"
+    merge_type   = "str(append)"
+
+    content = "${element(
+    concat(data.template_file.ssh_populate.*.rendered),
+    0)}"
   }
 
   # docker section

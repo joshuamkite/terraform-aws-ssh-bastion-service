@@ -142,6 +142,11 @@ variable "extra_user_data_merge_type" {
 }
 
 variable "custom_container" {
-  description = "command to download your own docker container"
+  description = "command to download custom docker container"
+  default     = ""
+}
+
+variable "custom_populate" {
+  description = "command to use custom ssh_populate script"
   default     = ""
 }

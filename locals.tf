@@ -33,3 +33,11 @@ locals {
 locals {
   container_build = "${var.custom_container == "" ? "cd /opt/sshd_worker\n        docker build -t sshd_worker ." : var.custom_container}"
 }
+
+##########################
+# Logic tests for using module default ssh_populate script
+##########################
+locals {
+  custom_populate_yes = "${var.custom_populate != "" ? 1 : 0}"
+  custom_populate_no  = "${var.custom_populate == "" ? 1 : 0}"
+}

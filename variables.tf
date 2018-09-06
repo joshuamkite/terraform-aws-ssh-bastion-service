@@ -150,3 +150,13 @@ variable "custom_populate" {
   description = "command to use custom ssh_populate script"
   default     = ""
 }
+
+variable "custom_authorized_keys_command" {
+  description = "command to use custom binary to get authorized keys"
+  default     = ""
+}
+
+variable "custom_build_the_things" {
+  description = "command to use custom method to build_the_things"
+  default     = ""
+}

@@ -31,7 +31,7 @@ locals {
 }
 
 locals {
-  container_build = "${var.custom_container == "" ? "cd /opt/sshd_worker\n        docker build -t sshd_worker ." : var.custom_container}"
+  container_build = "${var.custom_container == "" ? "cd /opt/sshd_worker\ndocker build -t sshd_worker ." : var.custom_container}"
 }
 
 ##########################
@@ -40,4 +40,22 @@ locals {
 locals {
   custom_populate_yes = "${var.custom_populate != "" ? 1 : 0}"
   custom_populate_no  = "${var.custom_populate == "" ? 1 : 0}"
+}
+
+##########################
+# Logic tests for using module default authorized_keys_command code
+##########################
+
+locals {
+  custom_authorized_keys_command_yes = "${var.custom_authorized_keys_command != "" ? 1 : 0}"
+  custom_authorized_keys_command_no  = "${var.custom_authorized_keys_command == "" ? 1 : 0}"
+}
+
+##########################
+# Logic tests for using module default build_the_things script
+##########################
+
+locals {
+  custom_build_the_things_yes = "${var.custom_build_the_things != "" ? 1 : 0}"
+  custom_build_the_things_no  = "${var.custom_build_the_things == "" ? 1 : 0}"
 }

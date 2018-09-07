@@ -37,7 +37,8 @@ data "template_file" "iam-authorized-keys-command" {
   template = "${file("${path.module}/user_data/iam-authorized-keys-command.tpl")}"
 
   vars {
-    authorized_command_code = "${file("${path.module}/user_data/iam_authorized_keys_code/main.go")}"
+    authorized_command_code   = "${file("${path.module}/user_data/iam_authorized_keys_code/main.go")}"
+    bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
   }
 }
 
@@ -46,10 +47,9 @@ data "template_file" "build_the_things" {
   template = "${file("${path.module}/user_data/build_the_things.tpl")}"
 
   vars {
-    bastion_host_name         = "${local.bastion_host_name}"
-    bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
-    vpc                       = "${var.vpc}"
-    container_build           = "${local.container_build}"
+    bastion_host_name = "${local.bastion_host_name}"
+    vpc               = "${var.vpc}"
+    container_build   = "${local.container_build}"
   }
 }
 

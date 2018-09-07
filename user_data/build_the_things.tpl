@@ -15,19 +15,6 @@ systemctl daemon-reload
 systemctl start docker
 #Build sshd service container
 ${container_build}
-# build iam-authorized-keys-command
-sudo apt-get install -y golang
-export GOPATH=/opt/golang
 
-COMMAND_DIR=$GOPATH/src/iam-authorized-keys-command
-
-mkdir -p $COMMAND_DIR
-cd $COMMAND_DIR
-
-go get ./...
-go build -ldflags "-X main.iamGroup=${bastion_allowed_iam_group}" -o /opt/iam_helper/iam-authorized-keys-command ./main.go
-
-chown root /opt/iam_helper
-chmod -R 700 /opt/iam_helper
 #set hostname to match dns
 hostnamectl set-hostname ${bastion_host_name}-${vpc}-bastion-host

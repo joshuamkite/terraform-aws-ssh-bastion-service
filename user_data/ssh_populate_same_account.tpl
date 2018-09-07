@@ -24,4 +24,4 @@ done
 
 /usr/sbin/sshd -i
 EOF
-chmod 0754 /opt/iam_helper/ssh_populate.sh
+chmod 0700 /opt/iam_helper/ssh_populate.sh

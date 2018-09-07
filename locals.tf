@@ -31,7 +31,7 @@ locals {
 }
 
 locals {
-  container_build = "${var.custom_container == "" ? "cd /opt/sshd_worker\n/usr/bin/docker build -t sshd_worker ." : var.custom_container}"
+  container_build = "${var.custom_container == "" ? "cd /opt/sshd_worker\ndocker build -t sshd_worker ." : var.custom_container}"
 }
 
 ##########################

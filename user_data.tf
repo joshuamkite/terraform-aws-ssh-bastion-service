@@ -55,7 +55,6 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "module_systemd"
     content_type = "text/x-shellscript"
-    content      = "${data.template_file.systemd.rendered}"
 
     content = "${element(
     concat(data.template_file.systemd.*.rendered),

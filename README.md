@@ -15,7 +15,7 @@ You may find it more convenient to call it in your plan [directly from the Terra
 
 # Custom base AMI and modular userdata from version 4.1
 
-You can now **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id
+You can now **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. Tested and working without other changes using Ubuntu 18.04
 
  **Userdata has been divided into sections which are now individually applicable**. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
 

@@ -23,23 +23,11 @@ locals {
 }
 
 ##########################
-# Logic tests for  building docker container locally or using custom container
-##########################
-locals {
-  custom_container_yes = "${var.custom_container != "" ? 1 : 0}"
-  custom_container_no  = "${var.custom_container == "" ? 1 : 0}"
-}
-
-locals {
-  container_build = "${var.custom_container == "" ? "cd /opt/sshd_worker\ndocker build -t sshd_worker ." : var.custom_container}"
-}
-
-##########################
 # Logic tests for using module default ssh_populate script
 ##########################
 locals {
-  custom_populate_yes = "${var.custom_populate != "" ? 1 : 0}"
-  custom_populate_no  = "${var.custom_populate == "" ? 1 : 0}"
+  custom_ssh_populate_yes = "${var.custom_ssh_populate != "" ? 1 : 0}"
+  custom_ssh_populate_no  = "${var.custom_ssh_populate == "" ? 1 : 0}"
 }
 
 ##########################

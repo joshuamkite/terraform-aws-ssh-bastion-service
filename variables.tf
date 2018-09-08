@@ -141,27 +141,22 @@ variable "extra_user_data_merge_type" {
   description = "Control how cloud-init merges user-data sections"
 }
 
-variable "custom_container" {
-  description = "command to download custom docker container in userdata"
-  default     = ""
-}
-
-variable "custom_populate" {
-  description = "command to use custom ssh_populate script in userdata"
+variable "custom_ssh_populate" {
+  description = "exclude default ssh_populate script used on container launch from userdata"
   default     = ""
 }
 
 variable "custom_authorized_keys_command" {
-  description = "command to use custom binary to get IAM authorized keys  in userdata"
+  description = "exclude default Go binary to get IAM authorized keys built from source in userdata"
   default     = ""
 }
 
 variable "custom_docker_setup" {
-  description = "command to use custom method to install and start docker in userdata"
+  description = "exclude default docker installation and container build from userdata"
   default     = ""
 }
 
 variable "custom_systemd" {
-  description = "command to use custom systemd section in userdata"
+  description = "exclude default systemd and hostname change from userdata"
   default     = ""
 }

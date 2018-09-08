@@ -11,21 +11,23 @@ This plan provides socket-activated sshd-containers with one container instantia
 
 You may find it more convenient to call it in your plan [directly from the Terraform Community Module Registry](https://registry.terraform.io/modules/joshuamkite/ssh-bastion-service/)
 
-## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project
+## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project and acknowledgment to tpesce
 
-# Ability to define your own seperate docker image (New in version 4.1)
+# Modular userdata from version 4.1
 
- You can now specify a custom docker container if you wish with ${var.custom_container}. If you do not supply a value to this variable then the container will be built on the host as in previous versions. If you do supply a value then this will be substituted into the bash script written to `/var/lib/cloud/scripts/per-once/localinstall.sh`. **Note that** although the docker daemon will be running when this command is run, your string must contain _all_ of the information needed to get your docker image onto the service host, including any registry or repo specific commands and credentials not otherwise accounted for. **alternatively put a hash in here and install your container as part of extra user data**
+ Userdata has been divided into sections which are now individually applicable. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
 
-In order to work correctly with the rest of the configuration here your custom docker container _must_:
-* Be called `sshd_worker` - see https://docs.docker.com/engine/reference/commandline/tag/ for aliasing
-* Include 
-  * openssh-server
-  * sudo
-  * BASH
-  * awscli
-* Expose port 22
-* Have the entry point `CMD ["/opt/ssh_populate.sh"]` As seen in user data, this script is mounted from the service host and uses terraform and bash variable interpolation. 
+These sections and their variables are
+
+* **custom_ssh_populate** - exclude default ssh_populate script used on container launch from userdata
+
+* **custom_authorized_keys_command** - exclude default Go binary to get IAM authorized keys built from source in userdata
+
+* **custom_docker_setup** - exclude default docker installation and container build from userdata
+
+* **custom_systemd** - exclude default systemd and hostname change from userdata
+
+If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
 
 # Network Load Balancer from version 4.0
 
@@ -206,7 +208,7 @@ The dns entry (if created) for the service is also displayed as an output of the
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 
-# Inputs
+## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
@@ -223,11 +225,14 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
-| custom_container | command to download your own docker container | string | `` | no |
+| custom_authorized_keys_command | exclude default Go binary to get IAM authorized keys built from source in userdata | string | `` | no |
+| custom_docker_setup | exclude default docker installation and container build from userdata | string | `` | no |
+| custom_ssh_populate | exclude default ssh_populate script used on container launch from userdata | string | `` | no |
+| custom_systemd | exclude default systemd and hostname change from userdata | string | `` | no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
 | extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |
-| extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript` | no |
+| extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript`| no |
 | extra_user_data_merge_type | Control how cloud-init merges user-data sections | string | `str(append)` | no |
 | lb_healthcheck_port | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
 | lb_healthy_threshold | Healthy threshold for lb target group | string | `2` | no |

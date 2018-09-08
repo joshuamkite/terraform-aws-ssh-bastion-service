@@ -7,6 +7,7 @@ apt update
 apt install -y docker-ce 
 systemctl start docker
 mkdir -p /opt/sshd_worker
+#Write out Dockerfile
 cat << EOF > /opt/sshd_worker/Dockerfile
 FROM ubuntu:${container_ubuntu_version}
 
@@ -16,4 +17,6 @@ EXPOSE 22
 CMD ["/opt/ssh_populate.sh"]
 EOF
 #Build sshd service container
-${container_build}
+cd /opt/sshd_worker
+docker build -t sshd_worker .
+

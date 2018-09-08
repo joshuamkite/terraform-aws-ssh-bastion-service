@@ -4,13 +4,21 @@
 * **It is not possible to successfully apply module version 3.4 thru 3.10 over earlier versions due to change from 'aws_security_group' to aws_security_group_rules'** 
 **You will need to terraform destroy; terraform apply in such cases**
 
-# 4.2 
-
-**Feature:** Conditionally write user data using template_cloudinit_config multipart templating
-
 # 4.1
 
-**Feature:** You can now specify a custom docker container if you wish with ${var.custom_container} or alternatively put a hash as its value and install your container as part of extra user data. See README.md for details
+**Feature:** Userdata has been divided into sections which are now individually applicable. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
+
+These sections and their variables are
+
+* **custom_ssh_populate** - exclude default ssh_populate script used on container launch from userdata
+
+* **custom_authorized_keys_command** - exclude default Go binary to get IAM authorized keys built from source in userdata
+
+* **custom_docker_setup** - exclude default docker installation and container build from userdata
+
+* **custom_systemd** - exclude default systemd and hostname change from userdata
+
+If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
 
 # 4.0
 

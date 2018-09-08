@@ -7,13 +7,12 @@ data "template_file" "systemd" {
 
   vars {
     bastion_host_name = "${local.bastion_host_name}"
-    bastion_host_name = "${local.bastion_host_name}"
     vpc               = "${var.vpc}"
   }
 }
 
 data "template_file" "ssh_populate_assume_role" {
-  count    = "${local.custom_populate_no}"
+  count    = "${local.custom_ssh_populate_no}"
   template = "${file("${path.module}/user_data/ssh_populate_assume_role.tpl")}"
 
   vars {
@@ -22,7 +21,7 @@ data "template_file" "ssh_populate_assume_role" {
 }
 
 data "template_file" "ssh_populate_same_account" {
-  count    = "${local.custom_populate_no}"
+  count    = "${local.custom_ssh_populate_no}"
   template = "${file("${path.module}/user_data/ssh_populate_same_account.tpl")}"
 }
 
@@ -32,7 +31,6 @@ data "template_file" "docker_setup" {
 
   vars {
     container_ubuntu_version = "${var.container_ubuntu_version}"
-    container_build          = "${local.container_build}"
   }
 }
 

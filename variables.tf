@@ -160,3 +160,8 @@ variable "custom_systemd" {
   description = "exclude default systemd and hostname change from userdata"
   default     = ""
 }
+
+variable "custom_ami_id" {
+  description = "id for custom ami if used"
+  default     = ""
+}

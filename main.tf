@@ -5,7 +5,7 @@ data "aws_region" "current" {}
 data "aws_availability_zones" "available" {}
 
 ##########################
-#Query for most recent AMI of type debian for use as host
+#Query for most recent AMI of type debian
 ##########################
 
 data "aws_ami" "debian" {
@@ -26,7 +26,7 @@ data "aws_ami" "debian" {
 resource "aws_launch_configuration" "bastion-service-host-local" {
   count                       = "${local.assume_role_no}"
   name_prefix                 = "bastion-service-host"
-  image_id                    = "${data.aws_ami.debian.id}"
+  image_id                    = "${local.bastion_ami_id}"
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_profile.arn}"
   associate_public_ip_address = "false"
@@ -42,7 +42,7 @@ resource "aws_launch_configuration" "bastion-service-host-local" {
 resource "aws_launch_configuration" "bastion-service-host-assume" {
   count                       = "${local.assume_role_yes}"
   name_prefix                 = "bastion-service-host"
-  image_id                    = "${data.aws_ami.debian.id}"
+  image_id                    = "${local.bastion_ami_id}"
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"
   associate_public_ip_address = "false"

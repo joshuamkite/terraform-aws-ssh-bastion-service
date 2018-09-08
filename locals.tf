@@ -54,3 +54,11 @@ locals {
   custom_systemd_yes = "${var.custom_systemd != "" ? 1 : 0}"
   custom_systemd_no  = "${var.custom_systemd == "" ? 1 : 0}"
 }
+
+##########################
+# Logic for using module default or custom ami
+##########################
+
+locals {
+  bastion_ami_id = "${var.custom_ami_id == "" ? data.aws_ami.debian.id : var.custom_ami_id}"
+}

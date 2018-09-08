@@ -52,10 +52,17 @@ locals {
 }
 
 ##########################
-# Logic tests for using module default build_the_things script
+# Logic tests for using module default docker_setup
 ##########################
-
 locals {
-  custom_build_the_things_yes = "${var.custom_build_the_things != "" ? 1 : 0}"
-  custom_build_the_things_no  = "${var.custom_build_the_things == "" ? 1 : 0}"
+  custom_docker_setup_yes = "${var.custom_docker_setup != "" ? 1 : 0}"
+  custom_docker_setup_no  = "${var.custom_docker_setup == "" ? 1 : 0}"
+}
+
+##########################
+# Logic tests for using module default systemd
+##########################
+locals {
+  custom_systemd_yes = "${var.custom_systemd != "" ? 1 : 0}"
+  custom_systemd_no  = "${var.custom_systemd == "" ? 1 : 0}"
 }

@@ -142,21 +142,26 @@ variable "extra_user_data_merge_type" {
 }
 
 variable "custom_container" {
-  description = "command to download custom docker container"
+  description = "command to download custom docker container in userdata"
   default     = ""
 }
 
 variable "custom_populate" {
-  description = "command to use custom ssh_populate script"
+  description = "command to use custom ssh_populate script in userdata"
   default     = ""
 }
 
 variable "custom_authorized_keys_command" {
-  description = "command to use custom binary to get authorized keys"
+  description = "command to use custom binary to get IAM authorized keys  in userdata"
   default     = ""
 }
 
-variable "custom_build_the_things" {
-  description = "command to use custom method to build_the_things"
+variable "custom_docker_setup" {
+  description = "command to use custom method to install and start docker in userdata"
+  default     = ""
+}
+
+variable "custom_systemd" {
+  description = "command to use custom systemd section in userdata"
   default     = ""
 }

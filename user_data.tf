@@ -1,11 +1,14 @@
 ############################
 # Templates section
 ############################
-data "template_file" "header_all" {
-  template = "${file("${path.module}/user_data/header_all.tpl")}"
+data "template_file" "systemd" {
+  template = "${file("${path.module}/user_data/systemd.tpl")}"
+  count    = "${local.custom_systemd_no}"
 
   vars {
     bastion_host_name = "${local.bastion_host_name}"
+    bastion_host_name = "${local.bastion_host_name}"
+    vpc               = "${var.vpc}"
   }
 }
 
@@ -23,12 +26,13 @@ data "template_file" "ssh_populate_same_account" {
   template = "${file("${path.module}/user_data/ssh_populate_same_account.tpl")}"
 }
 
-data "template_file" "dockerfile" {
-  count    = "${local.custom_container_no}"
-  template = "${file("${path.module}/user_data/dockerfile.tpl")}"
+data "template_file" "docker_setup" {
+  count    = "${local.custom_docker_setup_no}"
+  template = "${file("${path.module}/user_data/docker_setup.tpl")}"
 
   vars {
     container_ubuntu_version = "${var.container_ubuntu_version}"
+    container_build          = "${local.container_build}"
   }
 }
 
@@ -42,17 +46,6 @@ data "template_file" "iam-authorized-keys-command" {
   }
 }
 
-data "template_file" "build_the_things" {
-  count    = "${local.custom_build_the_things_no}"
-  template = "${file("${path.module}/user_data/build_the_things.tpl")}"
-
-  vars {
-    bastion_host_name = "${local.bastion_host_name}"
-    vpc               = "${var.vpc}"
-    container_build   = "${local.container_build}"
-  }
-}
-
 ############################
 # Templates combined section
 ############################
@@ -62,9 +55,13 @@ data "template_cloudinit_config" "config" {
 
   # header_all section
   part {
-    filename     = "module_header"
-    content_type = "text/cloud-config"
-    content      = "${data.template_file.header_all.rendered}"
+    filename     = "module_systemd"
+    content_type = "text/x-shellscript"
+    content      = "${data.template_file.systemd.rendered}"
+
+    content = "${element(
+    concat(data.template_file.systemd.*.rendered),
+    0)}"
   }
 
   # ssh_populate section
@@ -79,14 +76,14 @@ data "template_cloudinit_config" "config" {
     0)}"
   }
 
-  # docker section
+  # docker_setup section
   part {
-    filename     = "module_dockerfile"
+    filename     = "module_docker_setup"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
 
     content = "${element(
-    concat(data.template_file.dockerfile.*.rendered),
+    concat(data.template_file.docker_setup.*.rendered),
     0)}"
   }
 
@@ -98,18 +95,6 @@ data "template_cloudinit_config" "config" {
 
     content = "${element(
     concat(data.template_file.iam-authorized-keys-command.*.rendered),
-    0)}"
-  }
-
-  # build_the_things section
-  part {
-    filename     = "module_build_the_things"
-    content_type = "text/x-shellscript"
-    merge_type   = "str(append)"
-
-    content = "${element(
-    concat(data.template_file.build_the_things.*.rendered,
-           data.template_file.build_the_things.*.rendered),
     0)}"
   }
 

@@ -12,13 +12,13 @@
 
 The variables for these sections are:
 
-* **custom_ssh_populate** - exclude default ssh_populate script used on container launch from userdata
+* **custom_ssh_populate** - any value excludes default ssh_populate script used on container launch from userdata
 
-* **custom_authorized_keys_command** - exclude default Go binary to get IAM authorized keys built from source in userdata
+* **custom_authorized_keys_command** - any value excludes default Go binary to get IAM authorized keys built from source in userdata
 
-* **custom_docker_setup** - exclude default docker installation and container build from userdata
+* **custom_docker_setup** - any value excludes default docker installation and container build from userdata
 
-* **custom_systemd** - exclude default systemd and hostname change from userdata
+* **custom_systemd** - any value excludes default systemd and hostname change from userdata
 
 If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
 

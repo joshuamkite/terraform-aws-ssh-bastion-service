@@ -15,7 +15,7 @@ locals {
 }
 
 ##########################
-# Logic tests for  user-data 
+# Logic tests for  assume role vs same account 
 ##########################
 locals {
   assume_role_yes = "${var.assume_role_arn != "" ? 1 : 0}"

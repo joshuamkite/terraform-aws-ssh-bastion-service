@@ -12,7 +12,7 @@ data "template_file" "systemd" {
 }
 
 data "template_file" "ssh_populate_assume_role" {
-  count    = "${local.custom_ssh_populate_no}"
+  count    = "${local.assume_role_yes * local.custom_ssh_populate_no}"
   template = "${file("${path.module}/user_data/ssh_populate_assume_role.tpl")}"
 
   vars {
@@ -21,7 +21,7 @@ data "template_file" "ssh_populate_assume_role" {
 }
 
 data "template_file" "ssh_populate_same_account" {
-  count    = "${local.custom_ssh_populate_no}"
+  count    = "${local.assume_role_no * local.custom_ssh_populate_no}"
   template = "${file("${path.module}/user_data/ssh_populate_same_account.tpl")}"
 }
 
@@ -51,26 +51,27 @@ data "template_cloudinit_config" "config" {
   gzip          = false
   base64_encode = false
 
-  # header_all section
+  # systemd section
   part {
     filename     = "module_systemd"
     content_type = "text/x-shellscript"
-
-    content = "${element(
-    concat(data.template_file.systemd.*.rendered),
-    0)}"
+    content      = "${element(concat(data.template_file.systemd.*.rendered, list("")), 0)}"
   }
 
-  # ssh_populate section
+  # ssh_populate_assume_role
   part {
-    filename     = "module_ssh_populate"
+    filename     = "module_ssh_populate_assume_role"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
+    content      = "${element(concat(data.template_file.ssh_populate_assume_role.*.rendered, list("")), 0)}"
+  }
 
-    content = "${element(
-    concat(data.template_file.ssh_populate_assume_role.*.rendered,
-           data.template_file.ssh_populate_same_account.*.rendered),
-    0)}"
+  # ssh_populate_same_account
+  part {
+    filename     = "module_ssh_populate_same_account"
+    content_type = "text/x-shellscript"
+    merge_type   = "str(append)"
+    content      = "${element(concat(data.template_file.ssh_populate_same_account.*.rendered, list("")), 0)}"
   }
 
   # docker_setup section
@@ -78,10 +79,7 @@ data "template_cloudinit_config" "config" {
     filename     = "module_docker_setup"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
-
-    content = "${element(
-    concat(data.template_file.docker_setup.*.rendered),
-    0)}"
+    content      = "${element(concat(data.template_file.docker_setup.*.rendered, list("")), 0)}"
   }
 
   # iam-authorized-keys-command
@@ -89,10 +87,7 @@ data "template_cloudinit_config" "config" {
     filename     = "module_iam-authorized-keys-command"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
-
-    content = "${element(
-    concat(data.template_file.iam-authorized-keys-command.*.rendered),
-    0)}"
+    content      = "${element(concat(data.template_file.iam-authorized-keys-command.*.rendered, list("")), 0)}"
   }
 
   part {

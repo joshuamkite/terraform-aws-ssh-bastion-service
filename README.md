@@ -15,21 +15,21 @@ You may find it more convenient to call it in your plan [directly from the Terra
 
 # Custom base AMI and modular userdata from version 4.1
 
-You can now **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. Tested and working without other changes using Ubuntu 18.04
+You can now **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. Tested and working using Ubuntu 18.04 as an example ;)
 
- **Userdata has been divided into sections which are now individually applicable**. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
+ **Userdata has been divided into sections which are now individually applicable**. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore all of these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
 
 The variables for these sections are:
 
 * **custom_ssh_populate** - exclude default ssh_populate script used on container launch from userdata
 
-* **custom_authorized_keys_command** - exclude default Go binary to get IAM authorized keys built from source in userdata
+* **custom_authorized_keys_command** - exclude default Go binary iam-authorized-keys built from source from userdata
 
 * **custom_docker_setup** - exclude default docker installation and container build from userdata
 
 * **custom_systemd** - exclude default systemd and hostname change from userdata
 
-If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
+If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data for a working service. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
 
 # Network Load Balancer from version 4.0
 
@@ -227,14 +227,14 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
 | custom_ami_id | id for custom ami if used | string | `` | no |
-| custom_authorized_keys_command | exclude default Go binary to get IAM authorized keys built from source in userdata | string | `` | no |
+| custom_authorized_keys_command | exclude default Go binary iam-authorized-keys built from source from userdata | string | `` | no |
 | custom_docker_setup | exclude default docker installation and container build from userdata | string | `` | no |
 | custom_ssh_populate | exclude default ssh_populate script used on container launch from userdata | string | `` | no |
 | custom_systemd | exclude default systemd and hostname change from userdata | string | `` | no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
 | extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |
-| extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript`| no |
+| extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript` | no |
 | extra_user_data_merge_type | Control how cloud-init merges user-data sections | string | `str(append)` | no |
 | lb_healthcheck_port | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
 | lb_healthy_threshold | Healthy threshold for lb target group | string | `2` | no |

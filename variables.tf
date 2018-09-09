@@ -147,7 +147,7 @@ variable "custom_ssh_populate" {
 }
 
 variable "custom_authorized_keys_command" {
-  description = "exclude default Go binary to get IAM authorized keys built from source in userdata"
+  description = "exclude default Go binary iam-authorized-keys built from source from userdata"
   default     = ""
 }
 

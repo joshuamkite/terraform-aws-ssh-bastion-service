@@ -140,3 +140,28 @@ variable "extra_user_data_merge_type" {
   default     = "str(append)"
   description = "Control how cloud-init merges user-data sections"
 }
+
+variable "custom_ssh_populate" {
+  description = "any value excludes default ssh_populate script used on container launch from userdata"
+  default     = ""
+}
+
+variable "custom_authorized_keys_command" {
+  description = "any value excludes default Go binary iam-authorized-keys built from source from userdata"
+  default     = ""
+}
+
+variable "custom_docker_setup" {
+  description = "any value excludes default docker installation and container build from userdata"
+  default     = ""
+}
+
+variable "custom_systemd" {
+  description = "any value excludes default systemd and hostname change from userdata"
+  default     = ""
+}
+
+variable "custom_ami_id" {
+  description = "id for custom ami if used"
+  default     = ""
+}

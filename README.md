@@ -5,13 +5,35 @@ This Terraform deploys an sshd bastion service on AWS:
 
 # Overview
 
-This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. The actual call for public keys is made with a [GO binary](https://github.com/Fullscreen/iam-authorized-keys-command), which is built during host intial launch and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. The users who may access the bastion service may be restricted to membership of a defined AWS IAM group which is not set up or managed by this plan.  When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user. Asides from the resources provided by AWS and remote repositories this plan is entirely self contained. There is no reliance on registries, build chains etc.
+This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. 
+
+**Since version 4.1 it is possible to replace the components in userdata and the base AMI with components of your own choosing. The following describes deployment with all sections as provided by module defaults.**
+
+The actual call for public keys is made with a [GO binary](https://github.com/Fullscreen/iam-authorized-keys-command), which is built during host instance intial launch and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. The users who may access the bastion service may be restricted to membership of a defined AWS IAM group which is not set up or managed by this plan.  When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user. Aside from the resources provided by AWS and remote public repositories this plan is entirely self contained. There is no reliance on registries, build chains etc.
 
 # This plan is also published on the Terraform Community Module Registry
 
 You may find it more convenient to call it in your plan [directly from the Terraform Community Module Registry](https://registry.terraform.io/modules/joshuamkite/ssh-bastion-service/)
 
-## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project
+## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project and acknowledgment to tpesce
+
+# Custom base AMI and modular userdata from version 4.1
+
+You can now **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. Tested and working using Ubuntu 18.04 as an example ;)
+
+ **Userdata has been divided into sections which are now individually applicable**. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore all of these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
+
+The variables for these sections are:
+
+* **custom_ssh_populate** - any value excludes default ssh_populate script used on container launch from userdata
+
+* **custom_authorized_keys_command** - any value excludes default Go binary iam-authorized-keys built from source from userdata
+
+* **custom_docker_setup** - any value excludes default docker installation and container build from userdata
+
+* **custom_systemd** - any value excludes default systemd and hostname change from userdata
+
+If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data for a working service. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
 
 # Network Load Balancer from version 4.0
 
@@ -29,9 +51,9 @@ If you are seeking a solution for ECS hosts then you are recommended to either t
 
 In version 1.x series (download this release if you want it!) this plan deployed a simple static host. With the version 2 branch a move was made to make this a high availabilty service with an autoscaling group, health checks and a load balancer. This has necessitated the removal of the feature in version 1.x of creating and attaching to the container host an Elastic Network Interface for each additional subnet specified. With the new release series additional subnets are supplied instead to the autoscaling group and load balancer. The expectation is that separation will be managed by vpc rather than segregated subnet. 
 
-# Service deployed by this plan
+# Service deployed by this plan (presuming default userdata)
 
-This plan creates a load balancer and autoscaling group with an **optional (from version 3.7) dns entry for the service. You can now define the last part of the hostname. By default this is the vpc ID via the magic default value of 'vpc_id' with the format
+This plan creates a load balancer and autoscaling group with an **optional** (from version 3.7) DNS entry for the service. You can now define the last part of the hostname. By default this is the vpc ID via the magic default value of 'vpc_id' with the format
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
 
@@ -57,26 +79,27 @@ and a subsequent container might have
 
 In the case that `bastion_vpc_name = ""` the service container shell prompt is set similar to `you@dev-ap-northeast-1_3`
 
-It is considered normal to see very highly incremented counters.
+It is considered normal to see very highly incremented counters if the load blancer health checks are conducted on the service port.
 
 **It is essential to limit incoming service traffic to whitelisted ports** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
-**The host is set to run the latest patch release at deployment of Debian Stretch**. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up dhcp for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with
+The host is set to run the latest patch release at deployment of Debian Stretch - unless you specify a custom AMI. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with
 
     sudo apt install -y curl; ssh -p2222 admin@`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
 
-It is not possible to use Amazon Linux 2 because we need (from Systemd):
+**Make sure that your agent forwarding is active before attempting this!**
+
+
+If you are interested in specifying your own AMI then be aware that there are many subtle differences in systemd implemntations between different versions, e.g. it is not possible to use Amazon Linux 2 because we need (from Systemd):
 
 * RunTimeMaxSec to limit the service container lifetime. This was introduced with Systemd version 229 (feb 2016) whereas Amazon Linux 2 uses version 219 (Feb 2015) This is a critical requirement.
 * Ability to pass through hostname and increment (-- hostname foo%i) from systemd to docker, which does not appear to be supported on Amazon Linux 2. Ths is a 'nice to have' feature.
-
-**Make sure that your agent forwarding is active before attempting this!**
 
 # In Use
 
 ## IAM user names and Linux user names
 
-*with thanks to [michaelwittig](https://github.com/widdix/aws-ec2-ssh)*
+*with thanks to michaelwittig and the [Widdix project](https://github.com/widdix/aws-ec2-ssh)*
 
 IAM user names may be up to 64 characters long.
 
@@ -119,13 +142,13 @@ The following is referenced in "message of the day" on the container:
 
 ## Logging
 
-The sshd-worker container is launched with `v /dev/log:/dev/log` This causes logging information to be recorded in the host systemd journal which is not directly accessible from the container. It is thus simple to see who logged in and when by interrogating the host, e.g.
+The sshd-worker container is launched with `-v /dev/log:/dev/log` This causes logging information to be recorded in the host systemd journal which is not directly accessible from the container. It is thus simple to see who logged in and when by interrogating the host, e.g.
 
 	journalctl | grep 'Accepted publickey'
 
 gives information such as
 
-	April 27 14:05:02 dev-eu-west-1-bastion-host sshd[7294]: Accepted publickey for aws_user from UNKNOWN port 65535 ssh2: RSA SHA256:*****************************
+	April 27 14:05:02 dev-eu-west-1-bastion-host sshd[7294]: Accepted publickey for aws_user from 192.168.168.0 port 65535 ssh2: RSA SHA256:*****************************
 
 Starting with release 3.8 it is possible to use the output giving the name of the role created for the service and to appeand addtional user data. This means that you can call this module from a plan specifiying your preferred logging solution, e.g. AWS cloudwatch.
 
@@ -135,14 +158,12 @@ Starting with release 3.8 it is possible to use the output giving the name of th
 
 # Notes for deployment
 
-Starting with version 3.7, ELB health check port may be optionally set to either port 22 (containerised service) or port 2222 (EC2 host sshd). From version 3.8 port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthceck on port 2222 or not.
+Starting with version 3.7, ELB health check port may be optionally set to either port 22 (containerised service) or port 2222 (EC2 host sshd). From version 3.8 port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthcheck on port 2222 or not.
 
-## Components
+## Components (using default userdata)
 
 **EC2 Host OS (debian) with:**
 
-* awscli
-* Docker container
 * Systemd docker unit
 * Systemd service template unit
 * IAM Profile connected to EC2 host
@@ -151,13 +172,13 @@ Starting with version 3.7, ELB health check port may be optionally set to either
 
 **IAM Role**
 
-All of the following are prefixed with the bastion service host name to ensure uniqueness. An appropriate set is created depending on whether or not another aws account is referenced for IAM identity checks.
+This and all of the following are prefixed with the bastion service host name to ensure uniqueness. An appropriate set is created depending on whether or not another aws account is referenced for IAM identity checks.
 
 * IAM role
 * IAM policies
 * IAM instance profile
 
-**Docker container** 'sshd_worker' - built at host launch time using generic ubuntu image, we add sshd and sudo.
+**Docker container** 'sshd_worker' - built at host launch time using generic ubuntu image, we add awscli; sshd and sudo.
 
 **[Go binary](https://github.com/Fullscreen/iam-authorized-keys-command)** and [forked to a companion repo](https://github.com/joshuamkite/iam-authorized-keys-command).
 
@@ -178,13 +199,13 @@ The files in question on the host deploy thus:
 * `iam-helper` is made available as a read-only volume to the docker container as /opt.
 * `iam-authorized-keys-command` is the Go binary that gets the users and ssh public keys from aws - it is built during bastion deployment
 * `ssh_populate.sh` is the container entry point and populates the local user accounts using the go binary
-* `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses Ubuntu (16.04) from the public Docker registry.
+* `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses Ubuntu 16.04/18.04 from the public Docker registry and installs additional public packages.
 
 ## Sample policy for other accounts
  
 If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then a matching sample policy and trust relationship is given as an output from the plan to assist with application in that other account. 
 
-The dns entry (if created) for the service is also displayed as an output of the format
+The DNS entry (if created) for the service is also displayed as an output of the format
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
 
@@ -209,6 +230,11 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
+| custom_ami_id | id for custom ami if used | string | `` | no |
+| custom_authorized_keys_command | any value excludes default Go binary iam-authorized-keys built from source from userdata | string | `` | no |
+| custom_docker_setup | any value excludes default docker installation and container build from userdata | string | `` | no |
+| custom_ssh_populate | any value excludes default ssh_populate script used on container launch from userdata | string | `` | no |
+| custom_systemd | any value excludes default systemd and hostname change from userdata | string | `` | no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
 | environment_name | the name of the environment that we are deploying to | string | `staging` | no |
 | extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |

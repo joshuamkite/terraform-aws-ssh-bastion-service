@@ -4,6 +4,24 @@
 * **It is not possible to successfully apply module version 3.4 thru 3.10 over earlier versions due to change from 'aws_security_group' to aws_security_group_rules'** 
 **You will need to terraform destroy; terraform apply in such cases**
 
+# 4.1
+
+**Feature:** You can now specify a custom base AMI to use for the service host if you wish with var.custom_ami_id. Tested and working without other changes using Ubuntu 18.04
+
+**Feature:** Userdata has been divided into sections which are now individually applicable. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
+
+The variables for these sections are:
+
+* **custom_ssh_populate** - any value excludes default ssh_populate script used on container launch from userdata
+
+* **custom_authorized_keys_command** - any value excludes default Go binary to get IAM authorized keys built from source in userdata
+
+* **custom_docker_setup** - any value excludes default docker installation and container build from userdata
+
+* **custom_systemd** - any value excludes default systemd and hostname change from userdata
+
+If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
+
 # 4.0
 
 **New major version increment because of breaking changes** It is not possible to apply this version of this module over earlier versions

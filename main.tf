@@ -5,60 +5,7 @@ data "aws_region" "current" {}
 data "aws_availability_zones" "available" {}
 
 ##########################
-#Create user-data for bastion ec2 instance 
-##########################
-
-data "template_file" "user_data_assume_role" {
-  count    = "${local.assume_role_yes}"
-  template = "${file("${path.module}/user_data/bastion_host_cloudinit_config_assume_role.tpl")}"
-
-  vars {
-    bastion_host_name         = "${local.bastion_host_name}"
-    authorized_command_code   = "${indent(8, file("${path.module}/user_data/iam_authorized_keys_code/main.go"))}"
-    bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
-    vpc                       = "${var.vpc}"
-    assume_role_arn           = "${var.assume_role_arn}"
-    container_ubuntu_version  = "${var.container_ubuntu_version}"
-  }
-}
-
-data "template_file" "user_data_same_account" {
-  count    = "${local.assume_role_no}"
-  template = "${file("${path.module}/user_data/bastion_host_cloudinit_config.tpl")}"
-
-  vars {
-    bastion_host_name         = "${local.bastion_host_name}"
-    authorized_command_code   = "${indent(8, file("${path.module}/user_data/iam_authorized_keys_code/main.go"))}"
-    bastion_allowed_iam_group = "${var.bastion_allowed_iam_group}"
-    vpc                       = "${var.vpc}"
-    container_ubuntu_version  = "${var.container_ubuntu_version}"
-  }
-}
-
-data "template_cloudinit_config" "config" {
-  gzip          = false
-  base64_encode = false
-
-  part {
-    filename     = "module_user_data"
-    content_type = "text/cloud-config"
-
-    content = "${element(
-    concat(data.template_file.user_data_assume_role.*.rendered,
-           data.template_file.user_data_same_account.*.rendered),
-    0)}"
-  }
-
-  part {
-    filename     = "extra_user_data"
-    content_type = "${var.extra_user_data_content_type}"
-    content      = "${var.extra_user_data_content}"
-    merge_type   = "${var.extra_user_data_merge_type}"
-  }
-}
-
-##########################
-#Query for most recent AMI of type debian for use as host
+#Query for most recent AMI of type debian
 ##########################
 
 data "aws_ami" "debian" {
@@ -79,7 +26,7 @@ data "aws_ami" "debian" {
 resource "aws_launch_configuration" "bastion-service-host-local" {
   count                       = "${local.assume_role_no}"
   name_prefix                 = "bastion-service-host"
-  image_id                    = "${data.aws_ami.debian.id}"
+  image_id                    = "${local.bastion_ami_id}"
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_profile.arn}"
   associate_public_ip_address = "false"
@@ -95,7 +42,7 @@ resource "aws_launch_configuration" "bastion-service-host-local" {
 resource "aws_launch_configuration" "bastion-service-host-assume" {
   count                       = "${local.assume_role_yes}"
   name_prefix                 = "bastion-service-host"
-  image_id                    = "${data.aws_ami.debian.id}"
+  image_id                    = "${local.bastion_ami_id}"
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"
   associate_public_ip_address = "false"

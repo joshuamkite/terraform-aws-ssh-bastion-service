@@ -15,9 +15,50 @@ locals {
 }
 
 ##########################
-# Logic tests for  user-data 
+# Logic tests for  assume role vs same account 
 ##########################
 locals {
   assume_role_yes = "${var.assume_role_arn != "" ? 1 : 0}"
   assume_role_no  = "${var.assume_role_arn == "" ? 1 : 0}"
+}
+
+##########################
+# Logic tests for using module default ssh_populate script
+##########################
+locals {
+  custom_ssh_populate_yes = "${var.custom_ssh_populate != "" ? 1 : 0}"
+  custom_ssh_populate_no  = "${var.custom_ssh_populate == "" ? 1 : 0}"
+}
+
+##########################
+# Logic tests for using module default authorized_keys_command code
+##########################
+
+locals {
+  custom_authorized_keys_command_yes = "${var.custom_authorized_keys_command != "" ? 1 : 0}"
+  custom_authorized_keys_command_no  = "${var.custom_authorized_keys_command == "" ? 1 : 0}"
+}
+
+##########################
+# Logic tests for using module default docker_setup
+##########################
+locals {
+  custom_docker_setup_yes = "${var.custom_docker_setup != "" ? 1 : 0}"
+  custom_docker_setup_no  = "${var.custom_docker_setup == "" ? 1 : 0}"
+}
+
+##########################
+# Logic tests for using module default systemd
+##########################
+locals {
+  custom_systemd_yes = "${var.custom_systemd != "" ? 1 : 0}"
+  custom_systemd_no  = "${var.custom_systemd == "" ? 1 : 0}"
+}
+
+##########################
+# Logic for using module default or custom ami
+##########################
+
+locals {
+  bastion_ami_id = "${var.custom_ami_id == "" ? data.aws_ami.debian.id : var.custom_ami_id}"
 }

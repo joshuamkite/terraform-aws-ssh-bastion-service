@@ -160,6 +160,8 @@ Starting with release 3.8 it is possible to use the output giving the name of th
 
 Starting with version 3.7, ELB health check port may be optionally set to either port 22 (containerised service) or port 2222 (EC2 host sshd). From version 3.8 port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthcheck on port 2222 or not.
 
+From version 4.3 You can now specify a list of one or more security groups to attach to the host instance launch configuration. This can be supplied together with or instead of a whitelisted range of CIDR blocks. It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign a suitable security group or whitelist then you may not be able to reach the service!
+
 ## Components (using default userdata)
 
 **EC2 Host OS (debian) with:**
@@ -228,7 +230,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
 | bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
-| cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | - | yes |
+| cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | `<list>` | no |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
 | custom_ami_id | id for custom ami if used | string | `` | no |
 | custom_authorized_keys_command | any value excludes default Go binary iam-authorized-keys built from source from userdata | string | `` | no |
@@ -245,6 +247,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | lb_interval | interval for lb target group health check | string | `30` | no |
 | lb_unhealthy_threshold | Unhealthy threshold for lb target group | string | `2` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
+| security_groups_additional | additional security group IDs to attach to host instance | list | `<list>` | no |
 | subnets_asg | list of subnets for autoscaling group - availability zones must match subnets_lb | list | `<list>` | no |
 | subnets_lb | list of subnets for load balancer - availability zones must match subnets_asg | list | `<list>` | no |
 | tags | AWS tags that should be associated with created resources | map | `<map>` | no |

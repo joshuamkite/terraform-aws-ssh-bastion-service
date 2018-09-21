@@ -46,7 +46,7 @@ resource "aws_launch_configuration" "bastion-service-host-assume" {
   instance_type               = "${var.bastion_instance_type}"
   iam_instance_profile        = "${aws_iam_instance_profile.bastion_service_assume_role_profile.arn}"
   associate_public_ip_address = "false"
-  security_groups             = ["${aws_security_group.bastion_service.id}"]
+  security_groups             = ["${aws_security_group.bastion_service.id}", "${compact(concat(var.security_groups_additional))}"]
   user_data                   = "${data.template_cloudinit_config.config.rendered}"
   key_name                    = "${var.bastion_service_host_key_name}"
 

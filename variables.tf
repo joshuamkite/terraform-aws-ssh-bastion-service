@@ -12,6 +12,7 @@ variable "cidr_blocks_whitelist_host" {
 variable "cidr_blocks_whitelist_service" {
   description = "range(s) of incoming IP addresses to whitelist for the SERVICE"
   type        = "list"
+  default     = []
 }
 
 variable "environment_name" {
@@ -164,4 +165,10 @@ variable "custom_systemd" {
 variable "custom_ami_id" {
   description = "id for custom ami if used"
   default     = ""
+}
+
+variable "security_groups_additional" {
+  description = "additional security group IDs to attach to host instance"
+  type        = "list"
+  default     = []
 }

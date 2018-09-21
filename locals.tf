@@ -62,3 +62,12 @@ locals {
 locals {
   bastion_ami_id = "${var.custom_ami_id == "" ? data.aws_ami.debian.id : var.custom_ami_id}"
 }
+
+##########################
+# Logic for using cidr_blocks_whitelist_service ONLY if provided
+##########################
+
+locals {
+  cidr_blocks_whitelist_service_yes = "${(join(",", var.cidr_blocks_whitelist_service)) != "" ? 1 : 0}"
+  cidr_blocks_whitelist_service_no  = "${(join(",", var.cidr_blocks_whitelist_service)) == "" ? 1 : 0}"
+}

@@ -4,6 +4,14 @@
 * **It is not possible to successfully apply module version 3.4 thru 3.10 over earlier versions due to change from 'aws_security_group' to aws_security_group_rules'** 
 **You will need to terraform destroy; terraform apply in such cases**
 
+# 4.3
+
+**Feature:** You can now specify a list of one or more security groups to attach to the host instance launch configuration. This can be supplied together with or instead of a whitelisted range of CIDR blocks. It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign a suitable security group or whitelist then you may not be able to reach the service!
+
+# 4.2
+
+**Bugfix:** Make load balancer and target group names unique to support multiple environments in one account
+
 # 4.1
 
 **Feature:** You can now specify a custom base AMI to use for the service host if you wish with var.custom_ami_id. Tested and working without other changes using Ubuntu 18.04

@@ -6,7 +6,11 @@
 
 # 4.3
 
-**Feature:** You can now specify a list of one or more security groups to attach to the host instance launch configuration. This can be supplied together with or instead of a whitelisted range of CIDR blocks. It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign a suitable security group or whitelist then you may not be able to reach the service!
+**Feature:** You can now specify a list of one or more security groups to attach to the host instance launch configuration. This can be supplied together with or instead of a whitelisted range of CIDR blocks. **N.B. This is _not_ aws_security_group_rule/source_security_group_id!** If you wish to append your own 'security_group_id' rules then you will need to attach these from a plan caling this module (using output "bastion_sg_id") or as part of a separate security group which you then attach. 
+
+It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign a suitable security group or whitelist then you may not be able to reach the service!
+
+**Change:** The code has been DRYed significantly in locals.tf (to remove unused logic evaluations) and main.tf (to condense 2 seperate aws_launch_configuration and aws_autoscaling_group blocks into one each). This makes code maintenence much easier and less error prone **BUT** it does mean that these resources are now 'new' so if you are deploying over an older version of this plan then you can expect them to be rereated - with 'create before destroy' any downtime should be brief.
 
 # 4.2
 

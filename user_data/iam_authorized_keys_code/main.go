@@ -97,7 +97,7 @@ func users(svc *iam.IAM, iamGroup string) ([]*iam.User, error) {
 		return resp.Users, err
 	}
 	params := &iam.ListUsersInput{
-		MaxItems: aws.Int64(5000),
+		MaxItems: aws.Int64(1000),
 	}
 	resp, err := svc.ListUsers(params)
 	return resp.Users, err

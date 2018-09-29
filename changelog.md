@@ -10,7 +10,9 @@
 
 It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign a suitable security group or whitelist then you may not be able to reach the service!
 
-**Change:** The code has been DRYed significantly in locals.tf (to remove unused logic evaluations) and main.tf (to condense 2 seperate aws_launch_configuration and aws_autoscaling_group blocks into one each). This makes code maintenence much easier and less error prone **BUT** it does mean that these resources are now 'new' so if you are deploying over an older version of this plan then you can expect them to be rereated - with 'create before destroy' any downtime should be brief.
+**Change:** The code has been DRYed significantly in locals.tf (to remove unused logic evaluations) and main.tf (to condense 2 seperate aws_launch_configuration and aws_autoscaling_group blocks into one each). This makes code maintenence much easier and less error prone **BUT** it does mean that these resources are now 'new' so if you are deploying over an older version of this plan then you can expect them to be recreated - as lifecycle 'create before destroy' is specified, deployment will be a bit longer but downtime should be brief.
+
+**Bugfix:** Previously the Golang code used for obtaining users and ssh public keys limited the number of users returned to 100 _if_ an IAM group was specified. This has now been increased to 1000 and the code change accepted upstream. 
 
 # 4.2
 

@@ -1,8 +1,8 @@
 **N.B.**
 
-* **It is not possible to successfully apply module version >/= 4.0 over earlier versions due to chang from classic to network load balancer**
-* **It is not possible to successfully apply module version 3.4 thru 3.10 over earlier versions due to change from 'aws_security_group' to aws_security_group_rules'** 
-**You will need to terraform destroy; terraform apply in such cases**
+* **It is not possible to successfully apply module version >/= 4.0 over versions </= 3.xx due to chang from classic to network load balancer**
+
+**You will need to terraform destroy; terraform apply in such case**
 
 # 4.3
 

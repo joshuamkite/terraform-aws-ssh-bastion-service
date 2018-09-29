@@ -21,6 +21,7 @@ resource "aws_security_group" "bastion_service" {
 # SSH access in from whitelist IP ranges
 
 resource "aws_security_group_rule" "service_ssh_in" {
+  count             = "${(local.cidr_blocks_whitelist_service_yes ? 1 : 0) }"
   type              = "ingress"
   from_port         = 22
   to_port           = 22

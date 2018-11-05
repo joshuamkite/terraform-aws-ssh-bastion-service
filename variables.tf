@@ -12,6 +12,7 @@ variable "cidr_blocks_whitelist_host" {
 variable "cidr_blocks_whitelist_service" {
   description = "range(s) of incoming IP addresses to whitelist for the SERVICE"
   type        = "list"
+  default     = []
 }
 
 variable "environment_name" {
@@ -28,15 +29,15 @@ variable "bastion_service_host_key_name" {
   default     = ""
 }
 
-variable "subnets_elb" {
+variable "subnets_lb" {
   type        = "list"
-  description = "list of subnets for load balancer"
+  description = "list of subnets for load balancer - availability zones must match subnets_asg"
   default     = []
 }
 
 variable "subnets_asg" {
   type        = "list"
-  description = "list of subnets for autoscaling group"
+  description = "list of subnets for autoscaling group - availability zones must match subnets_lb"
   default     = []
 }
 
@@ -58,41 +59,29 @@ variable "bastion_allowed_iam_group" {
 
 variable "tags" {
   type        = "map"
-  description = "AWS tags that should be associated with created resources (except autoscaling group!)"
+  description = "AWS tags that should be associated with created resources"
   default     = {}
 }
 
 ##############################
-#ELB ASG variables
+#LB ASG variables
 ##############################
-variable "elb_healthy_threshold" {
+variable "lb_healthy_threshold" {
   type        = "string"
-  description = "Healthy threshold for ELB"
+  description = "Healthy threshold for lb target group"
   default     = "2"
 }
 
-variable "elb_unhealthy_threshold" {
+variable "lb_unhealthy_threshold" {
   type        = "string"
-  description = "Unhealthy threshold for ELB"
+  description = "Unhealthy threshold for lb target group"
   default     = "2"
 }
 
-variable "elb_timeout" {
+variable "lb_interval" {
   type        = "string"
-  description = "timeout for ELB"
-  default     = "3"
-}
-
-variable "elb_interval" {
-  type        = "string"
-  description = "interval for ELB health check"
+  description = "interval for lb target group health check"
   default     = "30"
-}
-
-variable "elb_idle_timeout" {
-  type        = "string"
-  description = "The time in seconds that the connection is allowed to be idle"
-  default     = "300"
 }
 
 variable "asg_max" {
@@ -122,9 +111,9 @@ variable "assume_role_arn" {
   default     = ""
 }
 
-variable "elb_healthcheck_port" {
-  description = "TCP port to conduct elb healthchecks. Acceptable values are 22 or 2222"
-  default     = "22"
+variable "lb_healthcheck_port" {
+  description = "TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222"
+  default     = "2222"
 }
 
 variable "bastion_vpc_name" {
@@ -135,4 +124,51 @@ variable "bastion_vpc_name" {
 variable "container_ubuntu_version" {
   description = "ubuntu version to use for service container. Tested with 16.04 and 18.04"
   default     = "16.04"
+}
+
+variable "extra_user_data_content" {
+  default     = ""
+  description = "Extra user-data to add to the default built-in"
+}
+
+variable "extra_user_data_content_type" {
+  default     = "text/x-shellscript"
+  description = "What format is content in - eg 'text/cloud-config' or 'text/x-shellscript'"
+}
+
+variable "extra_user_data_merge_type" {
+  # default     = "list(append)+dict(recurse_array)+str()"
+  default     = "str(append)"
+  description = "Control how cloud-init merges user-data sections"
+}
+
+variable "custom_ssh_populate" {
+  description = "any value excludes default ssh_populate script used on container launch from userdata"
+  default     = ""
+}
+
+variable "custom_authorized_keys_command" {
+  description = "any value excludes default Go binary iam-authorized-keys built from source from userdata"
+  default     = ""
+}
+
+variable "custom_docker_setup" {
+  description = "any value excludes default docker installation and container build from userdata"
+  default     = ""
+}
+
+variable "custom_systemd" {
+  description = "any value excludes default systemd and hostname change from userdata"
+  default     = ""
+}
+
+variable "custom_ami_id" {
+  description = "id for custom ami if used"
+  default     = ""
+}
+
+variable "security_groups_additional" {
+  description = "additional security group IDs to attach to host instance"
+  type        = "list"
+  default     = []
 }

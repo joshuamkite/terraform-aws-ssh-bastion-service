@@ -1,4 +1,75 @@
-**N.B. It is not possible to successfully apply module version >/=3.4 over version </=3.3 due to change from 'aws_security_group' to aws_security_group_rules' you will need to terraform destroy; terraform apply in this case**
+**N.B.**
+
+* **It is not possible to successfully apply module version >/= 4.0 over versions </= 3.xx due to chang from classic to network load balancer**
+
+**You will need to terraform destroy; terraform apply in such case**
+
+# 4.3
+
+**Feature:** You can now specify a list of one or more security groups to attach to the host instance launch configuration. This can be supplied together with or instead of a whitelisted range of CIDR blocks. **N.B. This is _not_ aws_security_group_rule/source_security_group_id!** If you wish to append your own 'security_group_id' rules then you will need to attach these from a plan caling this module (using output "bastion_sg_id") or as part of a separate security group which you then attach. 
+
+It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign a suitable security group or whitelist then you may not be able to reach the service!
+
+**Change:** The code has been DRYed significantly in locals.tf (to remove unused logic evaluations) and main.tf (to condense 2 seperate aws_launch_configuration and aws_autoscaling_group blocks into one each). This makes code maintenence much easier and less error prone **BUT** it does mean that these resources are now 'new' so if you are deploying over an older version of this plan then you can expect them to be recreated - as lifecycle 'create before destroy' is specified, deployment will be a bit longer but downtime should be brief.
+
+**Bugfix:** Previously the Golang code used for obtaining users and ssh public keys limited the number of users returned to 100 _if_ an IAM group was specified. This has now been increased to 1000 and the code change accepted upstream. 
+
+# 4.2
+
+**Bugfix:** Make load balancer and target group names unique to support multiple environments in one account
+
+# 4.1
+
+**Feature:** You can now specify a custom base AMI to use for the service host if you wish with var.custom_ami_id. Tested and working without other changes using Ubuntu 18.04
+
+**Feature:** Userdata has been divided into sections which are now individually applicable. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
+
+The variables for these sections are:
+
+* **custom_ssh_populate** - any value excludes default ssh_populate script used on container launch from userdata
+
+* **custom_authorized_keys_command** - any value excludes default Go binary to get IAM authorized keys built from source in userdata
+
+* **custom_docker_setup** - any value excludes default docker installation and container build from userdata
+
+* **custom_systemd** - any value excludes default systemd and hostname change from userdata
+
+If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
+
+# 4.0
+
+**New major version increment because of breaking changes** It is not possible to apply this version of this module over earlier versions
+
+**Feature:** Move from Classic Load Balancer to Network Load Balancer. 
+* elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration. 
+
+* Configurable load balancer variables naming now prefixed 'lb'. Unfortunately the change in load balancer type breaks backward compatibilty with deployments using earlier versions of this module anyway so the opportunity is being taken to update the variable names for future sanity.
+
+**Feature:** Security group rules apply 'description' tag
+
+**Change:**  New code now in seperate files to assist readabilty. locals also moved to seperate file.
+
+**Change:**  Security group name for EC2 instance now name_prefix and simplified
+
+# 3.10
+
+**Bugfix:**  Join bastion_service names to prevent error when route53_zone_id is not defined. With thanks to tpesce
+
+# 3.9
+
+**Feature:** Extensible tagging for Autoscaling groups
+
+**Bugfix:** Region now correctly interpolated for autoscaling group tag
+
+# 3.8
+
+**Feature:** Implement appendable user data - you can now add userdata from an encompassing plan
+
+**Feature:** The role created by this module is now available as an output so that an encompassing plan may use it e.g. for additional policies attachment
+
+* Both changes make it easier to set up your logging solution of choice, e.g. cloudwatch
+
+**Change:**  EC2 healthcheck port now defaults to 2222 - this avoids scaling issues with IAM in large deployments
 
 # 3.7
 

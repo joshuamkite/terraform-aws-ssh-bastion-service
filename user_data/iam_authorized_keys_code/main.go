@@ -92,12 +92,13 @@ func users(svc *iam.IAM, iamGroup string) ([]*iam.User, error) {
 	if iamGroup != "" {
 		params := &iam.GetGroupInput{
 			GroupName: aws.String(iamGroup),
+			MaxItems:  aws.Int64(1000),
 		}
 		resp, err := svc.GetGroup(params)
 		return resp.Users, err
 	}
 	params := &iam.ListUsersInput{
-		MaxItems: aws.Int64(100),
+		MaxItems: aws.Int64(1000),
 	}
 	resp, err := svc.ListUsers(params)
 	return resp.Users, err

@@ -4,7 +4,7 @@
 
 locals {
   bastion_vpc_name  = "${var.bastion_vpc_name == "vpc_id" ? var.vpc : var.bastion_vpc_name}"
-  bastion_host_name = "${join("-", compact(list(var.environment_name, data.aws_region.current.name, local.bastion_vpc_name)))}"
+  bastion_host_name = "${var.bastion_host_name == "" ? join("-", compact(list(var.environment_name, data.aws_region.current.name, local.bastion_vpc_name))) : var.bastion_host_name}"
 }
 
 ##########################

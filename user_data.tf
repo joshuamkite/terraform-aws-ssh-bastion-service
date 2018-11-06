@@ -55,7 +55,7 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "module_systemd"
     content_type = "text/x-shellscript"
-    content      = "${element(concat(data.template_file.systemd.*.rendered, list("")), 0)}"
+    content      = "${element(concat(data.template_file.systemd.*.rendered, list("#!/bin/bash")), 0)}"
   }
 
   # ssh_populate_assume_role
@@ -63,7 +63,7 @@ data "template_cloudinit_config" "config" {
     filename     = "module_ssh_populate_assume_role"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
-    content      = "${element(concat(data.template_file.ssh_populate_assume_role.*.rendered, list("")), 0)}"
+    content      = "${element(concat(data.template_file.ssh_populate_assume_role.*.rendered, list("#!/bin/bash")), 0)}"
   }
 
   # ssh_populate_same_account
@@ -71,7 +71,7 @@ data "template_cloudinit_config" "config" {
     filename     = "module_ssh_populate_same_account"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
-    content      = "${element(concat(data.template_file.ssh_populate_same_account.*.rendered, list("")), 0)}"
+    content      = "${element(concat(data.template_file.ssh_populate_same_account.*.rendered, list("#!/bin/bash")), 0)}"
   }
 
   # docker_setup section
@@ -79,7 +79,7 @@ data "template_cloudinit_config" "config" {
     filename     = "module_docker_setup"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
-    content      = "${element(concat(data.template_file.docker_setup.*.rendered, list("")), 0)}"
+    content      = "${element(concat(data.template_file.docker_setup.*.rendered, list("#!/bin/bash")), 0)}"
   }
 
   # iam-authorized-keys-command
@@ -87,7 +87,7 @@ data "template_cloudinit_config" "config" {
     filename     = "module_iam-authorized-keys-command"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
-    content      = "${element(concat(data.template_file.iam-authorized-keys-command.*.rendered, list("")), 0)}"
+    content      = "${element(concat(data.template_file.iam-authorized-keys-command.*.rendered, list("#!/bin/bash")), 0)}"
   }
 
   part {

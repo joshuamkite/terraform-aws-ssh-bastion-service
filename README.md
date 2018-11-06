@@ -229,6 +229,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
 | bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
 | bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
+| bastion_host_name | define the hostname of the instance, by default this is computed as a combination of environment name, region and vpc name/id  | string | `<computed>` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | `<list>` | no |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |

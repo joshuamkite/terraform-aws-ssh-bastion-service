@@ -91,6 +91,12 @@ variable "lb_interval" {
   default     = "30"
 }
 
+variable "lb_is_internal" {
+  type        = "string"
+  description = "whether the lb will be internal"
+  default     = false
+}
+
 variable "asg_max" {
   type        = "string"
   description = "Max numbers of bastion-service hosts in ASG"

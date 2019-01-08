@@ -7,6 +7,10 @@
 # 4.5
 
 **Feature:** Bastion load balancer can now be internal
+**Feature:** Bastion can now be assigned a public IP - permits use of module without NAT gateway (Thanks Ivan Mesic navi7
+)
+**Feature:** Example of simple use with a public IP - permits use of module without NAT gateway (Thanks Ivan Mesic navi7
+)
 
 # 4.4
 

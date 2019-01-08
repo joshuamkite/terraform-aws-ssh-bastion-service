@@ -29,6 +29,11 @@ variable "bastion_service_host_key_name" {
   default     = ""
 }
 
+variable "public_ip" {
+  default     = false
+  description = "Associate a public IP with the host instance when launching"
+}
+
 variable "subnets_lb" {
   type        = "list"
   description = "list of subnets for load balancer - availability zones must match subnets_asg"
@@ -64,11 +69,10 @@ variable "tags" {
 }
 
 variable "bastion_host_name" {
-  type = "string"
-  default = ""
+  type        = "string"
+  default     = ""
   description = "The hostname to give to the bastion instance"
 }
-
 
 ##############################
 #LB ASG variables

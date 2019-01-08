@@ -246,6 +246,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | lb_healthcheck_port | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
 | lb_healthy_threshold | Healthy threshold for lb target group | string | `2` | no |
 | lb_interval | interval for lb target group health check | string | `30` | no |
+| lb_is_internal | whether the lb will be internal | string | false | no |
 | lb_unhealthy_threshold | Unhealthy threshold for lb target group | string | `2` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
 | security_groups_additional | additional security group IDs to attach to host instance | list | `<list>` | no |

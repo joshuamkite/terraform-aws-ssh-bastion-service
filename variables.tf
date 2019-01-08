@@ -64,11 +64,10 @@ variable "tags" {
 }
 
 variable "bastion_host_name" {
-  type = "string"
-  default = ""
+  type        = "string"
+  default     = ""
   description = "The hostname to give to the bastion instance"
 }
-
 
 ##############################
 #LB ASG variables

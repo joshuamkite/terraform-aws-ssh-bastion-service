@@ -1,8 +1,18 @@
 **N.B.**
 
-* **It is not possible to successfully apply module version >/= 4.0 over versions </= 3.xx due to chang from classic to network load balancer**
+* **It is not possible to successfully apply module version >/= 4.0 over versions </= 3.xx due to change from classic to network load balancer**
 
 **You will need to terraform destroy; terraform apply in such case**
+
+# 4.5
+
+**Feature:** Bastion load balancer can now be internal
+
+# 4.4
+
+**Feature:** Adds a new variable so that the hostname can be overridden completely
+**Feature:** Removes the 'provider' so that it can set by the plan calling this module (as per Terraform guidelines)
+**Feature:** Adds a shebang as the default content for the shell script multipart mime types. This is so that, when using custom userdata, systemd doesn't report errors.
 
 # 4.3
 

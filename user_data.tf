@@ -93,7 +93,7 @@ data "template_cloudinit_config" "config" {
   part {
     filename     = "extra_user_data"
     content_type = "${var.extra_user_data_content_type}"
-    content      = "${var.extra_user_data_content}"
+    content      = "${(var.extra_user_data_content != "" ? var.extra_user_data_content : "#!/bin/bash")}"
     merge_type   = "${var.extra_user_data_merge_type}"
   }
 }

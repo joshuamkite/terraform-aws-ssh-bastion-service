@@ -5,7 +5,7 @@
 resource "aws_lb" "bastion-service" {
   name                             = "${md5(format("bastion-service-%s",var.vpc))}"
   load_balancer_type               = "network"
-  internal                         = false
+  internal                         = "${var.lb_is_internal}"
   subnets                          = ["${var.subnets_lb}"]
   enable_cross_zone_load_balancing = true
   tags                             = "${var.tags}"

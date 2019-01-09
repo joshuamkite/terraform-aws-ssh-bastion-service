@@ -7,10 +7,9 @@
 # 4.5
 
 **Feature:** Bastion load balancer can now be internal (Thanks Instacart)
-**Feature:** Bastion can now be assigned a public IP - permits use of module without NAT gateway (Thanks Ivan Mesic navi7
-)
-**Feature:** Example of simple use with a public IP - permits use of module without NAT gateway (Thanks Ivan Mesic navi7
-)
+**Feature:** Bastion can now be assigned a public IP - permits use of module without NAT gateway (Thanks Ivan Mesic navi7)
+**Feature:** Example of simple use of module with a public IP (Thanks Ivan Mesic navi7)
+**Bugfix:** Populate user data with default if empty (Thanks Ivan Mesic navi7)
 
 # 4.4
 

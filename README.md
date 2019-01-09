@@ -1,4 +1,4 @@
-This Terraform deploys a stateless containerised sshd bastion service on AWS:
+This Terraform deploys a stateless containerised sshd bastion service on AWS with IAM based authentication:
 ===================================
 
 **N.B. If you are using a newer version of this module when you have an older version deployed, please review the changelog!**

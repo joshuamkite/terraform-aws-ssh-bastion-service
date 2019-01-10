@@ -7,7 +7,7 @@ This Terraform deploys a stateless containerised sshd bastion service on AWS wit
 
 This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. 
 
-**Since version 4.1 it is possible to replace the components in userdata and the base AMI with components of your own choosing. The following describes deployment with all sections as provided by module defaults.**
+**It is possible to replace the components in userdata and the base AMI with components of your own choosing. The following describes deployment with all sections as provided by module defaults.**
 
 The actual call for public keys is made with a [GO binary](https://github.com/Fullscreen/iam-authorized-keys-command), which is built during host instance intial launch and made available via shared volume in the docker image. In use the Docker container queries AWS for users with ssh keys at runtime, creates local linux user accounts for them and handles their login. The users who may access the bastion service may be restricted to membership of a defined AWS IAM group which is not set up or managed by this plan.  When the connection is closed the container exits. This means that users log in _as themselves_ and manage their own ssh keys using the AWS web console or CLI. For any given session they will arrive in a vanilla Ubuntu container with passwordless sudo and can install whatever applications and frameworks might be required for that session. Because the IAM identity checking and user account population is done at container run time and the containers are called on demand, there is no delay between creating an account with a public ssh key on AWS and being able to access the bastion. If users have more than one ssh public key then their account will be set up so that any of them may be used- AWS allows up to 5 keys per user. Aside from the resources provided by AWS and remote public repositories this plan is entirely self contained. There is no reliance on registries, build chains etc.
 
@@ -15,9 +15,13 @@ The actual call for public keys is made with a [GO binary](https://github.com/Fu
 
 You may find it more convenient to call it in your plan [directly from the Terraform Community Module Registry](https://registry.terraform.io/modules/joshuamkite/ssh-bastion-service/)
 
-## With thanks to Piotr Jaromin, Luis Silva and Robert Stettner for their excellent contributions to this project and acknowledgment to tpesce
+## With thanks and acknowledgments to Piotr Jaromin, Luis Silva, Robert Stettner, tpesce, Jason He and Ivan Mesic.
 
-# Custom base AMI and modular userdata from version 4.1
+# Quick start
+
+Ivan Mesic has kindly contributed an example use of this module creating a VPC and a bastion instance within it - see `/examples`
+
+# Custom sections:
 
 You can now **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. Tested and working using Ubuntu 18.04 as an example ;)
 
@@ -35,25 +39,21 @@ The variables for these sections are:
 
 If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data for a working service. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
 
-# Network Load Balancer from version 4.0
+# Ability to assume a role in another account
 
-From version 4.0 this module implements a network_load_balancer rather than a classic_load_balancer in accordance with advised best practice for AWS. Sadly this is unavoidably a breaking change. The principal immediate benefit is that logs on the host will now show the remote ip address of the connecting client rather than the load balancer.
-
-# Ability to assume a role in another account (New in Version 3)
-
-With version 3 series (backward compatible with version 2) the ability to assume a role in another account has now been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. Since this is a high availabilty service, it is not envisaged that there would be reason for more than one independent deployment within such a combination. 
-
-Also with version 3 the IAM policy generation and user data have been moved from modules back into the main plan. User data is no longer displayed. 
+The ability to assume a role to source IAM users from another account has been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. Since this is a high availabilty service, it is not envisaged that there would be reason for more than one independent deployment within such a combination. 
 
 If you are seeking a solution for ECS hosts then you are recommended to either the [Widdix project](https://github.com/widdix/aws-ec2-ssh) directly or my [Ansible-galaxy respin of it](https://galaxy.ansible.com/joshuamkite/aws-ecs-iam-users-tags/). This offers IAM authentication for local users with a range of features suitable for a long-lived stateful host built as an AMI or with configuratino management tools.
 
-# Breaking Changes from version 1.x series
-
-In version 1.x series (download this release if you want it!) this plan deployed a simple static host. With the version 2 branch a move was made to make this a high availabilty service with an autoscaling group, health checks and a load balancer. This has necessitated the removal of the feature in version 1.x of creating and attaching to the container host an Elastic Network Interface for each additional subnet specified. With the new release series additional subnets are supplied instead to the autoscaling group and load balancer. The expectation is that separation will be managed by vpc rather than segregated subnet. 
-
 # Service deployed by this plan (presuming default userdata)
 
-This plan creates a load balancer and autoscaling group with an **optional** (from version 3.7) DNS entry for the service. You can now define the last part of the hostname. By default this is the vpc ID via the magic default value of 'vpc_id' with the format
+This plan creates a network load balancer and autoscaling group with an **optional** DNS entry and an **optional** public IP for the service. 
+
+## Default, partial and complete customisation of hostname
+
+You can overwrite the suggested hostname entirely with `var.bastion_host_name.` 
+
+You can customise just the last part of the hostname if you like. By default this is the vpc ID via the magic default value of 'vpc_id' with the format
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
 
@@ -79,6 +79,8 @@ and a subsequent container might have
 
 In the case that `bastion_vpc_name = ""` the service container shell prompt is set similar to `you@dev-ap-northeast-1_3`
 
+# In use
+
 It is considered normal to see very highly incremented counters if the load blancer health checks are conducted on the service port.
 
 **It is essential to limit incoming service traffic to whitelisted ports** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
@@ -94,8 +96,6 @@ If you are interested in specifying your own AMI then be aware that there are ma
 
 * RunTimeMaxSec to limit the service container lifetime. This was introduced with Systemd version 229 (feb 2016) whereas Amazon Linux 2 uses version 219 (Feb 2015) This is a critical requirement.
 * Ability to pass through hostname and increment (-- hostname foo%i) from systemd to docker, which does not appear to be supported on Amazon Linux 2. Ths is a 'nice to have' feature.
-
-# In Use
 
 ## IAM user names and Linux user names
 
@@ -158,9 +158,9 @@ Starting with release 3.8 it is possible to use the output giving the name of th
 
 # Notes for deployment
 
-Starting with version 3.7, ELB health check port may be optionally set to either port 22 (containerised service) or port 2222 (EC2 host sshd). From version 3.8 port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthcheck on port 2222 or not.
+Load Balancer health check port may be optionally set to either port 22 (containerised service) or port 2222 (EC2 host sshd). Port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthcheck on port 2222 or not.
 
-From version 4.3 You can now specify a list of one or more security groups to attach to the host instance launch configuration. This can be supplied together with or instead of a whitelisted range of CIDR blocks. It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign either a suitable security group or whitelist then you may not be able to reach the service!
+You can a list of one or more security groups to attach to the host instance launch configuration within the module if you wish. This can be supplied together with or instead of a whitelisted range of CIDR blocks. It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign either a suitable security group or whitelist then you may not be able to reach the service!
 
 ## Components (using default userdata)
 
@@ -226,10 +226,10 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | aws_profile |  | string | - | yes |
 | aws_region |  | string | - | yes |
 | bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | string | `` | no |
+| bastion_host_name | The hostname to give to the bastion instance | string | `` | no |
 | bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
 | bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
 | bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
-| bastion_host_name | define the hostname of the instance, by default this is computed as a combination of environment name, region and vpc name/id  | string | `<computed>` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
 | cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | `<list>` | no |
 | container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
@@ -246,8 +246,9 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | lb_healthcheck_port | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
 | lb_healthy_threshold | Healthy threshold for lb target group | string | `2` | no |
 | lb_interval | interval for lb target group health check | string | `30` | no |
-| lb_is_internal | whether the lb will be internal | string | false | no |
+| lb_is_internal | whether the lb will be internal | string | `false` | no |
 | lb_unhealthy_threshold | Unhealthy threshold for lb target group | string | `2` | no |
+| public_ip | Associate a public IP with the host instance when launching | string | `false` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
 | security_groups_additional | additional security group IDs to attach to host instance | list | `<list>` | no |
 | subnets_asg | list of subnets for autoscaling group - availability zones must match subnets_lb | list | `<list>` | no |

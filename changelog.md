@@ -4,6 +4,10 @@
 
 **You will need to terraform destroy; terraform apply in such case**
 
+# 4.5.1
+
+**Feature:** Maintenance release - documentation changes and bump module version in example only
+
 # 4.5
 
 **Feature:** Bastion load balancer can now be internal (Thanks Instacart)

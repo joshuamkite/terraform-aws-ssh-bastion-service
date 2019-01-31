@@ -2,8 +2,8 @@
 mkdir -p /opt/iam_helper/
 cat << 'EOF' > /opt/iam_helper/ssh_populate.sh
 #!/bin/bash
-KST=(\`aws sts assume-role --role-arn "${assume_role_arn}" --role-session-name $(hostname) --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text\`)
-export AWS_ACCESS_KEY_ID=${KST[0]}; export AWS_SECRET_ACCESS_KEY=${KST[1]}; export AWS_SESSION_TOKEN=${KST[2]}
+KST=(`aws sts assume-role --role-arn "${assume_role_arn}" --role-session-name $(hostname) --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text`)
+export AWS_ACCESS_KEY_ID=$${KST[0]}; export AWS_SECRET_ACCESS_KEY=$${KST[1]}; export AWS_SESSION_TOKEN=$${KST[2]}
 (
 count=1
 /opt/iam-authorized-keys-command | while read line

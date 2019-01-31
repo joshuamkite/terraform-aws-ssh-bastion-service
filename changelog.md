@@ -4,6 +4,10 @@
 
 **You will need to terraform destroy; terraform apply in such case**
 
+# 4.6
+
+**Bugfix:** Change quote style for ssh_populate scripts to avoid early interpolation (Thanks KevinGreen)
+
 # 4.5.1
 
 **Feature:** Maintenance release - documentation changes and bump module version in example only

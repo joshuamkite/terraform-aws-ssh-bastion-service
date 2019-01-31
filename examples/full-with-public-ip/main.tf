@@ -64,7 +64,7 @@ variable "everyone-cidr" {
 # Comment out the bastion service, apply, uncomment and apply again
 module "ssh-bastion-service" {
   source  = "joshuamkite/ssh-bastion-service/aws"
-  version = "4.5.1"
+  version = "4.6"
 
   aws_region  = "${var.aws-region}"
   aws_profile = "${var.aws-profile}"

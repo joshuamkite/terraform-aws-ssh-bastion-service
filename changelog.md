@@ -4,6 +4,10 @@
 
 **You will need to terraform destroy; terraform apply in such case**
 
+# 4.7
+
+**Feature:** Add output "lb_arn"
+
 # 4.6
 
 **Bugfix:** Change quote style for ssh_populate scripts to avoid early interpolation (Thanks KevinGreen)

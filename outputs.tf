@@ -16,7 +16,8 @@ output "bastion_sg_id" {
 }
 
 output "lb_dns_name" {
-  value = "${aws_lb.bastion-service.dns_name}"
+  description = "aws load balancer dns"
+  value       = "${aws_lb.bastion-service.dns_name}"
 }
 
 output "lb_zone_id" {
@@ -31,4 +32,9 @@ output "bastion_service_assume_role_name" {
 output "bastion_service_role_name" {
   description = "role created for service host asg - if created without assume role"
   value       = "${aws_iam_role.bastion_service_role.*.name}"
+}
+
+output "lb_arn" {
+  description = "aws load balancer arn"
+  value       = "${aws_lb.bastion-service.arn}"
 }

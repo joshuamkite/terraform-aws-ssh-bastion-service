@@ -1,24 +1,27 @@
 #aws iam role for host -same account queries
 
 resource "aws_iam_role" "bastion_service_role" {
-  name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
+  name               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
+  count              = "${local.assume_role_no}"
+  assume_role_policy = "${data.aws_iam_policy_document.bastion_service_role_assume.json}"
+}
 
+data "aws_iam_policy_document" "bastion_service_role_assume" {
   count = "${local.assume_role_no}"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow"
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type = "Service"
+
+      identifiers = [
+        "ec2.amazonaws.com",
+      ]
     }
-  ]
-}
-EOF
+  }
 }
 
 #########################
@@ -32,36 +35,32 @@ resource "aws_iam_instance_profile" "bastion_service_profile" {
   role = "${aws_iam_role.bastion_service_role.name}"
 }
 
-resource "aws_iam_policy" "check_ssh_authorized_keys" {
-  name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_check_ssh_authorized_keys"
+data "aws_iam_policy_document" "check_ssh_authorized_keys" {
+  count = "${local.assume_role_no}"
 
-  description = "Allow querying aws to obtain list of users with their ssh public keys"
-  count       = "${local.assume_role_no}"
+  statement {
+    effect = "Allow"
 
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "iam:ListUsers",
-                "iam:GetGroup",
-                "iam:GetSSHPublicKey",
-                "iam:ListSSHPublicKeys",
-                "iam:GetUser",
-                "iam:ListGroups"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "ec2:DescribeTags",
-            "Resource": "*"
-        }
+    actions = [
+      "iam:ListUsers",
+      "iam:GetGroup",
+      "iam:GetSSHPublicKey",
+      "iam:ListSSHPublicKeys",
+      "iam:GetUser",
+      "iam:ListGroups",
+      "ec2:DescribeTags",
     ]
+
+    resources = [
+      "*",
+    ]
+  }
 }
-EOF
+
+resource "aws_iam_policy" "check_ssh_authorized_keys" {
+  name   = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
+  count  = "${local.assume_role_no}"
+  policy = "${data.aws_iam_policy_document.check_ssh_authorized_keys.json}"
 }
 
 resource "aws_iam_role_policy_attachment" "check_ssh_authorized_keys" {

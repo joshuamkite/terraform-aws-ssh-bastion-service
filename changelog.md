@@ -10,6 +10,8 @@
 
 **Change:** All policies are now rendered with `aws_iam_policy_document` rather than as json blobs
 
+**Feature:** Add tags to roles
+
 # 4.6
 
 **Bugfix:** Change quote style for ssh_populate scripts to avoid early interpolation (Thanks KevinGreen)

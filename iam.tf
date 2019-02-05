@@ -4,6 +4,7 @@ resource "aws_iam_role" "bastion_service_role" {
   name               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
   count              = "${local.assume_role_no}"
   assume_role_policy = "${data.aws_iam_policy_document.bastion_service_role_assume.json}"
+  tags               = "${var.tags}"
 }
 
 data "aws_iam_policy_document" "bastion_service_role_assume" {

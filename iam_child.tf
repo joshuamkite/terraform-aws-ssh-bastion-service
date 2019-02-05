@@ -1,8 +1,7 @@
 #role in child account
 
 resource "aws_iam_role" "bastion_service_assume_role" {
-  name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
-
+  name               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
   count              = "${local.assume_role_yes}"
   assume_role_policy = "${data.aws_iam_policy_document.bastion_service_assume_role.json}"
   tags               = "${var.tags}"

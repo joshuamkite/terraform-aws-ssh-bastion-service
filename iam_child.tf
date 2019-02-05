@@ -5,6 +5,7 @@ resource "aws_iam_role" "bastion_service_assume_role" {
 
   count              = "${local.assume_role_yes}"
   assume_role_policy = "${data.aws_iam_policy_document.bastion_service_assume_role.json}"
+  tags               = "${var.tags}"
 }
 
 data "aws_iam_policy_document" "bastion_service_assume_role" {

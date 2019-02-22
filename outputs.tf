@@ -1,7 +1,5 @@
 output "service_dns_entry" {
   description = "dns-registered url for service and host"
-
-  # value       = "${aws_route53_record.bastion_service.*.name}"
   value = "${join("", aws_route53_record.bastion_service.*.name)}"
 }
 

@@ -12,6 +12,8 @@
 
 **Feature:** Add tags to roles
 
+**Feature:** Increment module version and add outputs for simple example
+
 # 4.6
 
 **Bugfix:** Change quote style for ssh_populate scripts to avoid early interpolation (Thanks KevinGreen)

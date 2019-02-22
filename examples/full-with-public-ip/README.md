@@ -1,4 +1,4 @@
-This example shows a complete setup for a new `bastion` service with all needed parts:
+This example shows a complete setup for a new `bastion` service with all needed parts using a single AWS account:
 
 * a new VPC,
 * private subnet(s) inside the VPC,

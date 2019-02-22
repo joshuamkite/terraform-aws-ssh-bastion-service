@@ -4,6 +4,16 @@
 
 **You will need to terraform destroy; terraform apply in such case**
 
+# 4.7
+
+**Feature:** Add output "lb_arn"
+
+**Change:** All policies are now rendered with `aws_iam_policy_document` rather than as json blobs
+
+**Feature:** Add tags to roles
+
+**Feature:** Increment module version and add outputs for simple example
+
 # 4.6
 
 **Bugfix:** Change quote style for ssh_populate scripts to avoid early interpolation (Thanks KevinGreen)

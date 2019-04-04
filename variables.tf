@@ -190,14 +190,7 @@ variable "security_groups_additional" {
   default     = []
 }
 
-# #################
-# variable "autogenerates_names" {
-#   description = "preserves module historic behaviour. set to 'true' to avoid load_balancer name collision"
-#   type        = "string"
-#   default     = "false"
-# }
-
 variable "service_name" {
-  description = "Unique name per vpc for associated resources- use for multiple deployments per vpc"
+  description = "Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc"
   default     = "bastion-service"
 }

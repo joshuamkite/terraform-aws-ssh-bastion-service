@@ -64,19 +64,16 @@ variable "everyone-cidr" {
 # Comment out the bastion service, apply, uncomment and apply again
 module "ssh-bastion-service" {
   source  = "joshuamkite/ssh-bastion-service/aws"
-  version = "4.7"
+  version = "4.8"
+
   # source="../../"
 
   aws_region  = "${var.aws-region}"
   aws_profile = "${var.aws-profile}"
-
   environment_name = "${var.environment-name}"
   vpc              = "${aws_vpc.bastion.id}"
-
   subnets_asg = ["${aws_subnet.bastion.*.id}"]
   subnets_lb  = ["${aws_subnet.bastion.*.id}"]
-
   cidr_blocks_whitelist_service = ["${var.everyone-cidr}"]
-
   public_ip = true
 }

@@ -69,7 +69,7 @@ resource "aws_autoscaling_group" "bastion-service" {
   tags = [
     {
       key                 = "Name"
-      value               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion"
+      value               = "${var.service_name  == "bastion-service" ? format("%s-%s-%s-bastion", var.environment_name, data.aws_region.current.name, var.vpc) : var.service_name}"
       propagate_at_launch = true
     },
     {

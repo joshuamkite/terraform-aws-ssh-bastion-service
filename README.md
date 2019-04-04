@@ -43,7 +43,7 @@ If you exclude any section then you must replace it with equivalent functionalit
 
 The ability to assume a role to source IAM users from another account has been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. This is a high availabilty service, but if you are making more than one independent deployment using this same module within such a combination you can specify "service_name" to avoid resource collision. 
 
-If you are seeking a solution for ECS hosts then you are recommended to either the [Widdix project](https://github.com/widdix/aws-ec2-ssh) directly or my [Ansible-galaxy respin of it](https://galaxy.ansible.com/joshuamkite/aws-ecs-iam-users-tags/). This offers IAM authentication for local users with a range of features suitable for a long-lived stateful host built as an AMI or with configuratino management tools.
+If you are seeking a solution for ECS hosts then you are recommended to  the [Widdix project](https://github.com/widdix/aws-ec2-ssh). This offers IAM authentication for local users with a range of features suitable for a long-lived stateful host built as an AMI or with configuratino management tools.
 
 # Service deployed by this plan (presuming default userdata)
 
@@ -215,7 +215,6 @@ The DNS entry (if created) for the service is also displayed as an output of the
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 
-
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -252,7 +251,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | public_ip | Associate a public IP with the host instance when launching | string | `false` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
 | security_groups_additional | additional security group IDs to attach to host instance | list | `<list>` | no |
-| service_name | Unique name per vpc for associated resources- use for multiple deployments per vpc | string | `bastion-service` | no |
+| service_name | Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc | string | `bastion-service` | no |
 | subnets_asg | list of subnets for autoscaling group - availability zones must match subnets_lb | list | `<list>` | no |
 | subnets_lb | list of subnets for load balancer - availability zones must match subnets_asg | list | `<list>` | no |
 | tags | AWS tags that should be associated with created resources | map | `<map>` | no |

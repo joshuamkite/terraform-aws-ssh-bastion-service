@@ -65,8 +65,7 @@ variable "everyone-cidr" {
 module "ssh-bastion-service" {
   source = "joshuamkite/ssh-bastion-service/aws"
 
-  # source="../../"
-
+  # source = "../../" # Useful for debugging local changes to module
   aws_region                    = "${var.aws-region}"
   aws_profile                   = "${var.aws-profile}"
   environment_name              = "${var.environment-name}"

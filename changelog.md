@@ -6,7 +6,7 @@
 
 # 4.8
 
-**Change:** Added variable "service_name" (default "`bastion-service`" to preserve module historic behaviour by default). Set this to a different value to avoid resource name collision when deploying more than one service using this module per vpc.
+**Change:** Added variable `${var.service_name}` (default "`bastion-service`" to preserve module historic behaviour by default). Set this to a different value to avoid resource name collision when deploying more than one service using this module per vpc.
 
 **Change:** Removed module version number and empty outputs from examples/full-with-public-ip
 

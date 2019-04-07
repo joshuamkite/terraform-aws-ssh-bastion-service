@@ -63,20 +63,15 @@ variable "everyone-cidr" {
 # This is currently a limitation of Terraform: https://github.com/hashicorp/terraform/issues/12570
 # Comment out the bastion service, apply, uncomment and apply again
 module "ssh-bastion-service" {
-  source  = "joshuamkite/ssh-bastion-service/aws"
-  version = "4.7"
-  # source="../../"
+  source = "joshuamkite/ssh-bastion-service/aws"
 
-  aws_region  = "${var.aws-region}"
-  aws_profile = "${var.aws-profile}"
-
-  environment_name = "${var.environment-name}"
-  vpc              = "${aws_vpc.bastion.id}"
-
-  subnets_asg = ["${aws_subnet.bastion.*.id}"]
-  subnets_lb  = ["${aws_subnet.bastion.*.id}"]
-
+  # source = "../../" # Useful for debugging local changes to module
+  aws_region                    = "${var.aws-region}"
+  aws_profile                   = "${var.aws-profile}"
+  environment_name              = "${var.environment-name}"
+  vpc                           = "${aws_vpc.bastion.id}"
+  subnets_asg                   = ["${aws_subnet.bastion.*.id}"]
+  subnets_lb                    = ["${aws_subnet.bastion.*.id}"]
   cidr_blocks_whitelist_service = ["${var.everyone-cidr}"]
-
-  public_ip = true
+  public_ip                     = true
 }

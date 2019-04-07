@@ -4,6 +4,12 @@
 
 **You will need to terraform destroy; terraform apply in such case**
 
+# 4.8
+
+**Change:** Added variable `${var.service_name}` (default "`bastion-service`" to preserve module historic behaviour by default). Set this to a different value to avoid resource name collision when deploying more than one service using this module per vpc.
+
+**Change:** Removed module version number and empty outputs from examples/full-with-public-ip
+
 # 4.7
 
 **Feature:** Add output "lb_arn"

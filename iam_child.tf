@@ -1,7 +1,7 @@
 #role in child account
 
 resource "aws_iam_role" "bastion_service_assume_role" {
-  name               = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
+  name               = "${var.service_name  == "bastion-service" ? format("%s-%s-%s_bastion", var.environment_name, data.aws_region.current.name, var.vpc) : var.service_name}"
   count              = "${local.assume_role_yes}"
   assume_role_policy = "${data.aws_iam_policy_document.bastion_service_assume_role.json}"
   tags               = "${var.tags}"
@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "bastion_service_assume_role" {
 
 #Instance profile
 resource "aws_iam_instance_profile" "bastion_service_assume_role_profile" {
-  name  = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
+  name  = "${var.service_name  == "bastion-service" ? format("%s-%s-%s_bastion", var.environment_name, data.aws_region.current.name, var.vpc) : var.service_name}"
   count = "${local.assume_role_yes}"
   role  = "${aws_iam_role.bastion_service_assume_role.name}"
 }
@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "bastion_service_assume_role_in_parent" {
 
 resource "aws_iam_policy" "bastion_service_assume_role_in_parent" {
   count  = "${local.assume_role_yes}"
-  name   = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}_bastion"
+  name   = "${var.service_name  == "bastion-service" ? format("%s-%s-%s_bastion", var.environment_name, data.aws_region.current.name, var.vpc) : var.service_name}"
   policy = "${data.aws_iam_policy_document.bastion_service_assume_role_in_parent.json}"
 }
 

@@ -189,3 +189,8 @@ variable "security_groups_additional" {
   type        = "list"
   default     = []
 }
+
+variable "service_name" {
+  description = "Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc"
+  default     = "bastion-service"
+}

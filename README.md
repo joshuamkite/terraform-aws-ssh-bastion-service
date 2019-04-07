@@ -15,7 +15,7 @@ The actual call for public keys is made with a [GO binary](https://github.com/Fu
 
 You may find it more convenient to call it in your plan [directly from the Terraform Community Module Registry](https://registry.terraform.io/modules/joshuamkite/ssh-bastion-service/)
 
-## With thanks and acknowledgments to Piotr Jaromin, Luis Silva, Robert Stettner, tpesce, Jason He and Ivan Mesic.
+## With thanks and acknowledgments to all contributors!
 
 # Quick start
 
@@ -23,9 +23,9 @@ Ivan Mesic has kindly contributed an example use of this module creating a VPC a
 
 # Custom sections:
 
-You can now **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. Tested and working using Ubuntu 18.04 as an example ;)
+You can **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. Tested and working using Ubuntu 18.04 as an example ;)
 
- **Userdata has been divided into sections which are now individually applicable**. Each is now a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore all of these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
+ **Userdata has been divided into sections which are individually applicable**. Each is a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore all of these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
 
 The variables for these sections are:
 
@@ -41,9 +41,9 @@ If you exclude any section then you must replace it with equivalent functionalit
 
 # Ability to assume a role in another account
 
-The ability to assume a role to source IAM users from another account has been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. Since this is a high availabilty service, it is not envisaged that there would be reason for more than one independent deployment within such a combination. 
+The ability to assume a role to source IAM users from another account has been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume (typically in another account) ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. This is a high availabilty service, but if you are making more than one independent deployment using this same module within such a combination then you can specify "service_name" to avoid resource collision. 
 
-If you are seeking a solution for ECS hosts then you are recommended to either the [Widdix project](https://github.com/widdix/aws-ec2-ssh) directly or my [Ansible-galaxy respin of it](https://galaxy.ansible.com/joshuamkite/aws-ecs-iam-users-tags/). This offers IAM authentication for local users with a range of features suitable for a long-lived stateful host built as an AMI or with configuratino management tools.
+If you are seeking a solution for ECS hosts then you are recommended to  the [Widdix project](https://github.com/widdix/aws-ec2-ssh). This offers IAM authentication for local users with a range of features suitable for a long-lived stateful host built as an AMI or with configuration management tools.
 
 # Service deployed by this plan (presuming default userdata)
 
@@ -53,7 +53,7 @@ This plan creates a network load balancer and autoscaling group with an **option
 
 You can overwrite the suggested hostname entirely with `var.bastion_host_name.` 
 
-You can customise just the last part of the hostname if you like. By default this is the vpc ID via the magic default value of 'vpc_id' with the format
+You can _instead_ customise just the last part of the hostname if you like with `bastion_vpc_name`. By default this is the vpc ID via the magic default value of 'vpc_id' with the format
 
   	name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
 
@@ -83,14 +83,15 @@ In the case that `bastion_vpc_name = ""` the service container shell prompt is s
 
 It is considered normal to see very highly incremented counters if the load blancer health checks are conducted on the service port.
 
-**It is essential to limit incoming service traffic to whitelisted ports** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
+**It is essential to limit incoming service traffic to whitelisted ports.** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
-The host is set to run the latest patch release at deployment of Debian Stretch - unless you specify a custom AMI. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container, e.g. with
+The host is set to run the latest patch release at deployment of Debian Stretch - unless you specify a custom AMI. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container during development, e.g. with
 
     sudo apt install -y curl; ssh -p2222 admin@`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
 
 **Make sure that your agent forwarding is active before attempting this!**
 
+It is advised to deploy to production _without_ ec2 keys to increase security.
 
 If you are interested in specifying your own AMI then be aware that there are many subtle differences in systemd implemntations between different versions, e.g. it is not possible to use Amazon Linux 2 because we need (from Systemd):
 
@@ -160,7 +161,7 @@ Starting with release 3.8 it is possible to use the output giving the name of th
 
 Load Balancer health check port may be optionally set to either port 22 (containerised service) or port 2222 (EC2 host sshd). Port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthcheck on port 2222 or not.
 
-You can a list of one or more security groups to attach to the host instance launch configuration within the module if you wish. This can be supplied together with or instead of a whitelisted range of CIDR blocks. It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign either a suitable security group or whitelist then you may not be able to reach the service!
+You can supply  list of one or more security groups to attach to the host instance launch configuration within the module if you wish. This can be supplied together with or instead of a whitelisted range of CIDR blocks. It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign either a suitable security group or whitelist then you may not be able to reach the service!
 
 ## Components (using default userdata)
 
@@ -174,7 +175,7 @@ You can a list of one or more security groups to attach to the host instance lau
 
 **IAM Role**
 
-This and all of the following are prefixed with the bastion service host name to ensure uniqueness. An appropriate set is created depending on whether or not another aws account is referenced for IAM identity checks.
+This and all of the following are prefixed with `${var.service_name}` to ensure uniqueness. An appropriate set is created depending on whether or not an external role to assume is referenced for IAM identity checks.
 
 * IAM role
 * IAM policies
@@ -205,7 +206,7 @@ The files in question on the host deploy thus:
 
 ## Sample policy for other accounts
  
-If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then a matching sample policy and trust relationship is given as an output from the plan to assist with application in that other account. 
+If you supply the ARN for an external role for the bastion service to assume `${var.assume_role_arn}` then a matching sample policy and trust relationship is given as an output from the plan to assist with application in that other account for typical operation.
 
 The DNS entry (if created) for the service is also displayed as an output of the format
 
@@ -251,6 +252,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | public_ip | Associate a public IP with the host instance when launching | string | `false` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
 | security_groups_additional | additional security group IDs to attach to host instance | list | `<list>` | no |
+| service_name | Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc | string | `bastion-service` | no |
 | subnets_asg | list of subnets for autoscaling group - availability zones must match subnets_lb | list | `<list>` | no |
 | subnets_lb | list of subnets for load balancer - availability zones must match subnets_asg | list | `<list>` | no |
 | tags | AWS tags that should be associated with created resources | map | `<map>` | no |
@@ -263,7 +265,8 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | bastion_service_assume_role_name | role created for service host asg - if created with assume role |
 | bastion_service_role_name | role created for service host asg - if created without assume role |
 | bastion_sg_id | Security Group id of the bastion host |
-| lb_dns_name |  |
+| lb_arn | aws load balancer arn |
+| lb_dns_name | aws load balancer dns |
 | lb_zone_id |  |
 | policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust relationship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
 | service_dns_entry | dns-registered url for service and host |

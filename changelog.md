@@ -4,9 +4,15 @@
 
 **You will need to terraform destroy; terraform apply in such case**
 
+# 4.9
+
+**Feature:** Added variable `${route53_fqdn}` (default `""`to preserve module historic behaviour by default). If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here.
+
+**Feature:** Added output target group arn. - Thanks Kevin Green
+
 # 4.8
 
-**Change:** Added variable `${var.service_name}` (default "`bastion-service`" to preserve module historic behaviour by default). Set this to a different value to avoid resource name collision when deploying more than one service using this module per vpc.
+**Feature:** Added variable `${var.service_name}` (default "`bastion-service`" to preserve module historic behaviour by default). Set this to a different value to avoid resource name collision when deploying more than one service using this module per vpc.
 
 **Change:** Removed module version number and empty outputs from examples/full-with-public-ip
 

@@ -36,3 +36,8 @@ output "lb_arn" {
   description = "aws load balancer arn"
   value       = "${aws_lb.bastion-service.arn}"
 }
+
+output "target_group_arn" {
+  description = "aws load balancer target group arn"
+  value       = "${aws_lb_target_group.bastion-service.arn}"
+}

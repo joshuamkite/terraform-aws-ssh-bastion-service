@@ -93,7 +93,7 @@ resource "aws_autoscaling_group" "bastion-service" {
 resource "aws_route53_record" "bastion_service" {
   count   = "${(var.route53_zone_id !="" ? 1 : 0) }"
   zone_id = "${var.route53_zone_id}"
-  name    = "${local.bastion_host_name}-${var.service_name}.${var.dns_domain}"
+  name    = "${var.route53_fqdn == "" ? local.route53_name_components : var.route53_fqdn}"
   type    = "A"
 
   alias {

@@ -194,3 +194,8 @@ variable "service_name" {
   description = "Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc"
   default     = "bastion-service"
 }
+
+variable "route53_fqdn" {
+  description = "If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here"
+  default     = ""
+}

@@ -8,7 +8,7 @@
 
 **Feature:** Added variable `${route53_fqdn}` (default `""`to preserve module historic behaviour by default). If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here.
 
-**Feature:** Added output target group arn. 
+**Feature:** Added output target group arn. - Thanks Kevin Green
 
 # 4.8
 

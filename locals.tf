@@ -48,3 +48,11 @@ locals {
 locals {
   cidr_blocks_whitelist_service_yes = "${(join(",", var.cidr_blocks_whitelist_service)) != "" ? 1 : 0}"
 }
+
+##########################
+# Construct route53 name for historical behaviour where used
+##########################
+
+locals {
+  route53_name_components = "${local.bastion_host_name}-${var.service_name}.${var.dns_domain}"
+}

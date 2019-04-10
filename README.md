@@ -250,7 +250,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | lb_is_internal | whether the lb will be internal | string | `false` | no |
 | lb_unhealthy_threshold | Unhealthy threshold for lb target group | string | `2` | no |
 | public_ip | Associate a public IP with the host instance when launching | string | `false` | no |
-| route53_fqdn | If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here | string | `` | no |
+| route53_fqdn | If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim | string | `` | no |
 | route53_zone_id | Route53 zoneId | string | `` | no |
 | security_groups_additional | additional security group IDs to attach to host instance | list | `<list>` | no |
 | service_name | Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc | string | `bastion-service` | no |

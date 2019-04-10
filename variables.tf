@@ -196,6 +196,6 @@ variable "service_name" {
 }
 
 variable "route53_fqdn" {
-  description = "If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here"
+  description = "If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim"
   default     = ""
 }

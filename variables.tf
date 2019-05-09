@@ -1,6 +1,6 @@
 variable "bastion_instance_type" {
   description = "The virtual hardware to be used for the bastion service host"
-  default     = "t2.micro"
+  default     = "t2.nano"
 }
 
 variable "cidr_blocks_whitelist_host" {
@@ -164,7 +164,7 @@ variable "custom_systemd" {
 
 variable "custom_ami_id" {
   description = "id for custom ami if used"
-  default     = ""
+  default     = "ami-09def150731bdbcc2"
 }
 
 variable "security_groups_additional" {

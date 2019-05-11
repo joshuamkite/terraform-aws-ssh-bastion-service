@@ -1,6 +1,6 @@
 variable "bastion_instance_type" {
   description = "The virtual hardware to be used for the bastion service host"
-  default     = "t2.nano"
+  default     = "t2.micro"
 }
 
 variable "cidr_blocks_whitelist_host" {
@@ -27,6 +27,11 @@ variable "vpc" {
 variable "bastion_service_host_key_name" {
   description = "AWS ssh key *.pem to be used for ssh access to the bastion service host"
   default     = ""
+}
+
+variable "public_ip" {
+  default     = false
+  description = "Associate a public IP with the host instance when launching"
 }
 
 variable "subnets_lb" {
@@ -63,6 +68,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "bastion_host_name" {
+  type        = "string"
+  default     = ""
+  description = "The hostname to give to the bastion instance"
+}
+
 ##############################
 #LB ASG variables
 ##############################
@@ -82,6 +93,12 @@ variable "lb_interval" {
   type        = "string"
   description = "interval for lb target group health check"
   default     = "30"
+}
+
+variable "lb_is_internal" {
+  type        = "string"
+  description = "whether the lb will be internal"
+  default     = false
 }
 
 variable "asg_max" {
@@ -164,11 +181,21 @@ variable "custom_systemd" {
 
 variable "custom_ami_id" {
   description = "id for custom ami if used"
-  default     = "ami-09def150731bdbcc2"
+  default     = ""
 }
 
 variable "security_groups_additional" {
   description = "additional security group IDs to attach to host instance"
   type        = "list"
   default     = []
+}
+
+variable "service_name" {
+  description = "Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc"
+  default     = "bastion-service"
+}
+
+variable "route53_fqdn" {
+  description = "If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim"
+  default     = ""
 }

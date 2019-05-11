@@ -38,7 +38,8 @@ locals {
 ##########################
 
 locals {
-  bastion_ami_id = "${var.custom_ami_id == "" ? data.aws_ami.debian.id : var.custom_ami_id}"
+  #bastion_ami_id = "${var.custom_ami_id == "" ? data.aws_ami.latest_ecs.id : var.custom_ami_id}"
+  bastion_ami_id = "${var.custom_ami_id == "" ? data.aws_ami.latest_ecs.id : var.custom_ami_id}"
 }
 
 ##########################

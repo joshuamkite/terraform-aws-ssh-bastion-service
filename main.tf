@@ -8,15 +8,34 @@ data "aws_availability_zones" "available" {}
 #Query for most recent AMI of type debian
 ##########################
 
-data "aws_ami" "debian" {
-  most_recent = true
+#data "aws_ami" "debian" {
+#  most_recent = true
+
+#  filter {
+#    name   = "name"
+#    values = ["debian-stretch-hvm-x86_64-*"]
+#  }
+
+#  owners = ["379101102735"] # Debian
+#}
+
+##########################
+#Query for most recent AWS ECS AMI
+##########################
+
+data "aws_ami" "latest_ecs" {
+most_recent = true
+owners = ["591542846629"] # AWS
 
   filter {
-    name   = "name"
-    values = ["debian-stretch-hvm-x86_64-*"]
+      name   = "name"
+      values = ["*amazon-ecs-optimized"]
   }
 
-  owners = ["379101102735"] # Debian
+  filter {
+      name   = "virtualization-type"
+      values = ["hvm"]
+  }
 }
 
 ############################

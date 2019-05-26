@@ -66,15 +66,15 @@ variable "everyone-cidr" {
 # Comment out the bastion service, apply, uncomment and apply again (as for Terraform 0.11.x)
 # Or simply run the plan twice - first time will give an error like below, simply run again
 
-      # Error: Provider produced inconsistent final plan
+# Error: Provider produced inconsistent final plan
 
-      # When expanding the plan for
-      # module.ssh-bastion-service.aws_autoscaling_group.bastion-service to include
-      # new values learned so far during apply, provider "aws" produced an invalid new
-      # value for .availability_zones: was known, but now unknown.
+# When expanding the plan for
+# module.ssh-bastion-service.aws_autoscaling_group.bastion-service to include
+# new values learned so far during apply, provider "aws" produced an invalid new
+# value for .availability_zones: was known, but now unknown.
 
-      # This is a bug in the provider, which should be reported in the provider's own
-      # issue tracker.
+# This is a bug in the provider, which should be reported in the provider's own
+# issue tracker.
 
 module "ssh-bastion-service" {
   # source = "joshuamkite/ssh-bastion-service/aws"
@@ -89,4 +89,3 @@ module "ssh-bastion-service" {
   cidr_blocks_whitelist_service = [var.everyone-cidr]
   public_ip                     = true
 }
-

@@ -82,7 +82,7 @@ resource "aws_autoscaling_group" "bastion-service" {
   }
   tags = data.null_data_source.asg-tags.*.outputs
 
-  # [
+  # tags = [
   # {
   #   key = "Name"
   #   value = var.service_name == "bastion-service" ? format(
@@ -103,7 +103,7 @@ resource "aws_autoscaling_group" "bastion-service" {
   #   value               = data.aws_region.current.name
   #   propagate_at_launch = true
   # },
-  # data.null_data_source.asg-tags.*.outputs,
+  # # data.null_data_source.asg-tags.*.outputs,
   # ]
 }
 

@@ -4,6 +4,18 @@ This example shows a complete setup for a new `bastion` service with all needed 
 * private subnet(s) inside the VPC,
 * an internet gateway and route tables.
 
-Before applying, create a key pair in the requested region named 'bastion-demo'.
+To create the bastion service, subnets need to already exist
+This is currently a limitation of Terraform: https://github.com/hashicorp/terraform/issues/12570
+Since Terraform version 0.12.0 you can either: 
+Comment out the bastion service, apply, uncomment and apply again (as for Terraform 0.11.x)
+Or simply run the plan twice - first time will give an error like below, simply run again
 
-Because of Terraform limitations (v0.11.x) it can't compute count/length of new resources so it can't generate the `aws_subnets` data block in  [`security_group.tf`](../../security_group.tf). A hack is to first create the VPC and then the rest of the bastion host: comment out the `ssh-bastion-service` module, `terraform apply`, uncomment and `apply` again.
+    Error: Provider produced inconsistent final plan
+
+    When expanding the plan for
+    module.ssh-bastion-service.aws_autoscaling_group.bastion-service to include
+    new values learned so far during apply, provider "aws" produced an invalid new
+    value for .availability_zones: was known, but now unknown.
+
+    This is a bug in the provider, which should be reported in the provider's own
+    issue tracker.

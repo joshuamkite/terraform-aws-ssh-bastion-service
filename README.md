@@ -1,6 +1,10 @@
 This Terraform deploys a stateless containerised sshd bastion service on AWS with IAM based authentication:
 ===================================
 
+Updated to Terraform 0.12/HCL2. **This is a Breaking change** 
+
+**For Terraform 0.11. Pin module version to ~> v4.0**
+
 **N.B. If you are using a newer version of this module when you have an older version deployed, please review the changelog!**
 
 # Overview
@@ -240,7 +244,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | custom_ssh_populate | any value excludes default ssh_populate script used on container launch from userdata | string | `` | no |
 | custom_systemd | any value excludes default systemd and hostname change from userdata | string | `` | no |
 | dns_domain | The domain used for Route53 records | string | `` | no |
-| environment_name | the name of the environment that we are deploying to | string | `staging` | no |
+| environment_name | the name of the environment that we are deploying to, used in tagging. Overwritten if var.service_name and var.bastion_host_name values are changed | `staging` | no |
 | extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |
 | extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript` | no |
 | extra_user_data_merge_type | Control how cloud-init merges user-data sections | string | `str(append)` | no |

@@ -5,18 +5,18 @@ variable "bastion_instance_type" {
 
 variable "cidr_blocks_whitelist_host" {
   description = "range(s) of incoming IP addresses to whitelist for the HOST"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "cidr_blocks_whitelist_service" {
   description = "range(s) of incoming IP addresses to whitelist for the SERVICE"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "environment_name" {
-  description = "the name of the environment that we are deploying to"
+  description = "the name of the environment that we are deploying to, used in tagging. Overwritten if var.service_name and var.bastion_host_name values are changed"
   default     = "staging"
 }
 
@@ -35,13 +35,13 @@ variable "public_ip" {
 }
 
 variable "subnets_lb" {
-  type        = "list"
+  type        = list(string)
   description = "list of subnets for load balancer - availability zones must match subnets_asg"
   default     = []
 }
 
 variable "subnets_asg" {
-  type        = "list"
+  type        = list(string)
   description = "list of subnets for autoscaling group - availability zones must match subnets_lb"
   default     = []
 }
@@ -57,19 +57,19 @@ variable "route53_zone_id" {
 }
 
 variable "bastion_allowed_iam_group" {
-  type        = "string"
+  type        = string
   description = "Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile"
   default     = ""
 }
 
 variable "tags" {
-  type        = "map"
+  type        = map(string)
   description = "AWS tags that should be associated with created resources"
   default     = {}
 }
 
 variable "bastion_host_name" {
-  type        = "string"
+  type        = string
   default     = ""
   description = "The hostname to give to the bastion instance"
 }
@@ -78,50 +78,52 @@ variable "bastion_host_name" {
 #LB ASG variables
 ##############################
 variable "lb_healthy_threshold" {
-  type        = "string"
+  type        = string
   description = "Healthy threshold for lb target group"
   default     = "2"
 }
 
 variable "lb_unhealthy_threshold" {
-  type        = "string"
+  type        = string
   description = "Unhealthy threshold for lb target group"
   default     = "2"
 }
 
 variable "lb_interval" {
-  type        = "string"
+  type        = string
   description = "interval for lb target group health check"
   default     = "30"
 }
 
 variable "lb_is_internal" {
-  type        = "string"
+  type        = string
   description = "whether the lb will be internal"
   default     = false
 }
 
 variable "asg_max" {
-  type        = "string"
+  type        = string
   description = "Max numbers of bastion-service hosts in ASG"
   default     = "2"
 }
 
 variable "asg_min" {
-  type        = "string"
+  type        = string
   description = "Min numbers of bastion-service hosts in ASG"
   default     = "1"
 }
 
 variable "asg_desired" {
-  type        = "string"
+  type        = string
   description = "Desired numbers of bastion-service hosts in ASG"
   default     = "1"
 }
 
-variable "aws_region" {}
+variable "aws_region" {
+}
 
-variable "aws_profile" {}
+variable "aws_profile" {
+}
 
 variable "assume_role_arn" {
   description = "arn for role to assume in separate identity account if used"
@@ -186,7 +188,7 @@ variable "custom_ami_id" {
 
 variable "security_groups_additional" {
   description = "additional security group IDs to attach to host instance"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
@@ -199,3 +201,4 @@ variable "route53_fqdn" {
   description = "If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim"
   default     = ""
 }
+

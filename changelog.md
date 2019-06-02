@@ -1,6 +1,24 @@
 **N.B.**
 
-* **It is not possible to successfully apply module version >/= 4.0 over versions </= 3.xx due to change from classic to network load balancer**
+# 5.0
+
+**Change:**  Updated to Terraform 0.12/HCL2. **This is a Breaking change** 
+
+**For Terraform 0.11. Pin module version to ~> v4.0**
+
+**Change:** The Tags 'Name', 'Environment' and 'Region' are no longer automatically created, populated and applied to the autoscaling group. This change is due to a combination of:
+
+* Difficult to port old behaviour to Terraform 12
+* It wasn't a great idea to pre-determine tags for users
+* Since this release is a breaking change anyway, it's a good opportunity to change this. 
+
+The tags given in var.tags are rendered to the Autoscaling group as before
+
+# 4.xx
+
+**This series is compatible with Terraform version 0.11.xx - Pin module version to ~> v4.0**
+
+**It is not possible to successfully apply module version >/= 4.0 over versions </= 3.xx due to change from classic to network load balancer**
 
 **You will need to terraform destroy; terraform apply in such case**
 

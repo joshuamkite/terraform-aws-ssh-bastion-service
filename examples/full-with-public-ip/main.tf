@@ -77,9 +77,8 @@ variable "everyone-cidr" {
 # issue tracker.
 
 module "ssh-bastion-service" {
-  # source = "joshuamkite/ssh-bastion-service/aws"
-
-  source                        = "../../"
+  source = "joshuamkite/ssh-bastion-service/aws"
+  # source                        = "../../"
   aws_region                    = var.aws-region
   aws_profile                   = var.aws-profile
   environment_name              = var.environment-name

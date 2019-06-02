@@ -81,30 +81,6 @@ resource "aws_autoscaling_group" "bastion-service" {
     create_before_destroy = true
   }
   tags = data.null_data_source.asg-tags.*.outputs
-
-  # tags = [
-  # {
-  #   key = "Name"
-  #   value = var.service_name == "bastion-service" ? format(
-  #     "%s-%s-%s-bastion",
-  #     var.environment_name,
-  #     data.aws_region.current.name,
-  #     var.vpc,
-  #   ) : var.service_name
-  #   propagate_at_launch = true
-  # },
-  # {
-  #   key                 = "Environment"
-  #   value               = var.environment_name
-  #   propagate_at_launch = true
-  # },
-  # {
-  #   key                 = "Region"
-  #   value               = data.aws_region.current.name
-  #   propagate_at_launch = true
-  # },
-  # # data.null_data_source.asg-tags.*.outputs,
-  # ]
 }
 
 ####################################################

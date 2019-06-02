@@ -16,7 +16,7 @@ variable "cidr_blocks_whitelist_service" {
 }
 
 variable "environment_name" {
-  description = "the name of the environment that we are deploying to"
+  description = "the name of the environment that we are deploying to, used in tagging. Overwritten if var.service_name and var.bastion_host_name values are changed"
   default     = "staging"
 }
 

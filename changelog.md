@@ -1,8 +1,69 @@
 **N.B.**
 
-* **It is not possible to successfully apply module version >/= 4.0 over versions </= 3.xx due to chang from classic to network load balancer**
+# 5.0
+
+**Change:**  Updated to Terraform 0.12/HCL2. **This is a Breaking change** 
+
+**For Terraform 0.11. Pin module version to ~> v4.0**
+
+**Change:** The Tags 'Name', 'Environment' and 'Region' are no longer automatically created, populated and applied to the autoscaling group. This change is due to a combination of:
+
+* Difficult to port old behaviour to Terraform 12
+* It wasn't a great idea to pre-determine tags for users
+* Since this release is a breaking change anyway, it's a good opportunity to change this. 
+
+The tags given in var.tags are rendered to the Autoscaling group as before
+
+# 4.xx
+
+**This series is compatible with Terraform version 0.11.xx - Pin module version to ~> v4.0**
+
+**It is not possible to successfully apply module version >/= 4.0 over versions </= 3.xx due to change from classic to network load balancer**
 
 **You will need to terraform destroy; terraform apply in such case**
+
+# 4.9
+
+**Feature:** Added variable `${route53_fqdn}` (default `""`to preserve module historic behaviour by default). If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here.
+
+**Feature:** Added output target group arn. - Thanks Kevin Green
+
+# 4.8
+
+**Feature:** Added variable `${var.service_name}` (default "`bastion-service`" to preserve module historic behaviour by default). Set this to a different value to avoid resource name collision when deploying more than one service using this module per vpc.
+
+**Change:** Removed module version number and empty outputs from examples/full-with-public-ip
+
+# 4.7
+
+**Feature:** Add output "lb_arn"
+
+**Change:** All policies are now rendered with `aws_iam_policy_document` rather than as json blobs
+
+**Feature:** Add tags to roles
+
+**Feature:** Increment module version and add outputs for simple example
+
+# 4.6
+
+**Bugfix:** Change quote style for ssh_populate scripts to avoid early interpolation (Thanks KevinGreen)
+
+# 4.5.1
+
+**Feature:** Maintenance release - documentation changes and bump module version in example only
+
+# 4.5
+
+**Feature:** Bastion load balancer can now be internal (Thanks Instacart)
+**Feature:** Bastion can now be assigned a public IP - permits use of module without NAT gateway (Thanks Ivan Mesic navi7)
+**Feature:** Example of simple use of module with a public IP (Thanks Ivan Mesic navi7)
+**Bugfix:** Populate user data with default if empty (Thanks Ivan Mesic navi7)
+
+# 4.4
+
+**Feature:** Adds a new variable so that the hostname can be overridden completely
+**Feature:** Removes the 'provider' so that it can set by the plan calling this module (as per Terraform guidelines)
+**Feature:** Adds a shebang as the default content for the shell script multipart mime types. This is so that, when using custom userdata, systemd doesn't report errors.
 
 # 4.3
 

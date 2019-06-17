@@ -6,7 +6,7 @@
 * Initialise backend (for remote state)
 
 
-	terraform init -backend -backend-config=config/?/config.remote
+	terraform init -backend-config=config/?/config.remote
 
 
 * Apply terraform plan

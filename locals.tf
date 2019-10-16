@@ -1,6 +1,10 @@
-##########################
-#Create local for bastion hostname
-##########################
+# ##############################################################################
+#
+# Local variables for the bastion service
+#
+# ##############################################################################
+
+# Compute a name for the bastion service host
 
 locals {
   bastion_vpc_name = var.bastion_vpc_name == "vpc_id" ? var.vpc : var.bastion_vpc_name
@@ -16,12 +20,12 @@ locals {
   ) : var.bastion_host_name
 }
 
-##########################
 # Logic for security group and listeners 
-##########################
+
 locals {
-  hostport_whitelisted = join(",", var.cidr_blocks_whitelist_host) != ""
-  hostport_healthcheck = var.lb_healthcheck_port == "2222"
+  hostport_whitelisted    = join(",", var.cidr_blocks_whitelist_host) != ""
+  hostport_healthcheck    = var.lb_healthcheck_port == "2222"
+  use_VPCs_security_group = var.vpc_security_group != ""
 }
 
 ##########################

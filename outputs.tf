@@ -13,7 +13,7 @@ output "policy_example_for_parent_account_empty_if_not_used" {
 
 output "bastion_sg_id" {
   description = "Security Group id of the bastion host"
-  value       = aws_security_group.bastion_service.id
+  value       = local.use_VPCs_security_group //? var.vpc_security_group : aws_security_group.bastion_service.id
 }
 
 output "lb_dns_name" {

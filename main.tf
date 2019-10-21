@@ -60,7 +60,7 @@ resource "aws_autoscaling_group" "bastion-service" {
   min_size             = var.asg_min
   desired_capacity     = var.asg_desired
   launch_configuration = aws_launch_configuration.bastion-service-host.name
-  vpc_zone_identifier  = var.subnets
+  vpc_zone_identifier  = var.subnets_asg
   target_group_arns = concat(
     [aws_lb_target_group.bastion-service.arn],
     aws_lb_target_group.bastion-host.*.arn

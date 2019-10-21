@@ -64,15 +64,15 @@ resource "aws_security_group_rule" "bastion_host_out" {
 
 # Allow health-check traffic from the load-balancer 
 
-data "aws_subnet" "subnets" {
-  count = length(var.subnets)
-  id    = var.subnets[count.index]
+data "aws_subnet" "lb_subnets" {
+  count = length(var.subnets_lb)
+  id    = var.subnets_lb[count.index]
 }
 
 resource "aws_security_group_rule" "lb_healthcheck_in" {
   count             = var.use_vpc_security_group
   security_group_id = var.use_vpc_security_group == 0 ? var.vpc_security_group : aws_security_group.bastion_service[0].id
-  cidr_blocks       = data.aws_subnet.subnets.*.cidr_block
+  cidr_blocks       = data.aws_subnet.lb_subnets.*.cidr_block
   from_port         = var.lb_healthcheck_port
   to_port           = var.lb_healthcheck_port
   protocol          = "tcp"

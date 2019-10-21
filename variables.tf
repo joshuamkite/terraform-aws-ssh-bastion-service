@@ -186,11 +186,18 @@ variable "service_name" {
   default     = "bastion-service"
 }
 
-variable "subnets" {
+variable "subnets_asg" {
   type        = list(string)
   description = "list of subnets for autoscaling group and load balancer"
   default     = []
 }
+
+variable "subnets_lb" {
+  type        = list(string)
+  description = "list of subnets for autoscaling group and load balancer"
+  default     = []
+}
+
 
 variable "tags" {
   description = "AWS tags that should be associated with created resources"

@@ -186,22 +186,15 @@ variable "service_name" {
   default     = "bastion-service"
 }
 
-variable "subnets_asg" {
+variable "subnets" {
   type        = list(string)
-  description = "list of subnets for autoscaling group - availability zones must match subnets_lb"
-  default     = []
-}
-
-variable "subnets_lb" {
-  type        = list(string)
-  description = "list of subnets for load balancer - availability zones must match subnets_asg"
+  description = "list of subnets for autoscaling group and load balancer"
   default     = []
 }
 
 variable "tags" {
   description = "AWS tags that should be associated with created resources"
-  type        = map(string)
-  default     = {}
+  type        = map
 }
 
 variable "vpc" {

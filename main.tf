@@ -36,7 +36,6 @@ resource "aws_launch_configuration" "bastion-service-host" {
   )
   user_data = data.template_cloudinit_config.config.rendered
   key_name  = var.bastion_service_host_key_name
-
   lifecycle {
     create_before_destroy = true
   }
@@ -61,7 +60,7 @@ resource "aws_autoscaling_group" "bastion-service" {
   min_size             = var.asg_min
   desired_capacity     = var.asg_desired
   launch_configuration = aws_launch_configuration.bastion-service-host.name
-  vpc_zone_identifier  = var.subnets_asg
+  vpc_zone_identifier  = var.subnets
   target_group_arns = concat(
     [aws_lb_target_group.bastion-service.arn],
     aws_lb_target_group.bastion-host.*.arn
@@ -101,4 +100,3 @@ data "template_file" "sample_policies_for_parent_account" {
     assume_role_arn           = var.assume_role_arn
   }
 }
-

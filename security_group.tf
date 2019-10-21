@@ -65,8 +65,8 @@ resource "aws_security_group_rule" "bastion_host_out" {
 # Allow health-check traffic from the load-balancer 
 
 data "aws_subnet" "subnets" {
-  count = length(var.subnets_asg)
-  id    = var.subnets_asg[count.index]
+  count = length(var.subnets)
+  id    = var.subnets[count.index]
 }
 
 resource "aws_security_group_rule" "lb_healthcheck_in" {

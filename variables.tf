@@ -188,13 +188,13 @@ variable "service_name" {
 
 variable "subnets_asg" {
   type        = list(string)
-  description = "list of subnets for autoscaling group and load balancer"
+  description = "list of subnets for autoscaling group - availability zones must match subnets_lb"
   default     = []
 }
 
 variable "subnets_lb" {
   type        = list(string)
-  description = "list of subnets for autoscaling group and load balancer"
+  description = "list of subnets for load balancer - availability zones must match subnets_asg"
   default     = []
 }
 

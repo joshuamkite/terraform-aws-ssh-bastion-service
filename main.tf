@@ -2,22 +2,16 @@
 data "aws_region" "current" {
 }
 
-#get list of AWS Availability Zones which can be accessed by an AWS account within the region for use later in plan
-data "aws_availability_zones" "available" {
-}
-
 ##########################
 #Query for most recent AMI of type debian
 ##########################
 
 data "aws_ami" "debian" {
   most_recent = true
-
   filter {
     name   = "name"
     values = ["debian-stretch-hvm-x86_64-*"]
   }
-
   owners = ["379101102735"] # Debian
 }
 
@@ -54,7 +48,6 @@ resource "aws_launch_configuration" "bastion-service-host" {
 
 data "null_data_source" "asg-tags" {
   count = length(keys(var.tags))
-
   inputs = {
     key                 = element(keys(var.tags), count.index)
     value               = element(values(var.tags), count.index)
@@ -63,7 +56,6 @@ data "null_data_source" "asg-tags" {
 }
 
 resource "aws_autoscaling_group" "bastion-service" {
-  availability_zones   = data.aws_availability_zones.available.names
   name_prefix          = "${var.service_name}-asg"
   max_size             = var.asg_max
   min_size             = var.asg_min
@@ -74,8 +66,6 @@ resource "aws_autoscaling_group" "bastion-service" {
     [aws_lb_target_group.bastion-service.arn],
     aws_lb_target_group.bastion-host.*.arn
   )
-
-
   lifecycle {
     create_before_destroy = true
   }
@@ -91,7 +81,6 @@ resource "aws_route53_record" "bastion_service" {
   zone_id = var.route53_zone_id
   name    = var.route53_fqdn == "" ? local.route53_name_components : var.route53_fqdn
   type    = "A"
-
   alias {
     name                   = aws_lb.bastion-service.dns_name
     zone_id                = aws_lb.bastion-service.zone_id
@@ -106,7 +95,6 @@ resource "aws_route53_record" "bastion_service" {
 data "template_file" "sample_policies_for_parent_account" {
   count    = local.assume_role_yes
   template = file("${path.module}/sts_assumerole_example/policy_example.tpl")
-
   vars = {
     aws_profile               = var.aws_profile
     bastion_allowed_iam_group = var.bastion_allowed_iam_group

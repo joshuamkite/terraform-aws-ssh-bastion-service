@@ -199,8 +199,8 @@ variable "subnets_lb" {
 }
 
 variable "tags" {
-  type        = map(string)
   description = "AWS tags that should be associated with created resources"
+  type        = map(string)
   default     = {}
 }
 

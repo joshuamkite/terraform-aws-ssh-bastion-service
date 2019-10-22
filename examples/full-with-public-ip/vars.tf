@@ -3,7 +3,7 @@ variable "aws-profile" {
 }
 
 variable "aws-region" {
-  default     = "eu-west-1"
+  default     = "us-east-1"
   description = "Default AWS region"
 }
 
@@ -15,3 +15,10 @@ variable "cidr-start" {
 variable "environment-name" {
   default = "demo"
 }
+
+variable "use_consumer_vpc" {
+  description = "If 1, use the security group of the VPC provided by the consumer"
+  type        = number
+  default     = 0
+}
+

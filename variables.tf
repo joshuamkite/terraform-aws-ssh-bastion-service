@@ -202,6 +202,7 @@ variable "subnets_lb" {
 variable "tags" {
   description = "AWS tags that should be associated with created resources"
   type        = map
+  default     = {}
 }
 
 variable "vpc" {

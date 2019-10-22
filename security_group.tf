@@ -6,7 +6,7 @@
 # ##############################################################################
 
 resource "aws_security_group" "bastion_service" {
-  count                  = var.use_vpc_security_group
+  count                  = var.use_vpc_security_group == 1 ? 0 : 1
   name_prefix            = var.service_name == "bastion-service" ? format("%s-%s", var.environment_name, var.service_name) : var.service_name
   description            = "Bastion service"
   revoke_rules_on_delete = true
@@ -24,26 +24,26 @@ resource "aws_security_group" "bastion_service" {
 
 
 resource "aws_security_group_rule" "service_ssh_in" {
-  count             = local.cidr_blocks_whitelist_service_yes //? 1 : 0
+  count             = "${var.use_vpc_security_group == 0 && local.cidr_blocks_whitelist_service_yes == 1 ? 1 : 0}"
   type              = "ingress"
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = var.cidr_blocks_whitelist_service
-  security_group_id = var.use_vpc_security_group ? var.vpc_security_group : aws_security_group.bastion_service[0].id
+  security_group_id = "${var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id}"
   description       = "bastion service access"
 }
 
 # Allow SSH SSH access to the bastion host from whitelisted IP ranges
 
 resource "aws_security_group_rule" "host_ssh_in_cond" {
-  count             = local.hostport_whitelisted ? 1 : 0
+  count             = "${local.hostport_whitelisted != "" ? 0 : 1}"
   type              = "ingress"
   from_port         = 2222
   to_port           = 2222
   protocol          = "tcp"
   cidr_blocks       = var.cidr_blocks_whitelist_host
-  security_group_id = var.use_vpc_security_group == 0 ? var.vpc_security_group : aws_security_group.bastion_service[0].id
+  security_group_id = var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id
   description       = "bastion HOST access"
 }
 
@@ -52,12 +52,12 @@ resource "aws_security_group_rule" "host_ssh_in_cond" {
 # the bastion host in an existing VPC, use the VPC's policy 
 
 resource "aws_security_group_rule" "bastion_host_out" {
-  count             = var.use_vpc_security_group
+  count             = "${var.use_vpc_security_group  == 1 ? 0 : 1}"
   type              = "egress"
   from_port         = 0
   to_port           = 65535
   protocol          = -1
-  security_group_id = var.use_vpc_security_group ? var.vpc_security_group : aws_security_group.bastion_service[0].id
+  security_group_id = var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id
   cidr_blocks       = ["0.0.0.0/0"]
   description       = "bastion service and host egress"
 }
@@ -70,8 +70,7 @@ data "aws_subnet" "lb_subnets" {
 }
 
 resource "aws_security_group_rule" "lb_healthcheck_in" {
-  count             = var.use_vpc_security_group
-  security_group_id = var.use_vpc_security_group == 0 ? var.vpc_security_group : aws_security_group.bastion_service[0].id
+  security_group_id = "${var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id}"
   cidr_blocks       = data.aws_subnet.lb_subnets.*.cidr_block
   from_port         = var.lb_healthcheck_port
   to_port           = var.lb_healthcheck_port

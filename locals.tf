@@ -21,11 +21,9 @@ locals {
 }
 
 # Logic for security group and listeners 
-
 locals {
   hostport_whitelisted    = join(",", var.cidr_blocks_whitelist_host) != ""
   hostport_healthcheck    = var.lb_healthcheck_port == "2222"
-  use_VPCs_security_group = var.vpc_security_group != ""
 }
 
 ##########################

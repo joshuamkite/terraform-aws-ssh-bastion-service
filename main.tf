@@ -31,7 +31,7 @@ resource "aws_launch_configuration" "bastion-service-host" {
     0,
   )
   associate_public_ip_address = var.public_ip
-  security_groups = concat(list("${local.use_VPCs_security_group ? var.vpc_security_group : aws_security_group.bastion_service[0].id}"),
+  security_groups = concat(list("${var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id}"),
     "${var.security_groups_additional}"
   )
   user_data = data.template_cloudinit_config.config.rendered

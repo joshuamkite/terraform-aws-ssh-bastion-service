@@ -20,11 +20,11 @@ resource "aws_security_group" "bastion_service" {
 
 # Bastion service security group rules
 
-# Allow SSH access to the service from whitelisted IP ranges
-
+# Allow SSH access to the service from whitelisted IP ranges when using
+# the bation service's security group
 
 resource "aws_security_group_rule" "service_ssh_in" {
-  count             = "${var.use_vpc_security_group == 0 && local.cidr_blocks_whitelist_service_yes == 1 ? 1 : 0}"
+  count             = "${var.use_vpc_security_group == 0 && local.cidr_blocks_whitelist_service_yes == 1 ? 1 : 0 }"
   type              = "ingress"
   from_port         = 22
   to_port           = 22
@@ -34,25 +34,10 @@ resource "aws_security_group_rule" "service_ssh_in" {
   description       = "bastion service access"
 }
 
-# Allow SSH SSH access to the bastion host from whitelisted IP ranges
-
-resource "aws_security_group_rule" "host_ssh_in_cond" {
-  count             = "${local.hostport_whitelisted != "" ? 0 : 1}"
-  type              = "ingress"
-  from_port         = 2222
-  to_port           = 2222
-  protocol          = "tcp"
-  cidr_blocks       = var.cidr_blocks_whitelist_host
-  security_group_id = var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id
-  description       = "bastion HOST access"
-}
-
-# If configured in a stand-alone VPC, allow outbound egress so that users
-# may install packages in the Docker image of their choosing.  If installing
-# the bastion host in an existing VPC, use the VPC's policy 
+# Allow egress when using the bastion service's security group
 
 resource "aws_security_group_rule" "bastion_host_out" {
-  count             = "${var.use_vpc_security_group  == 1 ? 0 : 1}"
+  count             = "${var.use_vpc_security_group  == 0 && local.cidr_blocks_whitelist_service_yes == 1 ? 1 : 0 }"
   type              = "egress"
   from_port         = 0
   to_port           = 65535
@@ -62,12 +47,22 @@ resource "aws_security_group_rule" "bastion_host_out" {
   description       = "bastion service and host egress"
 }
 
-# Allow health-check traffic from the load-balancer 
+# Allow SSH SSH access to the bastion host from whitelisted IP ranges
+# regardless of whether using the bastion service's security group
 
-data "aws_subnet" "lb_subnets" {
-  count = length(var.subnets_lb)
-  id    = var.subnets_lb[count.index]
+resource "aws_security_group_rule" "host_ssh_in_cond" {
+  count             = "${local.hostport_whitelisted == false ? 0 : 1}"
+  type              = "ingress"
+  from_port         = 2222
+  to_port           = 2222
+  protocol          = "tcp"
+  cidr_blocks       = var.cidr_blocks_whitelist_host
+  security_group_id = var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id
+  description       = "bastion HOST access"
 }
+
+# Allow health-check traffic from the load-balancer regardless of whether
+# using the bastion service's security group
 
 resource "aws_security_group_rule" "lb_healthcheck_in" {
   security_group_id = "${var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id}"
@@ -77,4 +72,9 @@ resource "aws_security_group_rule" "lb_healthcheck_in" {
   protocol          = "tcp"
   type              = "ingress"
   description       = "Allow bastion service health-check"
+}
+
+data "aws_subnet" "lb_subnets" {
+  count = length(var.subnets_lb)
+  id    = var.subnets_lb[count.index]
 }

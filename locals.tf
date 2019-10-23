@@ -57,7 +57,7 @@ locals {
 ##########################
 
 locals {
-  cidr_blocks_whitelist_service_yes = join(",", var.cidr_blocks_whitelist_service) != "" ? 1 : 0
+  cidr_blocks_whitelist_service_yes = length(var.cidr_blocks_whitelist_service) != 0 ? 1 : 0
 }
 
 ##########################

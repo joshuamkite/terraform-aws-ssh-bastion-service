@@ -65,6 +65,7 @@ resource "aws_security_group_rule" "host_ssh_in_cond" {
 # using the bastion service's security group
 
 resource "aws_security_group_rule" "lb_healthcheck_in" {
+  count             = "${var.use_vpc_security_group  == 0 ? 1 : 0 }"
   security_group_id = "${var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id}"
   cidr_blocks       = data.aws_subnet.lb_subnets.*.cidr_block
   from_port         = var.lb_healthcheck_port

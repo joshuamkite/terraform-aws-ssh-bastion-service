@@ -27,7 +27,7 @@ resource "aws_vpc" "bastion" {
   enable_dns_hostnames = true
   enable_dns_support   = true
   tags = {
-    Name = "bastion-${var.environment-name}-subnet-${count.index}"
+    Name = "bastion-${var.environment-name}"
   }
 }
 
@@ -132,6 +132,6 @@ module "ssh-bastion-service" {
   subnets_asg                   = flatten([aws_subnet.bastion.*.id])
   subnets_lb                    = flatten([aws_subnet.bastion.*.id])
   cidr_blocks_whitelist_service = "${flatten(concat(list(local.localhost_ipv4_cidr), aws_subnet.bastion.*.cidr_block))}"
-#  cidr_blocks_whitelist_host    = "${flatten(concat(list(local.localhost_ipv4_cidr), aws_subnet.bastion.*.cidr_block))}"
+  cidr_blocks_whitelist_host    = "${list(local.localhost_ipv4_cidr)}"
   public_ip                     = true
 }

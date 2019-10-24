@@ -68,3 +68,6 @@ locals {
   route53_name_components = "${local.bastion_host_name}-${var.service_name}.${var.dns_domain}"
 }
 
+locals {
+  selected_security_group = var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id
+}

@@ -90,6 +90,7 @@ resource "aws_lb_target_group" "bastion-host" {
 }
 
 # Then associate the target group with the bastion service auto-scaling group
+
 resource "aws_autoscaling_attachment" "bastion_host" {
   count                  = local.hostport_whitelisted ? 1 : 0
   autoscaling_group_name = "${aws_autoscaling_group.bastion-service.id}"

@@ -11,15 +11,8 @@ data "http" "ipv4" {
   url = "https://api.ipify.org?format=json"
 }
 
-# Localhost IPV6 address
-
-data "http" "ipv6" {
-  url = "https://api6.ipify.org?format=json"
-}
-
 locals {
   localhost_ipv4_cidr = "${jsondecode(data.http.ipv4.body)["ip"]}/32"
-  localhost_ipv6_cidr = "${jsondecode(data.http.ipv6.body)["ip"]}/32"
 }
 
 resource "aws_vpc" "bastion" {
@@ -103,24 +96,7 @@ resource "aws_security_group_rule" "allow_outbound" {
   security_group_id = "${aws_security_group.bastion_demo_security_group[0].id}"
 }
 
-# To create the bastion service, subnets need to already exist
-# This is currently a limitation of Terraform: https://github.com/hashicorp/terraform/issues/12570
-# Since Terraform version 0.12.0 you can either: 
-# Comment out the bastion service, apply, uncomment and apply again (as for Terraform 0.11.x)
-# Or simply run the plan twice - first time will give an error like below, simply run again
-
-# Error: Provider produced inconsistent final plan
-
-# When expanding the plan for
-# module.ssh-bastion-service.aws_autoscaling_group.bastion-service to include
-# new values learned so far during apply, provider "aws" produced an invalid new
-# value for .availability_zones: was known, but now unknown.
-
-# This is a bug in the provider, which should be reported in the provider's own
-# issue tracker.
-
 module "ssh-bastion-service" {
-#  source = "joshuamkite/ssh-bastion-service/aws"
   source                        = "../../"
   aws_region                    = var.aws-region
   aws_profile                   = var.aws-profile
@@ -132,6 +108,6 @@ module "ssh-bastion-service" {
   subnets_asg                   = flatten([aws_subnet.bastion.*.id])
   subnets_lb                    = flatten([aws_subnet.bastion.*.id])
   cidr_blocks_whitelist_service = "${flatten(concat(list(local.localhost_ipv4_cidr), aws_subnet.bastion.*.cidr_block))}"
-  cidr_blocks_whitelist_host    = "${list(local.localhost_ipv4_cidr)}"
+#  cidr_blocks_whitelist_host    = "${list(local.localhost_ipv4_cidr)}"
   public_ip                     = true
 }

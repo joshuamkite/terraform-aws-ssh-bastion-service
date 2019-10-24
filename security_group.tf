@@ -30,19 +30,19 @@ resource "aws_security_group_rule" "service_ssh_in" {
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = var.cidr_blocks_whitelist_service
-  security_group_id = "${var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id}"
+  security_group_id = local.selected_security_group
   description       = "bastion service access"
 }
 
 # Allow egress when using the bastion service's security group
 
 resource "aws_security_group_rule" "bastion_host_out" {
-  count             = "${var.use_vpc_security_group  == 0 && local.cidr_blocks_whitelist_service_yes == 1 ? 1 : 0 }"
+  count             = var.use_vpc_security_group  == 0 ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 65535
   protocol          = -1
-  security_group_id = var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id
+  security_group_id = local.selected_security_group
   cidr_blocks       = ["0.0.0.0/0"]
   description       = "bastion service and host egress"
 }
@@ -57,7 +57,7 @@ resource "aws_security_group_rule" "host_ssh_in_cond" {
   to_port           = 2222
   protocol          = "tcp"
   cidr_blocks       = var.cidr_blocks_whitelist_host
-  security_group_id = var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id
+  security_group_id = local.selected_security_group
   description       = "bastion HOST access"
 }
 
@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "host_ssh_in_cond" {
 
 resource "aws_security_group_rule" "lb_healthcheck_in" {
   count             = "${var.use_vpc_security_group  == 0 ? 1 : 0 }"
-  security_group_id = "${var.use_vpc_security_group == 1 && var.vpc_security_group != "" ? var.vpc_security_group : aws_security_group.bastion_service[0].id}"
+  security_group_id = local.selected_security_group
   cidr_blocks       = data.aws_subnet.lb_subnets.*.cidr_block
   from_port         = var.lb_healthcheck_port
   to_port           = var.lb_healthcheck_port

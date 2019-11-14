@@ -1,3 +1,4 @@
+
 variable "bastion_instance_type" {
   description = "The virtual hardware to be used for the bastion service host"
   default     = "t2.micro"
@@ -200,5 +201,10 @@ variable "service_name" {
 variable "route53_fqdn" {
   description = "If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim"
   default     = ""
+}
+
+variable "on_demand_base_capacity" {
+  default     = 0
+  description = "allows a base level of on demand when using spot"
 }
 

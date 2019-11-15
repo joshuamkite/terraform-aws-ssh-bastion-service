@@ -1,0 +1,4 @@
+- type: changed
+  m: Move bastions servers to use spot instances
+  jira: PLAT-1652
+  owner: carvalho-dazn

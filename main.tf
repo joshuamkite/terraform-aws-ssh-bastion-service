@@ -21,14 +21,18 @@ data "aws_ami" "debian" {
   owners = ["379101102735"] # Debian
 }
 
+
 ############################
-#Launch configuration for service host
+#Launch template for service host
 ############################
 
-resource "aws_launch_configuration" "bastion-service-host" {
+resource "aws_launch_template" "bastion-service-host" {
   name_prefix   = "${var.service_name}-host"
   image_id      = local.bastion_ami_id
   instance_type = var.bastion_instance_type
+  key_name      = var.bastion_service_host_key_name
+  user_data     = data.template_cloudinit_config.config.rendered
+
   iam_instance_profile = element(
     concat(
       aws_iam_instance_profile.bastion_service_assume_role_profile.*.arn,
@@ -36,13 +40,14 @@ resource "aws_launch_configuration" "bastion-service-host" {
     ),
     0,
   )
-  associate_public_ip_address = var.public_ip
-  security_groups = concat(
+
+  network_interfaces {
+    associate_public_ip_address = var.public_ip
+    security_groups             =  concat(
     [aws_security_group.bastion_service.id],
     var.security_groups_additional
-  )
-  user_data = data.template_cloudinit_config.config.rendered
-  key_name  = var.bastion_service_host_key_name
+    )
+  }
 
   lifecycle {
     create_before_destroy = true
@@ -69,7 +74,33 @@ resource "aws_autoscaling_group" "bastion-service" {
   max_size             = var.asg_max
   min_size             = var.asg_min
   desired_capacity     = var.asg_desired
-  launch_configuration = aws_launch_configuration.bastion-service-host.name
+
+  mixed_instances_policy {
+    instances_distribution {
+      on_demand_base_capacity                  = var.on_demand_base_capacity
+      on_demand_percentage_above_base_capacity = 0
+    }
+
+    launch_template {
+      launch_template_specification {
+        launch_template_id = aws_launch_template.bastion-service-host.id
+        version            = "$$Latest"
+      }
+
+      override {
+        instance_type = var.bastion_instance_type
+      }
+
+      override {
+        instance_type = "t2.small"
+      }
+
+      override {
+        instance_type = "t2.medium"
+      }
+    }
+  }
+
   vpc_zone_identifier  = var.subnets_asg
   target_group_arns = concat(
     [aws_lb_target_group.bastion-service.arn],

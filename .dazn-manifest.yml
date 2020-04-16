@@ -1,0 +1,5 @@
+dazn-manifest: 0.0.2
+info:
+  name: terraform-aws-ssh-bastion-service
+  description: stateless containerised sshd bastion service on AWS with IAM based authentication
+  owner: CE

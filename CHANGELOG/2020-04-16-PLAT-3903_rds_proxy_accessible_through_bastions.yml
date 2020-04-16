@@ -1,0 +1,4 @@
+- type: changed
+  m: Add unique target group name for bastion host elb
+  jira: PLAT-3903
+  owner: simonkey007

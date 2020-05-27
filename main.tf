@@ -33,19 +33,21 @@ resource "aws_launch_template" "bastion-service-host" {
   key_name      = var.bastion_service_host_key_name
   user_data     = data.template_cloudinit_config.config.rendered
 
-  iam_instance_profile = element(
-    concat(
-      aws_iam_instance_profile.bastion_service_assume_role_profile.*.arn,
-      aws_iam_instance_profile.bastion_service_profile.*.arn,
-    ),
-    0,
-  )
+  iam_instance_profile {
+    name = element(
+      concat(
+        aws_iam_instance_profile.bastion_service_assume_role_profile.*.arn,
+        aws_iam_instance_profile.bastion_service_profile.*.arn,
+      ),
+      0,
+    )
+  }
 
   network_interfaces {
     associate_public_ip_address = var.public_ip
-    security_groups             =  concat(
-    [aws_security_group.bastion_service.id],
-    var.security_groups_additional
+    security_groups = concat(
+      [aws_security_group.bastion_service.id],
+      var.security_groups_additional
     )
   }
 
@@ -69,11 +71,11 @@ data "null_data_source" "asg-tags" {
 }
 
 resource "aws_autoscaling_group" "bastion-service" {
-  availability_zones   = data.aws_availability_zones.available.names
-  name_prefix          = "${var.service_name}-asg"
-  max_size             = var.asg_max
-  min_size             = var.asg_min
-  desired_capacity     = var.asg_desired
+  availability_zones = data.aws_availability_zones.available.names
+  name_prefix        = "${var.service_name}-asg"
+  max_size           = var.asg_max
+  min_size           = var.asg_min
+  desired_capacity   = var.asg_desired
 
   mixed_instances_policy {
     instances_distribution {
@@ -101,7 +103,7 @@ resource "aws_autoscaling_group" "bastion-service" {
     }
   }
 
-  vpc_zone_identifier  = var.subnets_asg
+  vpc_zone_identifier = var.subnets_asg
   target_group_arns = concat(
     [aws_lb_target_group.bastion-service.arn],
     aws_lb_target_group.bastion-host.*.arn
@@ -145,4 +147,3 @@ data "template_file" "sample_policies_for_parent_account" {
     assume_role_arn           = var.assume_role_arn
   }
 }
-

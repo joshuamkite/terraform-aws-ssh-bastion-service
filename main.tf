@@ -31,13 +31,13 @@ resource "aws_launch_template" "bastion-service-host" {
   image_id      = local.bastion_ami_id
   instance_type = var.bastion_instance_type
   key_name      = var.bastion_service_host_key_name
-  user_data     = data.template_cloudinit_config.config.rendered
+  user_data     = base64encode(data.template_cloudinit_config.config.rendered)
 
   iam_instance_profile {
     name = element(
       concat(
-        aws_iam_instance_profile.bastion_service_assume_role_profile.*.arn,
-        aws_iam_instance_profile.bastion_service_profile.*.arn,
+        aws_iam_instance_profile.bastion_service_assume_role_profile.*.name,
+        aws_iam_instance_profile.bastion_service_profile.*.name,
       ),
       0,
     )

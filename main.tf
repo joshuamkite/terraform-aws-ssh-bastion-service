@@ -60,7 +60,7 @@ resource "aws_launch_template" "bastion-service-host" {
   tag_specifications {
     resource_type = "instance"
     tags          = var.tags
-}
+  }
   tag_specifications {
     resource_type = "volume"
     tags          = var.tags
@@ -97,7 +97,7 @@ resource "aws_autoscaling_group" "bastion-service" {
     launch_template {
       launch_template_specification {
         launch_template_id = aws_launch_template.bastion-service-host.id
-        version            = "$$Latest"
+        version            = "$Latest"
       }
 
       override {

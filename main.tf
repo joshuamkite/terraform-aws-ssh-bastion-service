@@ -29,7 +29,7 @@ data "aws_ami" "debian" {
 resource "aws_launch_template" "bastion-service-host" {
   name_prefix   = "${var.service_name}-host"
   image_id      = local.bastion_ami_id
-  instance_type = var.bastion_instance_type
+  instance_type = var.bastion_instance_types[0]
   key_name      = var.bastion_service_host_key_name
   user_data     = base64encode(data.template_cloudinit_config.config.rendered)
 
@@ -100,16 +100,11 @@ resource "aws_autoscaling_group" "bastion-service" {
         version            = "$Latest"
       }
 
-      override {
-        instance_type = var.bastion_instance_type
-      }
-
-      override {
-        instance_type = "t2.small"
-      }
-
-      override {
-        instance_type = "t2.medium"
+      dynamic "override" {
+        for_each = var.bastion_instance_types
+        content {
+          instance_type = override.value
+        }
       }
     }
   }

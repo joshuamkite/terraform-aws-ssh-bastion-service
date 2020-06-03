@@ -232,7 +232,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | aws_region |  | string | - | yes |
 | bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | string | `` | no |
 | bastion_host_name | The hostname to give to the bastion instance | string | `` | no |
-| bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
+| bastion_instance_types | List of ec2 types for the bastion host, used by aws_launch_template (first from the list) and in aws_autoscaling_group | list(string) | "t2.small", "t2.medium", "t2.large" | no |
 | bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
 | bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
 | cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |

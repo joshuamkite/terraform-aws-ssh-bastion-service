@@ -1,7 +1,6 @@
-
-variable "bastion_instance_type" {
-  description = "The virtual hardware to be used for the bastion service host"
-  default     = "t2.micro"
+variable "bastion_instance_types" {
+  description = "List of ec2 types for the bastion host, used by aws_launch_template (first from the list) and in aws_autoscaling_group"
+  default     = ["t2.small", "t2.medium", "t2.large"]
 }
 
 variable "cidr_blocks_whitelist_host" {
@@ -207,4 +206,3 @@ variable "on_demand_base_capacity" {
   default     = 0
   description = "allows a base level of on demand when using spot"
 }
-

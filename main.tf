@@ -59,7 +59,7 @@ resource "aws_launch_template" "bastion-service-host" {
 
   tag_specifications {
     resource_type = "instance"
-    tags          = var.tags
+    tags          = merge(var.tags, { "Name" : local.bastion_host_name })
   }
   tag_specifications {
     resource_type = "volume"

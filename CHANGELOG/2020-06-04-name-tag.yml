@@ -1,0 +1,3 @@
+- type: changed
+  m: Add name tag to instance tags for launch template
+  owner: mwieczorek

@@ -206,3 +206,8 @@ variable "on_demand_base_capacity" {
   default     = 0
   description = "allows a base level of on demand when using spot"
 }
+
+variable "delete_network_interface_on_termination" {
+  description = "if network interface created for bastion host should be deleted when instance in terminated. Setting propagated to aws_launch_template.network_interfaces.delete_on_termination"
+  default = true
+}

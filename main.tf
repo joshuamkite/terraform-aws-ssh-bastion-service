@@ -45,6 +45,7 @@ resource "aws_launch_template" "bastion-service-host" {
 
   network_interfaces {
     associate_public_ip_address = var.public_ip
+    delete_on_termination       = var.delete_network_interface_on_termination
     security_groups = concat(
       [aws_security_group.bastion_service.id],
       var.security_groups_additional

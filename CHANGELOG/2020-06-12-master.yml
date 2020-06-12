@@ -1,0 +1,3 @@
+- type: changed
+  m: Delete network interface on instance termination
+  owner: mwieczorek

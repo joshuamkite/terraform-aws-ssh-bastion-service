@@ -1,0 +1,4 @@
+- type: added
+  m: Enable metrics collection on ASG
+  jira: PLAT-4675
+  owner: tomnorth

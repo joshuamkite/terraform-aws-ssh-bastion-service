@@ -116,6 +116,7 @@ resource "aws_autoscaling_group" "bastion-service" {
     aws_lb_target_group.bastion-host.*.arn
   )
 
+  enabled_metrics = ["GroupMinSize", "GroupMaxSize", "GroupDesiredCapacity", "GroupInServiceInstances", "GroupPendingInstances", "GroupStandbyInstances", "GroupTerminatingInstances", "GroupTotalInstances"]
 
   lifecycle {
     create_before_destroy = true

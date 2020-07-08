@@ -1,0 +1,4 @@
+- type: added
+  m: Allow instances to set themselves as unhealthy so that Autoscaling can kill them.
+  jira: PLAT-4678
+  owner: tomnorth

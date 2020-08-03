@@ -1,0 +1,4 @@
+- type: changed
+  m: Enable setting EBS size for bastion instance
+  jira: PLAT-5131
+  owner: mwieczorek

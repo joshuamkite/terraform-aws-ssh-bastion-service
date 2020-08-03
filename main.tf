@@ -52,6 +52,16 @@ resource "aws_launch_template" "bastion-service-host" {
     )
   }
 
+  block_device_mappings {
+    device_name = var.bastion_ebs_device_name
+
+    ebs {
+      volume_size           = var.bastion_ebs_size
+      volume_type           = "gp2"
+      delete_on_termination = "true"
+    }
+  }
+
   lifecycle {
     create_before_destroy = true
   }

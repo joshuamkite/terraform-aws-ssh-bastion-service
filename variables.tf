@@ -209,5 +209,15 @@ variable "on_demand_base_capacity" {
 
 variable "delete_network_interface_on_termination" {
   description = "if network interface created for bastion host should be deleted when instance in terminated. Setting propagated to aws_launch_template.network_interfaces.delete_on_termination"
-  default = true
+  default     = true
+}
+
+variable "bastion_ebs_size" {
+  description = "Size of EBS attached to the bastion instance"
+  default     = 8
+}
+
+variable "bastion_ebs_device_name" {
+  description = "Name of bastion instance block device"
+  default     = "/dev/xvda"
 }

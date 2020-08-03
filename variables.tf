@@ -219,5 +219,5 @@ variable "bastion_ebs_size" {
 
 variable "bastion_ebs_device_name" {
   description = "Name of bastion instance block device"
-  default     = "/dev/xvda"
+  default     = "xvda"
 }

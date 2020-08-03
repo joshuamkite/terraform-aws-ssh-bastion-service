@@ -1,0 +1,4 @@
+- type: changed
+  m: Fix default name for ebs device
+  jira: PLAT-5131
+  owner: mwieczorek

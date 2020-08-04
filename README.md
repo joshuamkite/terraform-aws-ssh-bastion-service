@@ -1,15 +1,17 @@
 This Terraform deploys a stateless containerised sshd bastion service on AWS with IAM based authentication:
 ===================================
 
-Updated to Terraform 0.12/HCL2. **This is a Breaking change** 
+ This module requires Terraform 0.12/HCL2. 
 
-**For Terraform 0.11. Pin module version to ~> v4.0**
+**Terraform 0.11.x was *previously* supported with pinning module version to ~> v4.0** 
 
 **N.B. If you are using a newer version of this module when you have an older version deployed, please review the changelog!**
 
 # Overview
 
 This plan provides socket-activated sshd-containers with one container instantiated per connection and destroyed on connection termination or else after 12 hours- to deter things like reverse tunnels etc. The host assumes an IAM role, inherited by the containers, allowing it to query IAM users and request their ssh public keys lodged with AWS. 
+
+**It is essential to limit incoming service traffic to whitelisted ports.** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
 **It is possible to replace the components in userdata and the base AMI with components of your own choosing. The following describes deployment with all sections as provided by module defaults.**
 
@@ -89,7 +91,30 @@ It is considered normal to see very highly incremented counters if the load blan
 
 **It is essential to limit incoming service traffic to whitelisted ports.** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
-The host is set to run the latest patch release at deployment of Debian Stretch - unless you specify a custom AMI. Debian was chosen because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). **The login username is 'admin'**. The host sshd is available on port 2222 and uses standard ec2 ssh keying. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container during development, e.g. with
+The host is set to run the latest patch release at deployment of Debian Stretch - unless you specify a custom AMI. This Terraform has also been tested working with Ubuntu 18.04 'latest' host, e.g.:
+
+## For Ubuntu 18.04 'latest' host
+
+```bash
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  owners = ["099720109477"] # Canonical
+}
+
+custom_ami_id = data.aws_ami.ubuntu.id
+```
+
+Debian was chosen originally because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). Both Debian 10.x 'Buster' and Ubuntu 20.04 'Focal' have breaking changes around repository/package naming and Golang behaviour - look for support for these in a future release - contributions very welcome!
+
+The host sshd is available on port 2222 and uses standard ec2 ssh keying. **The default login username for Debian AMI's is 'admin'**. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container during development, e.g. with
 
     sudo apt install -y curl; ssh -p2222 admin@`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
 
@@ -220,59 +245,74 @@ The DNS entry (if created) for the service is also displayed as an output of the
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| aws | n/a |
+| null | n/a |
+| template | n/a |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|:----:|:-----:|:-----:|
-| asg_desired | Desired numbers of bastion-service hosts in ASG | string | `1` | no |
-| asg_max | Max numbers of bastion-service hosts in ASG | string | `2` | no |
-| asg_min | Min numbers of bastion-service hosts in ASG | string | `1` | no |
-| assume_role_arn | arn for role to assume in separate identity account if used | string | `` | no |
-| aws_profile |  | string | - | yes |
-| aws_region |  | string | - | yes |
-| bastion_allowed_iam_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | string | `` | no |
-| bastion_host_name | The hostname to give to the bastion instance | string | `` | no |
-| bastion_instance_type | The virtual hardware to be used for the bastion service host | string | `t2.micro` | no |
-| bastion_service_host_key_name | AWS ssh key *.pem to be used for ssh access to the bastion service host | string | `` | no |
-| bastion_vpc_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this | string | `vpc_id` | no |
-| cidr_blocks_whitelist_host | range(s) of incoming IP addresses to whitelist for the HOST | list | `<list>` | no |
-| cidr_blocks_whitelist_service | range(s) of incoming IP addresses to whitelist for the SERVICE | list | `<list>` | no |
-| container_ubuntu_version | ubuntu version to use for service container. Tested with 16.04 and 18.04 | string | `16.04` | no |
-| custom_ami_id | id for custom ami if used | string | `` | no |
-| custom_authorized_keys_command | any value excludes default Go binary iam-authorized-keys built from source from userdata | string | `` | no |
-| custom_docker_setup | any value excludes default docker installation and container build from userdata | string | `` | no |
-| custom_ssh_populate | any value excludes default ssh_populate script used on container launch from userdata | string | `` | no |
-| custom_systemd | any value excludes default systemd and hostname change from userdata | string | `` | no |
-| dns_domain | The domain used for Route53 records | string | `` | no |
-| environment_name | the name of the environment that we are deploying to, used in tagging. Overwritten if var.service_name and var.bastion_host_name values are changed | `staging` | no |
-| extra_user_data_content | Extra user-data to add to the default built-in | string | `` | no |
-| extra_user_data_content_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | string | `text/x-shellscript` | no |
-| extra_user_data_merge_type | Control how cloud-init merges user-data sections | string | `str(append)` | no |
-| lb_healthcheck_port | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | string | `2222` | no |
-| lb_healthy_threshold | Healthy threshold for lb target group | string | `2` | no |
-| lb_interval | interval for lb target group health check | string | `30` | no |
-| lb_is_internal | whether the lb will be internal | string | `false` | no |
-| lb_unhealthy_threshold | Unhealthy threshold for lb target group | string | `2` | no |
-| public_ip | Associate a public IP with the host instance when launching | string | `false` | no |
-| route53_fqdn | If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim | string | `` | no |
-| route53_zone_id | Route53 zoneId | string | `` | no |
-| security_groups_additional | additional security group IDs to attach to host instance | list | `<list>` | no |
-| service_name | Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc | string | `bastion-service` | no |
-| subnets_asg | list of subnets for autoscaling group - availability zones must match subnets_lb | list | `<list>` | no |
-| subnets_lb | list of subnets for load balancer - availability zones must match subnets_asg | list | `<list>` | no |
-| tags | AWS tags that should be associated with created resources | map | `<map>` | no |
-| vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | string | - | yes |
+|------|-------------|------|---------|:--------:|
+| asg\_desired | Desired numbers of bastion-service hosts in ASG | `string` | `"1"` | no |
+| asg\_max | Max numbers of bastion-service hosts in ASG | `string` | `"2"` | no |
+| asg\_min | Min numbers of bastion-service hosts in ASG | `string` | `"1"` | no |
+| assume\_role\_arn | arn for role to assume in separate identity account if used | `string` | `""` | no |
+| aws\_profile | n/a | `any` | n/a | yes |
+| aws\_region | n/a | `any` | n/a | yes |
+| bastion\_allowed\_iam\_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | `string` | `""` | no |
+| bastion\_host\_name | The hostname to give to the bastion instance | `string` | `""` | no |
+| bastion\_instance\_type | The virtual hardware to be used for the bastion service host | `string` | `"t2.micro"` | no |
+| bastion\_service\_host\_key\_name | AWS ssh key \*.pem to be used for ssh access to the bastion service host | `string` | `""` | no |
+| bastion\_vpc\_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc\_id' but you can pass a custom string, or an empty value to omit this | `string` | `"vpc_id"` | no |
+| cidr\_blocks\_whitelist\_host | range(s) of incoming IP addresses to whitelist for the HOST | `list(string)` | `[]` | no |
+| cidr\_blocks\_whitelist\_service | range(s) of incoming IP addresses to whitelist for the SERVICE | `list(string)` | `[]` | no |
+| container\_ubuntu\_version | ubuntu version to use for service container. Tested with 16.04; 18.04; 20.04 | `string` | `"20.04"` | no |
+| custom\_ami\_id | id for custom ami if used | `string` | `""` | no |
+| custom\_authorized\_keys\_command | any value excludes default Go binary iam-authorized-keys built from source from userdata | `string` | `""` | no |
+| custom\_docker\_setup | any value excludes default docker installation and container build from userdata | `string` | `""` | no |
+| custom\_ssh\_populate | any value excludes default ssh\_populate script used on container launch from userdata | `string` | `""` | no |
+| custom\_systemd | any value excludes default systemd and hostname change from userdata | `string` | `""` | no |
+| dns\_domain | The domain used for Route53 records | `string` | `""` | no |
+| environment\_name | the name of the environment that we are deploying to, used in tagging. Overwritten if var.service\_name and var.bastion\_host\_name values are changed | `string` | `"staging"` | no |
+| extra\_user\_data\_content | Extra user-data to add to the default built-in | `string` | `""` | no |
+| extra\_user\_data\_content\_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | `string` | `"text/x-shellscript"` | no |
+| extra\_user\_data\_merge\_type | Control how cloud-init merges user-data sections | `string` | `"str(append)"` | no |
+| lb\_healthcheck\_port | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | `string` | `"2222"` | no |
+| lb\_healthy\_threshold | Healthy threshold for lb target group | `string` | `"2"` | no |
+| lb\_interval | interval for lb target group health check | `string` | `"30"` | no |
+| lb\_is\_internal | whether the lb will be internal | `string` | `false` | no |
+| lb\_unhealthy\_threshold | Unhealthy threshold for lb target group | `string` | `"2"` | no |
+| public\_ip | Associate a public IP with the host instance when launching | `bool` | `false` | no |
+| route53\_fqdn | If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim | `string` | `""` | no |
+| route53\_zone\_id | Route53 zoneId | `string` | `""` | no |
+| security\_groups\_additional | additional security group IDs to attach to host instance | `list(string)` | `[]` | no |
+| service\_name | Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc | `string` | `"bastion-service"` | no |
+| subnets\_asg | list of subnets for autoscaling group - availability zones must match subnets\_lb | `list(string)` | `[]` | no |
+| subnets\_lb | list of subnets for load balancer - availability zones must match subnets\_asg | `list(string)` | `[]` | no |
+| tags | AWS tags that should be associated with created resources | `map(string)` | `{}` | no |
+| vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | `any` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| bastion_service_assume_role_name | role created for service host asg - if created with assume role |
-| bastion_service_role_name | role created for service host asg - if created without assume role |
-| bastion_sg_id | Security Group id of the bastion host |
-| lb_arn | aws load balancer arn |
-| lb_dns_name | aws load balancer dns |
-| lb_zone_id |  |
-| policy_example_for_parent_account_empty_if_not_used | You must apply an IAM policy with trust relationship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
-| service_dns_entry | dns-registered url for service and host |
-| target_group_arn | aws load balancer target group arn |
+| bastion\_service\_assume\_role\_name | role created for service host asg - if created with assume role |
+| bastion\_service\_role\_name | role created for service host asg - if created without assume role |
+| bastion\_sg\_id | Security Group id of the bastion host |
+| lb\_arn | aws load balancer arn |
+| lb\_dns\_name | aws load balancer dns |
+| lb\_zone\_id | n/a |
+| policy\_example\_for\_parent\_account\_empty\_if\_not\_used | You must apply an IAM policy with trust relationship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
+| service\_dns\_entry | dns-registered url for service and host |
+| target\_group\_arn | aws load balancer target group arn |
+

@@ -3,6 +3,7 @@ mkdir -p /opt/golang/src/iam-authorized-keys-command/
 cat << EOF > /opt/golang/src/iam-authorized-keys-command/main.go
         ${authorized_command_code}
 EOF
+DEBIAN_FRONTEND=noninteractive
 sudo apt-get install -y golang
 export GOPATH=/opt/golang
 

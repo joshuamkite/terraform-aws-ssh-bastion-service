@@ -1,5 +1,13 @@
 **N.B.**
 
+# 5.1 
+
+**Bugfix:** Change all `apt` => `apt-get`; Prefix `apt-get install` with `DEBIAN_FRONTEND=noninteractive` so that prompts are automatically accepted during cloud-init run (Thanks @DavidBennettUK)
+
+**Change:**  Default ubuntu container version updated `16.04` => `20.04`
+
+**Feature:** Update README.md
+
 # 5.0
 
 **Change:**  Updated to Terraform 0.12/HCL2. **This is a Breaking change** 

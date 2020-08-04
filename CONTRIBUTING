@@ -1,5 +1,13 @@
 # Contributing to this module
 
-I am always happy to consider contributions to the code offered here. Please feel free to raise issues or pull requests. All proposed code changes must be tested before submission!
+I am always happy to consider contributions to the code offered here. Please feel free to raise issues or pull requests. If a feature was useful enough for you to add then it may be useful to others!
+
+I generally try to avoid breaking changes and changes to default behaviour except e.g. where versions have become deprecated
+
+All proposed code changes must be tested before submission! I don't have a formal test suite so I'm afraid it is a case of testing changes manually with deployment, log in successfully, etc. 
+
+## Current 'missing features' that would be especially welcomed:
+
+* Support for Debian Buster 10.x and Ubuntu Focal 20.04 hosts
 
 Thanks

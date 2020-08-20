@@ -1,0 +1,4 @@
+- type: fixed
+  m: Fix name for target group
+  jira: PLAT-5132
+  owner: mwieczorek

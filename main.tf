@@ -27,7 +27,7 @@ data "aws_ami" "debian" {
 ############################
 
 resource "aws_launch_template" "bastion-service-host" {
-  name_prefix   = "${var.service_name}-host"
+  name_prefix   = "${var.service_name}-host-${var.environment_name}"
   image_id      = local.bastion_ami_id
   instance_type = var.bastion_instance_types[0]
   key_name      = var.bastion_service_host_key_name
@@ -94,7 +94,7 @@ data "null_data_source" "asg-tags" {
 
 resource "aws_autoscaling_group" "bastion-service" {
   availability_zones = data.aws_availability_zones.available.names
-  name_prefix        = "${var.service_name}-asg"
+  name_prefix        = "${var.service_name}-asg-${var.environment_name}"
   max_size           = var.asg_max
   min_size           = var.asg_min
   desired_capacity   = var.asg_desired

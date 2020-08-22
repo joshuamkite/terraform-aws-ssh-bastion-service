@@ -249,7 +249,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12 |
+| terraform | >= 0.13 |
 
 ## Providers
 
@@ -267,7 +267,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | asg\_max | Max numbers of bastion-service hosts in ASG | `string` | `"2"` | no |
 | asg\_min | Min numbers of bastion-service hosts in ASG | `string` | `"1"` | no |
 | assume\_role\_arn | arn for role to assume in separate identity account if used | `string` | `""` | no |
-| aws\_profile | n/a | `any` | n/a | yes |
+| aws\_profile | n/a | `string` | `""` | no |
 | aws\_region | n/a | `any` | n/a | yes |
 | bastion\_allowed\_iam\_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | `string` | `""` | no |
 | bastion\_host\_name | The hostname to give to the bastion instance | `string` | `""` | no |

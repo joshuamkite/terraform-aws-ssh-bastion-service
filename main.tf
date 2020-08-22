@@ -2,10 +2,6 @@
 data "aws_region" "current" {
 }
 
-#get list of AWS Availability Zones which can be accessed by an AWS account within the region for use later in plan
-data "aws_availability_zones" "available" {
-}
-
 ##########################
 #Query for most recent AMI of type debian
 ##########################
@@ -64,7 +60,6 @@ data "null_data_source" "asg-tags" {
 }
 
 resource "aws_autoscaling_group" "bastion-service" {
-  availability_zones   = data.aws_availability_zones.available.names
   name_prefix          = "${var.service_name}-asg"
   max_size             = var.asg_max
   min_size             = var.asg_min

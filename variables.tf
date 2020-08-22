@@ -123,6 +123,7 @@ variable "aws_region" {
 }
 
 variable "aws_profile" {
+    default     = ""
 }
 
 variable "assume_role_arn" {

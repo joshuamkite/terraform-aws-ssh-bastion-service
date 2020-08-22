@@ -1,7 +1,3 @@
-variable "aws-profile" {
-  default = ""
-}
-
 variable "aws-region" {
   default     = "eu-west-1"
   description = "Default AWS region"

@@ -60,31 +60,19 @@ variable "everyone-cidr" {
   description = "Everyone"
 }
 
-# To create the bastion service, subnets need to already exist
-# This is currently a limitation of Terraform: https://github.com/hashicorp/terraform/issues/12570
-# Since Terraform version 0.12.0 you can either: 
-# Comment out the bastion service, apply, uncomment and apply again (as for Terraform 0.11.x)
-# Or simply run the plan twice - first time will give an error like below, simply run again
-
-# Error: Provider produced inconsistent final plan
-
-# When expanding the plan for
-# module.ssh-bastion-service.aws_autoscaling_group.bastion-service to include
-# new values learned so far during apply, provider "aws" produced an invalid new
-# value for .availability_zones: was known, but now unknown.
-
-# This is a bug in the provider, which should be reported in the provider's own
-# issue tracker.
-
 module "ssh-bastion-service" {
   source = "joshuamkite/ssh-bastion-service/aws"
   # source                        = "../../"
   aws_region                    = var.aws-region
-  aws_profile                   = var.aws-profile
   environment_name              = var.environment-name
   vpc                           = aws_vpc.bastion.id
   subnets_asg                   = flatten([aws_subnet.bastion.*.id])
   subnets_lb                    = flatten([aws_subnet.bastion.*.id])
   cidr_blocks_whitelist_service = [var.everyone-cidr]
   public_ip                     = true
+  depends_on = [
+    aws_vpc.bastion,
+    aws_subnet.bastion,
+    aws_internet_gateway.bastion,
+  ]
 }

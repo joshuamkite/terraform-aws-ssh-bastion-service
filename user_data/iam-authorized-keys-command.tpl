@@ -12,5 +12,5 @@ COMMAND_DIR=$GOPATH/src/iam-authorized-keys-command
 mkdir -p $COMMAND_DIR
 cd $COMMAND_DIR
 
-go get ./...
-go build -ldflags "-X main.iamGroup=${bastion_allowed_iam_group}" -o /opt/iam_helper/iam-authorized-keys-command ./main.go
+sudo go get ./...
+sudo go build -ldflags "-X main.iamGroup=${bastion_allowed_iam_group}" -o /opt/iam_helper/iam-authorized-keys-command ./main.go

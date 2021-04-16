@@ -92,16 +92,16 @@ It is considered normal to see very highly incremented counters if the load blan
 
 **It is essential to limit incoming service traffic to whitelisted ports.** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
-The host is set to run the latest patch release at deployment of Debian Stretch - unless you specify a custom AMI. This Terraform has also been tested working with Ubuntu 18.04 'latest' host, e.g.:
+The host is set to run the latest patch release at deployment of Debian Stretch - unless you specify a custom AMI. This Terraform has also been tested working with Ubuntu 20.04 'latest' host, e.g.:
 
-## For Ubuntu 18.04 'latest' host
+## For Ubuntu 20.04 'latest' host
 
 ```bash
 data "aws_ami" "ubuntu" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
   filter {
     name   = "virtualization-type"
@@ -113,7 +113,7 @@ data "aws_ami" "ubuntu" {
 custom_ami_id = data.aws_ami.ubuntu.id
 ```
 
-Debian was chosen originally because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). Both Debian 10.x 'Buster' and Ubuntu 20.04 'Focal' have breaking changes around repository/package naming and Golang behaviour - look for support for these in a future release - contributions very welcome!
+Debian was chosen originally because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). Debian 10.x 'Buster' has breaking changes around repository/package naming and Golang behaviour - look for support for this in a future release - contributions very welcome!
 
 The host sshd is available on port 2222 and uses standard ec2 ssh keying. **The default login username for Debian AMI's is 'admin'**. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container during development, e.g. with
 

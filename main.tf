@@ -48,17 +48,6 @@ resource "aws_launch_configuration" "bastion-service-host" {
 #######################################################
 # ASG section
 #######################################################
-
-data "null_data_source" "asg-tags" {
-  count = length(keys(var.tags))
-
-  inputs = {
-    key                 = element(keys(var.tags), count.index)
-    value               = element(values(var.tags), count.index)
-    propagate_at_launch = true
-  }
-}
-
 resource "aws_autoscaling_group" "bastion-service" {
   name_prefix          = "${var.service_name}-asg"
   max_size             = var.asg_max
@@ -71,11 +60,18 @@ resource "aws_autoscaling_group" "bastion-service" {
     aws_lb_target_group.bastion-host.*.arn
   )
 
-
   lifecycle {
     create_before_destroy = true
   }
-  tags = data.null_data_source.asg-tags.*.outputs
+
+  dynamic "tags" {
+    for_each = var.tags
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
 }
 
 ####################################################

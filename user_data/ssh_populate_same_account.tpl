@@ -4,9 +4,11 @@ cat << 'EOF' > /opt/iam_helper/ssh_populate.sh
 #!/bin/bash
 (
 count=1
-/opt/iam-authorized-keys-command | while read line
+/opt/iam_helper/iam-authorized-keys-command | while read line
 do
-    username=$( echo $line | sed -e 's/^# //' -e 's/+/plus/' -e 's/=/equal/' -e 's/,/comma/' -e 's/@/at/' )
+    IFS='@'
+    read -a name <<< "$line"
+    username=$( echo ${name[0]} | sed -e 's/^# //' -e 's/+/plus/' -e 's/=/equal/' -e 's/,/comma/' -e 's/@/at/' )
     useradd -m -s /bin/bash -k /etc/skel $username
     usermod -a -G sudo $username
     echo $username\ 'ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/$count

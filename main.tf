@@ -65,7 +65,8 @@ resource "aws_autoscaling_group" "bastion-service" {
   lifecycle {
     create_before_destroy = true
   }
-  dynamic "tags" {
+
+  dynamic "tag" {
     for_each = var.tags
     content {
       key                 = tag.key

@@ -32,6 +32,11 @@ locals {
   assume_role_no  = var.assume_role_arn == "" ? 1 : 0
 }
 
+locals {
+  assuming_role_yes = var.assume_role_arn != "" ? true : false
+  assuming_role_no  = var.assume_role_arn == "" ? true : false
+}
+
 ##########################
 # Logic for using module default userdata sections or not
 ##########################

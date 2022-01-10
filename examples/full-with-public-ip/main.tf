@@ -1,5 +1,5 @@
 provider "aws" {
-  region = var.aws-region
+  region = var.aws_region
 }
 
 data "aws_availability_zones" "available" {
@@ -61,9 +61,9 @@ variable "everyone-cidr" {
 }
 
 module "ssh-bastion-service" {
-  source = "joshuamkite/ssh-bastion-service/aws"
-  # source                        = "../../"
-  aws_region                    = var.aws-region
+  # source = "joshuamkite/ssh-bastion-service/aws"
+  source                        = "../../"
+  aws_region                    = var.aws_region
   environment_name              = var.environment-name
   vpc                           = aws_vpc.bastion.id
   subnets_asg                   = flatten([aws_subnet.bastion.*.id])

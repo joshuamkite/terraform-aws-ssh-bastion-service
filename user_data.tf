@@ -53,9 +53,6 @@ locals {
   )
 }
 
-
-
-
 ############################
 # Templates combined section
 ############################
@@ -127,7 +124,7 @@ data "template_cloudinit_config" "config" {
     # )
 
 
-    content = local.custom_authorized_keys_command_no != "" ? local.iam-authorized-keys-command : "#!/bin/bash"
+    content = local.custom_authorized_keys_command_no_bool ? local.iam-authorized-keys-command : "#!/bin/bash"
 
 
 

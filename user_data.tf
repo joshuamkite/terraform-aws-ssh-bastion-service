@@ -1,7 +1,7 @@
 ############################
 # User Data Templates combined
 ############################
-data "template_cloudinit_config" "config" {
+data "cloudinit_config" "config" {
   gzip          = false
   base64_encode = false
 

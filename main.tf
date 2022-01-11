@@ -37,7 +37,7 @@ resource "aws_launch_configuration" "bastion-service-host" {
     [aws_security_group.bastion_service.id],
     var.security_groups_additional
   )
-  user_data = data.template_cloudinit_config.config.rendered
+  user_data = data.cloudinit_config.config.rendered
   key_name  = var.bastion_service_host_key_name
 
   lifecycle {

@@ -71,3 +71,24 @@ locals {
   route53_name_components = "${local.bastion_host_name}-${var.service_name}.${var.dns_domain}"
 }
 
+
+############################
+# User Data Templates
+############################
+locals {
+  systemd = templatefile("${path.module}/user_data/systemd.tpl", {
+    bastion_host_name = local.bastion_host_name
+    vpc               = var.vpc
+  })
+  ssh_populate_assume_role = templatefile("${path.module}/user_data/ssh_populate_assume_role.tpl", {
+    "assume_role_arn" = var.assume_role_arn
+  })
+  ssh_populate_same_account = file("${path.module}/user_data/ssh_populate_same_account.tpl")
+  docker_setup = templatefile("${path.module}/user_data/docker_setup.tpl", {
+    "container_ubuntu_version" = var.container_ubuntu_version
+  })
+  iam_authorized_keys_command = templatefile("${path.module}/user_data/iam-authorized-keys-command.tpl", {
+    "authorized_command_code"   = file("${path.module}/user_data/iam_authorized_keys_code/main.go")
+    "bastion_allowed_iam_group" = var.bastion_allowed_iam_group
+  })
+}

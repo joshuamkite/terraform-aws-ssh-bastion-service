@@ -246,6 +246,7 @@ name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-basti
 ## Inputs and Outputs
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
+
 ## Requirements
 
 | Name | Version |
@@ -257,8 +258,8 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
-| <a name="provider_template"></a> [template](#provider\_template) | n/a |
 
 ## Modules
 
@@ -296,8 +297,8 @@ No modules.
 | [aws_iam_policy_document.check_ssh_authorized_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [aws_subnet.lb_subnets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
+| [cloudinit_config.config](https://registry.terraform.io/providers/hashicorp/cloudinit/latest/docs/data-sources/config) | data source |
 | [null_data_source.asg-tags](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) | data source |
-| [template_cloudinit_config.config](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config) | data source |
 
 ## Inputs
 

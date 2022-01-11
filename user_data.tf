@@ -34,15 +34,27 @@ data "template_file" "docker_setup" {
   }
 }
 
-data "template_file" "iam-authorized-keys-command" {
-  count    = local.custom_authorized_keys_command_no
-  template = file("${path.module}/user_data/iam-authorized-keys-command.tpl")
+# data "template_file" "iam-authorized-keys-command" {
+#   count    = local.custom_authorized_keys_command_no
+#   template = file("${path.module}/user_data/iam-authorized-keys-command.tpl")
 
-  vars = {
-    authorized_command_code   = file("${path.module}/user_data/iam_authorized_keys_code/main.go")
-    bastion_allowed_iam_group = var.bastion_allowed_iam_group
-  }
+#   vars = {
+#     authorized_command_code   = file("${path.module}/user_data/iam_authorized_keys_code/main.go")
+#     bastion_allowed_iam_group = var.bastion_allowed_iam_group
+#   }
+# }
+
+############################
+locals {
+  iam-authorized-keys-command = templatefile("${path.module}/user_data/iam-authorized-keys-command.tpl", {
+    "authorized_command_code"   = file("${path.module}/user_data/iam_authorized_keys_code/main.go")
+    "bastion_allowed_iam_group" = var.bastion_allowed_iam_group
+    }
+  )
 }
+
+
+
 
 ############################
 # Templates combined section
@@ -73,6 +85,7 @@ data "template_cloudinit_config" "config" {
       ),
       0,
     )
+    count = local.assuming_role_yes
   }
 
   # ssh_populate_same_account
@@ -105,13 +118,19 @@ data "template_cloudinit_config" "config" {
     filename     = "module_iam-authorized-keys-command"
     content_type = "text/x-shellscript"
     merge_type   = "str(append)"
-    content = element(
-      concat(
-        data.template_file.iam-authorized-keys-command.*.rendered,
-        ["#!/bin/bash"],
-      ),
-      0,
-    )
+    # content = element(
+    #   concat(
+    #     data.template_file.iam-authorized-keys-command.*.rendered,
+    #     ["#!/bin/bash"],
+    #   ),
+    #   0,
+    # )
+
+
+    content = local.custom_authorized_keys_command_no != "" ? local.iam-authorized-keys-command : "#!/bin/bash"
+
+
+
   }
 
   part {

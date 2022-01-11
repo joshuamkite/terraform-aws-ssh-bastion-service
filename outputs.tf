@@ -6,7 +6,7 @@ output "service_dns_entry" {
 output "policy_example_for_parent_account_empty_if_not_used" {
   description = "You must apply an IAM policy with trust relationship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login"
   value = [
-    local.assuming_role_yes ? local.sample_policies_for_parent_account : ""
+    local.assume_role_yes_bool ? local.sample_policies_for_parent_account : ""
   ]
 }
 

@@ -33,8 +33,8 @@ locals {
 }
 
 locals {
-  assuming_role_yes = var.assume_role_arn != "" ? true : false
-  assuming_role_no  = var.assume_role_arn == "" ? true : false
+  assume_role_yes_bool = var.assume_role_arn != "" ? true : false
+  assume_role_no_bool  = var.assume_role_arn == "" ? true : false
 }
 
 ##########################
@@ -42,10 +42,9 @@ locals {
 ##########################
 locals {
   custom_ssh_populate_no            = var.custom_ssh_populate == "" ? 1 : 0
-  custom_authorized_keys_command_no = var.custom_authorized_keys_command == "" ? 1 : 0
-  custom_authorized_keys_command_no_bool = var.custom_authorized_keys_command == "" ? true : false
-  custom_docker_setup_no            = var.custom_docker_setup == "" ? 1 : 0
-  custom_systemd_no                 = var.custom_systemd == "" ? 1 : 0
+  custom_authorized_keys_command_no = var.custom_authorized_keys_command == "" ? true : false
+  custom_docker_setup_no            = var.custom_docker_setup == "" ? true : false
+  custom_systemd_no                 = var.custom_systemd == "" ? true : false
 }
 
 ##########################

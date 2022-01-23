@@ -77,15 +77,7 @@ resource "aws_launch_template" "bastion-service-host" {
 # ASG section
 #######################################################
 
-data "null_data_source" "asg-tags" {
-  count = length(keys(var.tags))
-
-  inputs = {
-    key                 = element(keys(var.tags), count.index)
-    value               = element(values(var.tags), count.index)
-    propagate_at_launch = true
-  }
-}
+data "aws_default_tags" "this" {}
 
 resource "aws_autoscaling_group" "bastion-service" {
   name_prefix         = "${var.service_name}-asg"
@@ -124,6 +116,15 @@ resource "aws_autoscaling_group" "bastion-service" {
 
   lifecycle {
     create_before_destroy = true
+  }
+
+  dynamic "tag" {
+    for_each = merge(data.aws_default_tags.this.tags, var.tags)
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
   }
 }
 

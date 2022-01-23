@@ -1,7 +1,8 @@
 # This Terraform deploys a stateless containerised sshd bastion service on AWS with IAM based authentication:
 
-**This module requires Terraform 0.13**
+**This module requires Terraform >/=0.15/1.x.x**
 
+- Terraform 0.13.x was _previously_ supported with module version to ~> v6.1
 - Terraform 0.12.x was _previously_ supported with module version to ~> v5.0
 - Terraform 0.11.x was _previously_ supported with module version to ~> v4.0
 

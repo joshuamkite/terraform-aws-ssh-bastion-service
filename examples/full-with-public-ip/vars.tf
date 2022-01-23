@@ -8,6 +8,18 @@ variable "cidr-start" {
   description = "Default CIDR block"
 }
 
-variable "environment-name" {
+variable "environment_name" {
   default = "demo"
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "tags aplied to all resources"
+  default     = {}
+}
+
+locals {
+  default_tags = {
+    Name = "bastion-service-${var.environment_name}"
+  }
 }

@@ -4,18 +4,52 @@ This example shows a complete setup for a new `bastion` service with all needed 
 * private subnet(s) inside the VPC,
 * an internet gateway and route tables.
 
-To create the bastion service, subnets need to already exist
-This is currently a limitation of Terraform: https://github.com/hashicorp/terraform/issues/12570
-Since Terraform version 0.12.0 you can either: 
-Comment out the bastion service, apply, uncomment and apply again (as for Terraform 0.11.x)
-Or simply run the plan twice - first time will give an error like below, simply run again
+## Requirements
 
-    Error: Provider produced inconsistent final plan
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
 
-    When expanding the plan for
-    module.ssh-bastion-service.aws_autoscaling_group.bastion-service to include
-    new values learned so far during apply, provider "aws" produced an invalid new
-    value for .availability_zones: was known, but now unknown.
+## Providers
 
-    This is a bug in the provider, which should be reported in the provider's own
-    issue tracker.
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.71.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_ssh-bastion-service"></a> [ssh-bastion-service](#module\_ssh-bastion-service) | joshuamkite/ssh-bastion-service/aws | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_internet_gateway.bastion](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
+| [aws_route.bastion-ipv4-out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route_table.bastion](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_route_table_association.bastion](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_subnet.bastion](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_vpc.bastion](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | Default AWS region | `string` | `"eu-west-1"` | no |
+| <a name="input_cidr-start"></a> [cidr-start](#input\_cidr-start) | Default CIDR block | `string` | `"10.50"` | no |
+| <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | n/a | `string` | `"demo"` | no |
+| <a name="input_everyone-cidr"></a> [everyone-cidr](#input\_everyone-cidr) | Everyone | `string` | `"0.0.0.0/0"` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | tags aplied to all resources | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_bastion_service_role_name"></a> [bastion\_service\_role\_name](#output\_bastion\_service\_role\_name) | role created for service host asg - if created without assume role |
+| <a name="output_bastion_sg_id"></a> [bastion\_sg\_id](#output\_bastion\_sg\_id) | Security Group id of the bastion host |
+| <a name="output_lb_arn"></a> [lb\_arn](#output\_lb\_arn) | aws load balancer arn |
+| <a name="output_lb_dns_name"></a> [lb\_dns\_name](#output\_lb\_dns\_name) | aws load balancer dns |
+| <a name="output_lb_zone_id"></a> [lb\_zone\_id](#output\_lb\_zone\_id) | n/a |

@@ -1,4 +1,33 @@
-**N.B.**
+# 7.0
+
+**Bugfix:** Retire deprecated null-resource provider
+
+**Bugfix:** Retire deprecated template provider (required for darwin_arm64)
+
+**Feature:** Support provider default tags as well as explicit tags for all supported resources plus autoscaling group
+
+**Feature:** Update Terraform version to >/=0.15.x/1.0.0
+
+**Bugfix:** Update formatting in readme
+
+**Bugfix:** Spellcheck readme
+
+**Feature:** Update terraform-docs outputs on documentation
+# 6.1 
+
+**Change:** Update readme to specify that we are targeting terraform 13
+
+# 6.0
+
+**Change:** Major version increment as changes accommodate major version increments for both AWS provider and Terraform itself  
+
+**Change:** Terraform 0.13 using `terraform 0.13upgrade` linting and provider specification
+
+**Change:** Terraform AWS provider 3.0.0 - `vpc_zone_identifier` argument now conflicts with `vpc_zone_identifier` in Resource: `aws_autoscaling_group`
+
+**Feature:** Single deployment of included example, accommodating above changes
+
+**Change:** `var.aws_profile` is now defaulted to `""` as it is only used for sample policies output
 
 # 5.1 
 

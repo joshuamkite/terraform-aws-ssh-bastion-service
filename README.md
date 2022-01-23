@@ -61,11 +61,15 @@ You can overwrite the suggested hostname entirely with `var.bastion_host_name.`
 
 You can _instead_ customise just the last part of the hostname if you like with `bastion_vpc_name`. By default this is the vpc ID via the magic default value of 'vpc_id' with the format
 
+```terraform
 name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
-
+```
 e.g.
 
-module default: `dev-ap-northeast-1-vpc-1a23b456d7890-bastion-service.yourdomain.com`
+module default: 
+```terraform
+dev-ap-northeast-1-vpc-1a23b456d7890-bastion-service.yourdomain.com
+```
 
 but you can pass a custom string, or an empty value to omit this. e.g.
 
@@ -75,13 +79,15 @@ but you can pass a custom string, or an empty value to omit this. e.g.
 
 In any event this ensures a consistent and obvious naming format for each combination of AWS account and region that does not collide if multiple vpcs are deployed per region.
 
-The container shell prompt is set similarly but with a systemd incremented counter, e.g. for 'aws_user'
+The container shell prompt is set similarly but with a systemd incremented counter, e.g. for `aws_user`:
+```
 aws_user@dev-eu-west-1-vpc_12345688-172:~$
+```
 
 and a subsequent container might have
-
-    aws_user@dev-eu-west-1-vpc_12345688-180:~$
-
+```
+aws_user@dev-eu-west-1-vpc_12345688-180:~$
+```
 In the case that `bastion_vpc_name = ""` the service container shell prompt is set similar to `you@dev-ap-northeast-1_3`
 
 # In use
@@ -176,11 +182,14 @@ The following is referenced in "message of the day" on the container:
 
 The sshd-worker container is launched with `-v /dev/log:/dev/log` This causes logging information to be recorded in the host systemd journal which is not directly accessible from the container. It is thus simple to see who logged in and when by interrogating the host, e.g.
 
-    journalctl | grep 'Accepted publickey'
-
+```bash
+journalctl | grep 'Accepted publickey'
+```
 gives information such as
-
-    April 27 14:05:02 dev-eu-west-1-bastion-host sshd[7294]: Accepted publickey for aws_user from 192.168.168.0 port 65535 ssh2: RSA SHA256:*****************************
+```
+April 27 14:05:02 dev-eu-west-1-bastion-host sshd[7294]: Accepted publickey for aws_user from 192.168.168.0 port 65535 ssh2: RSA SHA256:*****************************
+```
+**N.B.** It appears that calling client IP addresses are no longer visible - see [issue 45](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/45#issuecomment-1019509753). The reason for this is unclear.
 
 Starting with release 3.8 it is possible to use the output giving the name of the role created for the service and to appeand addtional user data. This means that you can call this module from a plan specifiying your preferred logging solution, e.g. AWS cloudwatch.
 
@@ -240,9 +249,9 @@ The files in question on the host deploy thus:
 If you supply the ARN for an external role for the bastion service to assume `${var.assume_role_arn}` then a matching sample policy and trust relationship is given as an output from the plan to assist with application in that other account for typical operation.
 
 The DNS entry (if created) for the service is also displayed as an output of the format
-
+```terraform
 name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
-
+```
 ## Inputs and Outputs
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)

@@ -44,7 +44,9 @@ The variables for these sections are:
 
 - **custom_systemd** - any value excludes default systemd and hostname change from userdata
 
-If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or extra_user_data for a working service. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as 'sshd_worker'. The service container in turn references the 'ssh_populate' script which calls 'iam-authorized-keys' from a specific location.
+- **extra_user_data*** - (optional, several variables) you may supply your own user data here - appended following above sections
+
+If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or `extra_user_data*` for a working service. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as `sshd_worker`. The service container in turn references the `ssh_populate` script which calls `iam-authorized-keys` from a specific location.
 
 # Ability to assume a role in another account
 

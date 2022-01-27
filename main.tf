@@ -61,6 +61,16 @@ resource "aws_launch_template" "bastion-service-host" {
   lifecycle {
     create_before_destroy = true
   }
+  tags = var.tags
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = merge(var.tags, { "Name" : local.bastion_host_name })
+  }
+  tag_specifications {
+    resource_type = "volume"
+    tags          = var.tags
+  }
 }
 
 #######################################################

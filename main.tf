@@ -70,6 +70,7 @@ resource "aws_launch_template" "bastion-service-host" {
 
 data "aws_default_tags" "this" {}
 
+
 resource "aws_autoscaling_group" "bastion-service" {
   name_prefix         = "${var.service_name}-asg"
   max_size            = var.asg_max

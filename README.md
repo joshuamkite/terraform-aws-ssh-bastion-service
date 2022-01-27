@@ -317,7 +317,7 @@ No modules.
 | [aws_iam_role.bastion_service_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.bastion_service_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.check_ssh_authorized_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_launch_configuration.bastion-service-host](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_configuration) | resource |
+| [aws_launch_template.bastion-service-host](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
 | [aws_lb.bastion-service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
 | [aws_lb_listener.bastion-host](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_listener.bastion-service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
@@ -350,8 +350,10 @@ No modules.
 | <a name="input_aws_profile"></a> [aws\_profile](#input\_aws\_profile) | n/a | `string` | `""` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | n/a | `any` | n/a | yes |
 | <a name="input_bastion_allowed_iam_group"></a> [bastion\_allowed\_iam\_group](#input\_bastion\_allowed\_iam\_group) | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | `string` | `""` | no |
+| <a name="input_bastion_ebs_device_name"></a> [bastion\_ebs\_device\_name](#input\_bastion\_ebs\_device\_name) | Name of bastion instance block device | `string` | `"xvda"` | no |
+| <a name="input_bastion_ebs_size"></a> [bastion\_ebs\_size](#input\_bastion\_ebs\_size) | Size of EBS attached to the bastion instance | `number` | `8` | no |
 | <a name="input_bastion_host_name"></a> [bastion\_host\_name](#input\_bastion\_host\_name) | The hostname to give to the bastion instance | `string` | `""` | no |
-| <a name="input_bastion_instance_type"></a> [bastion\_instance\_type](#input\_bastion\_instance\_type) | The virtual hardware to be used for the bastion service host | `string` | `"t2.micro"` | no |
+| <a name="input_bastion_instance_types"></a> [bastion\_instance\_types](#input\_bastion\_instance\_types) | List of ec2 types for the bastion host, used by aws\_launch\_template (first from the list) and in aws\_autoscaling\_group | `list` | <pre>[<br>  "t2.small",<br>  "t2.medium",<br>  "t2.large"<br>]</pre> | no |
 | <a name="input_bastion_service_host_key_name"></a> [bastion\_service\_host\_key\_name](#input\_bastion\_service\_host\_key\_name) | AWS ssh key *.pem to be used for ssh access to the bastion service host | `string` | `""` | no |
 | <a name="input_bastion_vpc_name"></a> [bastion\_vpc\_name](#input\_bastion\_vpc\_name) | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc\_id' but you can pass a custom string, or an empty value to omit this | `string` | `"vpc_id"` | no |
 | <a name="input_cidr_blocks_whitelist_host"></a> [cidr\_blocks\_whitelist\_host](#input\_cidr\_blocks\_whitelist\_host) | range(s) of incoming IP addresses to whitelist for the HOST | `list(string)` | `[]` | no |
@@ -362,6 +364,7 @@ No modules.
 | <a name="input_custom_docker_setup"></a> [custom\_docker\_setup](#input\_custom\_docker\_setup) | any value excludes default docker installation and container build from userdata | `string` | `""` | no |
 | <a name="input_custom_ssh_populate"></a> [custom\_ssh\_populate](#input\_custom\_ssh\_populate) | any value excludes default ssh\_populate script used on container launch from userdata | `string` | `""` | no |
 | <a name="input_custom_systemd"></a> [custom\_systemd](#input\_custom\_systemd) | any value excludes default systemd and hostname change from userdata | `string` | `""` | no |
+| <a name="input_delete_network_interface_on_termination"></a> [delete\_network\_interface\_on\_termination](#input\_delete\_network\_interface\_on\_termination) | if network interface created for bastion host should be deleted when instance in terminated. Setting propagated to aws\_launch\_template.network\_interfaces.delete\_on\_termination | `bool` | `true` | no |
 | <a name="input_dns_domain"></a> [dns\_domain](#input\_dns\_domain) | The domain used for Route53 records | `string` | `""` | no |
 | <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | the name of the environment that we are deploying to, used in tagging. Overwritten if var.service\_name and var.bastion\_host\_name values are changed | `string` | `"staging"` | no |
 | <a name="input_extra_user_data_content"></a> [extra\_user\_data\_content](#input\_extra\_user\_data\_content) | Extra user-data to add to the default built-in | `string` | `""` | no |
@@ -372,6 +375,7 @@ No modules.
 | <a name="input_lb_interval"></a> [lb\_interval](#input\_lb\_interval) | interval for lb target group health check | `string` | `"30"` | no |
 | <a name="input_lb_is_internal"></a> [lb\_is\_internal](#input\_lb\_is\_internal) | whether the lb will be internal | `string` | `false` | no |
 | <a name="input_lb_unhealthy_threshold"></a> [lb\_unhealthy\_threshold](#input\_lb\_unhealthy\_threshold) | Unhealthy threshold for lb target group | `string` | `"2"` | no |
+| <a name="input_on_demand_base_capacity"></a> [on\_demand\_base\_capacity](#input\_on\_demand\_base\_capacity) | allows a base level of on demand when using spot | `number` | `0` | no |
 | <a name="input_public_ip"></a> [public\_ip](#input\_public\_ip) | Associate a public IP with the host instance when launching | `bool` | `false` | no |
 | <a name="input_route53_fqdn"></a> [route53\_fqdn](#input\_route53\_fqdn) | If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim | `string` | `""` | no |
 | <a name="input_route53_zone_id"></a> [route53\_zone\_id](#input\_route53\_zone\_id) | Route53 zoneId | `string` | `""` | no |

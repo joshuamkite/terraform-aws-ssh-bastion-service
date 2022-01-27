@@ -1,6 +1,6 @@
-variable "bastion_instance_type" {
-  description = "The virtual hardware to be used for the bastion service host"
-  default     = "t2.micro"
+variable "bastion_instance_types" {
+  description = "List of ec2 types for the bastion host, used by aws_launch_template (first from the list) and in aws_autoscaling_group"
+  default     = ["t2.small", "t2.medium", "t2.large"]
 }
 
 variable "cidr_blocks_whitelist_host" {
@@ -203,3 +203,22 @@ variable "route53_fqdn" {
   default     = ""
 }
 
+variable "on_demand_base_capacity" {
+  default     = 0
+  description = "allows a base level of on demand when using spot"
+}
+
+variable "delete_network_interface_on_termination" {
+  description = "if network interface created for bastion host should be deleted when instance in terminated. Setting propagated to aws_launch_template.network_interfaces.delete_on_termination"
+  default     = true
+}
+
+variable "bastion_ebs_size" {
+  description = "Size of EBS attached to the bastion instance"
+  default     = 8
+}
+
+variable "bastion_ebs_device_name" {
+  description = "Name of bastion instance block device"
+  default     = "xvda"
+}

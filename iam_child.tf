@@ -56,6 +56,17 @@ data "aws_iam_policy_document" "bastion_service_assume_role_in_parent" {
       var.assume_role_arn,
     ]
   }
+
+  # Allow instances to mark themselves unhealthy
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "autoscaling:SetInstanceHealth"
+    ]
+
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "bastion_service_assume_role_in_parent" {

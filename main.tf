@@ -27,7 +27,7 @@ resource "aws_launch_template" "bastion-service-host" {
   image_id      = local.bastion_ami_id
   instance_type = var.bastion_instance_types[0]
   key_name      = var.bastion_service_host_key_name
-  user_data     = data.cloudinit_config.config.rendered
+  user_data     = base64encode(data.cloudinit_config.config.rendered)
 
   iam_instance_profile {
     name = element(
@@ -62,15 +62,6 @@ resource "aws_launch_template" "bastion-service-host" {
     create_before_destroy = true
   }
   tags = var.tags
-
-  tag_specifications {
-    resource_type = "instance"
-    tags          = merge(var.tags, { "Name" : local.bastion_host_name })
-  }
-  tag_specifications {
-    resource_type = "volume"
-    tags          = var.tags
-  }
 }
 
 #######################################################
@@ -112,7 +103,7 @@ resource "aws_autoscaling_group" "bastion-service" {
     aws_lb_target_group.bastion-host.*.arn
   )
 
-  enabled_metrics = ["GroupMinSize", "GroupMaxSize", "GroupDesiredCapacity", "GroupInServiceInstances", "GroupPendingInstances", "GroupStandbyInstances", "GroupTerminatingInstances", "GroupTotalInstances"]
+  enabled_metrics = var.autoscaling_group_enabled_metrics
 
   lifecycle {
     create_before_destroy = true

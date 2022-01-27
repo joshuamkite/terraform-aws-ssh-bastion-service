@@ -222,3 +222,9 @@ variable "bastion_ebs_device_name" {
   description = "Name of bastion instance block device"
   default     = "xvda"
 }
+
+variable "autoscaling_group_enabled_metrics" {
+  type        = list(string)
+  description = "A list of CloudWatch metrics to collect on the autoscaling group. Permitted values include: GroupMinSize; GroupMaxSize; GroupDesiredCapacity; GroupInServiceInstances; GroupPendingInstances; GroupStandbyInstances; GroupTerminatingInstances; GroupTotalInstances"
+  default     = []
+}

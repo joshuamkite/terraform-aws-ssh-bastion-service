@@ -2,15 +2,25 @@
 
 **Bugfix:** Retire deprecated null-resource provider
 
-**Bugfix:** Retire deprecated template provider (required for darwin_arm64)
+**Bugfix:** Retire deprecated template provider (required for darwin_arm64). Fixes [Issue #51](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
 
 **Feature:** Support provider default tags as well as explicit tags for all supported resources plus autoscaling group
 
 **Feature:** Update Terraform version to >/=0.15.x/1.0.0
 
+**Feature:** Change from Launch Configuration to Launch Template. Includes support for spot instances. Fixes [Issue #46](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
+
+**Feature:** Allow instances to kill themselves via ASG custom health check.
+
+**Feature:** Enable setting cloudwatch metrics for autoscaling group
+
+**Feature:** Add unique target group name for bastion host elb
+
+**Feature:** Enable setting EBS size and name for bastion instance
+
 **Bugfix:** Update formatting in readme
 
-**Bugfix:** Spellcheck readme
+**Bugfix:** Spellcheck readme and changelog
 
 **Feature:** Update terraform-docs outputs on documentation
 # 6.1 
@@ -104,11 +114,11 @@ The tags given in var.tags are rendered to the Autoscaling group as before
 
 # 4.3
 
-**Feature:** You can now specify a list of one or more security groups to attach to the host instance launch configuration. This can be supplied together with or instead of a whitelisted range of CIDR blocks. **N.B. This is _not_ aws_security_group_rule/source_security_group_id!** If you wish to append your own 'security_group_id' rules then you will need to attach these from a plan caling this module (using output "bastion_sg_id") or as part of a separate security group which you then attach. 
+**Feature:** You can now specify a list of one or more security groups to attach to the host instance launch configuration. This can be supplied together with or instead of a whitelisted range of CIDR blocks. **N.B. This is _not_ aws_security_group_rule/source_security_group_id!** If you wish to append your own 'security_group_id' rules then you will need to attach these from a plan calling this module (using output "bastion_sg_id") or as part of a separate security group which you then attach. 
 
 It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign a suitable security group or whitelist then you may not be able to reach the service!
 
-**Change:** The code has been DRYed significantly in locals.tf (to remove unused logic evaluations) and main.tf (to condense 2 seperate aws_launch_configuration and aws_autoscaling_group blocks into one each). This makes code maintenence much easier and less error prone **BUT** it does mean that these resources are now 'new' so if you are deploying over an older version of this plan then you can expect them to be recreated - as lifecycle 'create before destroy' is specified, deployment will be a bit longer but downtime should be brief.
+**Change:** The code has been DRYed significantly in locals.tf (to remove unused logic evaluations) and main.tf (to condense 2 separate aws_launch_configuration and aws_autoscaling_group blocks into one each). This makes code maintenance much easier and less error prone **BUT** it does mean that these resources are now 'new' so if you are deploying over an older version of this plan then you can expect them to be recreated - as lifecycle 'create before destroy' is specified, deployment will be a bit longer but downtime should be brief.
 
 **Bugfix:** Previously the Golang code used for obtaining users and ssh public keys limited the number of users returned to 100 _if_ an IAM group was specified. This has now been increased to 1000 and the code change accepted upstream. 
 
@@ -141,11 +151,11 @@ If you exclude any section then you must replace it with equivalent functionalit
 **Feature:** Move from Classic Load Balancer to Network Load Balancer. 
 * elb_idle_timeout and elb_timeout variables have been removed as they are not supported in this configuration. 
 
-* Configurable load balancer variables naming now prefixed 'lb'. Unfortunately the change in load balancer type breaks backward compatibilty with deployments using earlier versions of this module anyway so the opportunity is being taken to update the variable names for future sanity.
+* Configurable load balancer variables naming now prefixed 'lb'. Unfortunately the change in load balancer type breaks backward compatibility with deployments using earlier versions of this module anyway so the opportunity is being taken to update the variable names for future sanity.
 
 **Feature:** Security group rules apply 'description' tag
 
-**Change:**  New code now in seperate files to assist readabilty. locals also moved to seperate file.
+**Change:**  New code now in separate files to assist readability. locals also moved to separate file.
 
 **Change:**  Security group name for EC2 instance now name_prefix and simplified
 
@@ -171,9 +181,9 @@ If you exclude any section then you must replace it with equivalent functionalit
 
 # 3.7
 
-**Feature:** ELB health check port may be optionally set to either port 22 (containerised service; default) or port 2222 (EC2 host sshd). If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in reponse to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue and is recommended for larger deployments. The host sshd is set to port 2222 as part of the service setup so this heathcheck is not entirely invalid. Security group rules are conditionally created to support any combination of access/healthceck on port 2222 or not.
+**Feature:** ELB health check port may be optionally set to either port 22 (containerised service; default) or port 2222 (EC2 host sshd). If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in response to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue and is recommended for larger deployments. The host sshd is set to port 2222 as part of the service setup so this healthcheck is not entirely invalid. Security group rules are conditionally created to support any combination of access/healthcheck on port 2222 or not.
 
-**Feature:** Friendlier DNS and hostnaming. You can now define the last part of the hostname. By default this is the vpc ID via the magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this. e.g. 
+**Feature:** Friendlier DNS and host naming. You can now define the last part of the hostname. By default this is the vpc ID via the magic default value of 'vpc_id' but you can pass a custom string, or an empty value to omit this. e.g. 
 
  module default: `dev-ap-northeast-1-vpc-1a23b456d7890-bastion-service.yourdomain.com`
  
@@ -196,11 +206,11 @@ If you exclude any section then you must replace it with equivalent functionalit
 
 **Feature:** New output: bastion_sg_id gives the Security Group id of the bastion host which may be useful for other services
 
-**Documentation:** update readme to reflect new ouptputs and names; acknowledgements
+**Documentation:** update readme to reflect new outputs and names; acknowledgements
 
 # 3.5 (broken, withdrawn)
 
-**Bugfix:** Remove parentheses from the name of the sample policy ouptut to make it parsable when called from module
+**Bugfix:** Remove parentheses from the name of the sample policy output to make it parsable when called from module
 
 # 3.4 (broken, withdrawn)
 
@@ -218,15 +228,15 @@ If you exclude any section then you must replace it with equivalent functionalit
 
 # 3.1
 
-**Feature (backward compatible):** Improvements to example asssume role policy generation - making it easier to copy and paste from Terraform output to AWS web console
+**Feature (backward compatible):** Improvements to example assume role policy generation - making it easier to copy and paste from Terraform output to AWS web console
 
 # 3.0
 
-With version 3 series (backward compatible with version 2) the ability to assume a role in another account has now been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. Since this is a high availabilty service, it is not envisaged that there would be reason for more than one independent deployment within such a combination. 
+With version 3 series (backward compatible with version 2) the ability to assume a role in another account has now been integrated with conditional logic. If you supply the ARN for a role for the bastion service to assume in another account ${var.assume_role_arn} then this plan will create an instance profile, role and policy along with each bastion to make use of it. A matching sample policy and trust relationship is given as an output from the plan to assist with application in the other account. If you do not supply this arn then this plan presumes IAM lookups in the same account and creates an appropriate instance profile, role and policies for each bastion in the same AWS account. 'Each bastion' here refers to a combination of environment, AWS account, AWS region and VPCID determined by deployment. Since this is a high availability service, it is not envisaged that there would be reason for more than one independent deployment within such a combination. 
 
 Also with version 3 the IAM policy generation and user data have been moved from modules back into the main plan. User data is no longer displayed. 
 
-If you are seeking a solution for ECS hosts then you are recommended to either the [Widdix project]((https://github.com/widdix/aws-ec2-ssh)) directly or my [Ansible-galaxy respin of it](https://galaxy.ansible.com/joshuamkite/aws-ecs-iam-users-tags/). This offers a range of features, suitable for a long-lived stateful host built.
+If you are seeking a solution for ECS hosts then you are recommended to either the [Widdix project]((https://github.com/widdix/aws-ec2-ssh)) directly or my [Ansible-galaxy re-spin of it](https://galaxy.ansible.com/joshuamkite/aws-ecs-iam-users-tags/). This offers a range of features, suitable for a long-lived stateful host built.
 
 # 2.0 
 

@@ -347,6 +347,7 @@ No modules.
 | <a name="input_asg_max"></a> [asg\_max](#input\_asg\_max) | Max numbers of bastion-service hosts in ASG | `string` | `"2"` | no |
 | <a name="input_asg_min"></a> [asg\_min](#input\_asg\_min) | Min numbers of bastion-service hosts in ASG | `string` | `"1"` | no |
 | <a name="input_assume_role_arn"></a> [assume\_role\_arn](#input\_assume\_role\_arn) | arn for role to assume in separate identity account if used | `string` | `""` | no |
+| <a name="input_autoscaling_group_enabled_metrics"></a> [autoscaling\_group\_enabled\_metrics](#input\_autoscaling\_group\_enabled\_metrics) | A list of CloudWatch metrics to collect on the autoscaling group. Permitted values include: GroupMinSize; GroupMaxSize; GroupDesiredCapacity; GroupInServiceInstances; GroupPendingInstances; GroupStandbyInstances; GroupTerminatingInstances; GroupTotalInstances | `list(string)` | `[]` | no |
 | <a name="input_aws_profile"></a> [aws\_profile](#input\_aws\_profile) | n/a | `string` | `""` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | n/a | `any` | n/a | yes |
 | <a name="input_bastion_allowed_iam_group"></a> [bastion\_allowed\_iam\_group](#input\_bastion\_allowed\_iam\_group) | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | `string` | `""` | no |

@@ -61,4 +61,5 @@ module "ssh-bastion-service" {
     aws_subnet.bastion,
     aws_internet_gateway.bastion,
   ]
+  bastion_instance_types = ["t2.micro"]
 }

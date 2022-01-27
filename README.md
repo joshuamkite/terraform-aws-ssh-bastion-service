@@ -298,12 +298,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 3.71.0 |
-<<<<<<< HEAD
-| <a name="provider_null"></a> [null](#provider\_null) | 3.1.0 |
-| <a name="provider_template"></a> [template](#provider\_template) | n/a |
-=======
 | <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | 2.2.0 |
->>>>>>> 562d73b (remove use of null provider and implement/enable provider default tagging)
 
 ## Modules
 

@@ -250,70 +250,118 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.13 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
-| null | n/a |
-| template | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.71.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.1.0 |
+| <a name="provider_template"></a> [template](#provider\_template) | n/a |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_autoscaling_group.bastion-service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group) | resource |
+| [aws_iam_instance_profile.bastion_service_assume_role_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_instance_profile.bastion_service_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_policy.bastion_service_assume_role_in_parent](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.check_ssh_authorized_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.bastion_service_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.bastion_service_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.bastion_service_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.check_ssh_authorized_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_launch_template.bastion-service-host](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
+| [aws_lb.bastion-service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_lb_listener.bastion-host](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_listener.bastion-service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_target_group.bastion-host](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+| [aws_lb_target_group.bastion-service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+| [aws_route53_record.bastion_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_security_group.bastion_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group_rule.bastion_host_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.host_ssh_in_cond](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.lb_healthcheck_in](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.service_ssh_in](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_ami.debian](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_iam_policy_document.bastion_service_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.bastion_service_assume_role_in_parent](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.bastion_service_role_assume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.check_ssh_authorized_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+| [aws_subnet.lb_subnets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
+| [null_data_source.asg-tags](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) | data source |
+| [template_cloudinit_config.config](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/cloudinit_config) | data source |
+| [template_file.docker_setup](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
+| [template_file.iam-authorized-keys-command](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
+| [template_file.sample_policies_for_parent_account](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
+| [template_file.ssh_populate_assume_role](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
+| [template_file.ssh_populate_same_account](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
+| [template_file.systemd](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| asg\_desired | Desired numbers of bastion-service hosts in ASG | `string` | `"1"` | no |
-| asg\_max | Max numbers of bastion-service hosts in ASG | `string` | `"2"` | no |
-| asg\_min | Min numbers of bastion-service hosts in ASG | `string` | `"1"` | no |
-| assume\_role\_arn | arn for role to assume in separate identity account if used | `string` | `""` | no |
-| aws\_profile | n/a | `string` | `""` | no |
-| aws\_region | n/a | `any` | n/a | yes |
-| bastion\_allowed\_iam\_group | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | `string` | `""` | no |
-| bastion\_host\_name | The hostname to give to the bastion instance | `string` | `""` | no |
-| bastion\_instance\_type | The virtual hardware to be used for the bastion service host | `string` | `"t2.micro"` | no |
-| bastion\_service\_host\_key\_name | AWS ssh key \*.pem to be used for ssh access to the bastion service host | `string` | `""` | no |
-| bastion\_vpc\_name | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc\_id' but you can pass a custom string, or an empty value to omit this | `string` | `"vpc_id"` | no |
-| cidr\_blocks\_whitelist\_host | range(s) of incoming IP addresses to whitelist for the HOST | `list(string)` | `[]` | no |
-| cidr\_blocks\_whitelist\_service | range(s) of incoming IP addresses to whitelist for the SERVICE | `list(string)` | `[]` | no |
-| container\_ubuntu\_version | ubuntu version to use for service container. Tested with 16.04; 18.04; 20.04 | `string` | `"20.04"` | no |
-| custom\_ami\_id | id for custom ami if used | `string` | `""` | no |
-| custom\_authorized\_keys\_command | any value excludes default Go binary iam-authorized-keys built from source from userdata | `string` | `""` | no |
-| custom\_docker\_setup | any value excludes default docker installation and container build from userdata | `string` | `""` | no |
-| custom\_ssh\_populate | any value excludes default ssh\_populate script used on container launch from userdata | `string` | `""` | no |
-| custom\_systemd | any value excludes default systemd and hostname change from userdata | `string` | `""` | no |
-| dns\_domain | The domain used for Route53 records | `string` | `""` | no |
-| environment\_name | the name of the environment that we are deploying to, used in tagging. Overwritten if var.service\_name and var.bastion\_host\_name values are changed | `string` | `"staging"` | no |
-| extra\_user\_data\_content | Extra user-data to add to the default built-in | `string` | `""` | no |
-| extra\_user\_data\_content\_type | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | `string` | `"text/x-shellscript"` | no |
-| extra\_user\_data\_merge\_type | Control how cloud-init merges user-data sections | `string` | `"str(append)"` | no |
-| lb\_healthcheck\_port | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | `string` | `"2222"` | no |
-| lb\_healthy\_threshold | Healthy threshold for lb target group | `string` | `"2"` | no |
-| lb\_interval | interval for lb target group health check | `string` | `"30"` | no |
-| lb\_is\_internal | whether the lb will be internal | `string` | `false` | no |
-| lb\_unhealthy\_threshold | Unhealthy threshold for lb target group | `string` | `"2"` | no |
-| public\_ip | Associate a public IP with the host instance when launching | `bool` | `false` | no |
-| route53\_fqdn | If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim | `string` | `""` | no |
-| route53\_zone\_id | Route53 zoneId | `string` | `""` | no |
-| security\_groups\_additional | additional security group IDs to attach to host instance | `list(string)` | `[]` | no |
-| service\_name | Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc | `string` | `"bastion-service"` | no |
-| subnets\_asg | list of subnets for autoscaling group - availability zones must match subnets\_lb | `list(string)` | `[]` | no |
-| subnets\_lb | list of subnets for load balancer - availability zones must match subnets\_asg | `list(string)` | `[]` | no |
-| tags | AWS tags that should be associated with created resources | `map(string)` | `{}` | no |
-| vpc | ID for Virtual Private Cloud to apply security policy and deploy stack to | `any` | n/a | yes |
+| <a name="input_asg_desired"></a> [asg\_desired](#input\_asg\_desired) | Desired numbers of bastion-service hosts in ASG | `string` | `"1"` | no |
+| <a name="input_asg_max"></a> [asg\_max](#input\_asg\_max) | Max numbers of bastion-service hosts in ASG | `string` | `"2"` | no |
+| <a name="input_asg_min"></a> [asg\_min](#input\_asg\_min) | Min numbers of bastion-service hosts in ASG | `string` | `"1"` | no |
+| <a name="input_assume_role_arn"></a> [assume\_role\_arn](#input\_assume\_role\_arn) | arn for role to assume in separate identity account if used | `string` | `""` | no |
+| <a name="input_aws_profile"></a> [aws\_profile](#input\_aws\_profile) | n/a | `string` | `""` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | n/a | `any` | n/a | yes |
+| <a name="input_bastion_allowed_iam_group"></a> [bastion\_allowed\_iam\_group](#input\_bastion\_allowed\_iam\_group) | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | `string` | `""` | no |
+| <a name="input_bastion_ebs_device_name"></a> [bastion\_ebs\_device\_name](#input\_bastion\_ebs\_device\_name) | Name of bastion instance block device | `string` | `"xvda"` | no |
+| <a name="input_bastion_ebs_size"></a> [bastion\_ebs\_size](#input\_bastion\_ebs\_size) | Size of EBS attached to the bastion instance | `number` | `8` | no |
+| <a name="input_bastion_host_name"></a> [bastion\_host\_name](#input\_bastion\_host\_name) | The hostname to give to the bastion instance | `string` | `""` | no |
+| <a name="input_bastion_instance_types"></a> [bastion\_instance\_types](#input\_bastion\_instance\_types) | List of ec2 types for the bastion host, used by aws\_launch\_template (first from the list) and in aws\_autoscaling\_group | `list` | <pre>[<br>  "t2.small",<br>  "t2.medium",<br>  "t2.large"<br>]</pre> | no |
+| <a name="input_bastion_service_host_key_name"></a> [bastion\_service\_host\_key\_name](#input\_bastion\_service\_host\_key\_name) | AWS ssh key *.pem to be used for ssh access to the bastion service host | `string` | `""` | no |
+| <a name="input_bastion_vpc_name"></a> [bastion\_vpc\_name](#input\_bastion\_vpc\_name) | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc\_id' but you can pass a custom string, or an empty value to omit this | `string` | `"vpc_id"` | no |
+| <a name="input_cidr_blocks_whitelist_host"></a> [cidr\_blocks\_whitelist\_host](#input\_cidr\_blocks\_whitelist\_host) | range(s) of incoming IP addresses to whitelist for the HOST | `list(string)` | `[]` | no |
+| <a name="input_cidr_blocks_whitelist_service"></a> [cidr\_blocks\_whitelist\_service](#input\_cidr\_blocks\_whitelist\_service) | range(s) of incoming IP addresses to whitelist for the SERVICE | `list(string)` | `[]` | no |
+| <a name="input_container_ubuntu_version"></a> [container\_ubuntu\_version](#input\_container\_ubuntu\_version) | ubuntu version to use for service container. Tested with 16.04; 18.04; 20.04 | `string` | `"20.04"` | no |
+| <a name="input_custom_ami_id"></a> [custom\_ami\_id](#input\_custom\_ami\_id) | id for custom ami if used | `string` | `""` | no |
+| <a name="input_custom_authorized_keys_command"></a> [custom\_authorized\_keys\_command](#input\_custom\_authorized\_keys\_command) | any value excludes default Go binary iam-authorized-keys built from source from userdata | `string` | `""` | no |
+| <a name="input_custom_docker_setup"></a> [custom\_docker\_setup](#input\_custom\_docker\_setup) | any value excludes default docker installation and container build from userdata | `string` | `""` | no |
+| <a name="input_custom_ssh_populate"></a> [custom\_ssh\_populate](#input\_custom\_ssh\_populate) | any value excludes default ssh\_populate script used on container launch from userdata | `string` | `""` | no |
+| <a name="input_custom_systemd"></a> [custom\_systemd](#input\_custom\_systemd) | any value excludes default systemd and hostname change from userdata | `string` | `""` | no |
+| <a name="input_delete_network_interface_on_termination"></a> [delete\_network\_interface\_on\_termination](#input\_delete\_network\_interface\_on\_termination) | if network interface created for bastion host should be deleted when instance in terminated. Setting propagated to aws\_launch\_template.network\_interfaces.delete\_on\_termination | `bool` | `true` | no |
+| <a name="input_dns_domain"></a> [dns\_domain](#input\_dns\_domain) | The domain used for Route53 records | `string` | `""` | no |
+| <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | the name of the environment that we are deploying to, used in tagging. Overwritten if var.service\_name and var.bastion\_host\_name values are changed | `string` | `"staging"` | no |
+| <a name="input_extra_user_data_content"></a> [extra\_user\_data\_content](#input\_extra\_user\_data\_content) | Extra user-data to add to the default built-in | `string` | `""` | no |
+| <a name="input_extra_user_data_content_type"></a> [extra\_user\_data\_content\_type](#input\_extra\_user\_data\_content\_type) | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | `string` | `"text/x-shellscript"` | no |
+| <a name="input_extra_user_data_merge_type"></a> [extra\_user\_data\_merge\_type](#input\_extra\_user\_data\_merge\_type) | Control how cloud-init merges user-data sections | `string` | `"str(append)"` | no |
+| <a name="input_lb_healthcheck_port"></a> [lb\_healthcheck\_port](#input\_lb\_healthcheck\_port) | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | `string` | `"2222"` | no |
+| <a name="input_lb_healthy_threshold"></a> [lb\_healthy\_threshold](#input\_lb\_healthy\_threshold) | Healthy threshold for lb target group | `string` | `"2"` | no |
+| <a name="input_lb_interval"></a> [lb\_interval](#input\_lb\_interval) | interval for lb target group health check | `string` | `"30"` | no |
+| <a name="input_lb_is_internal"></a> [lb\_is\_internal](#input\_lb\_is\_internal) | whether the lb will be internal | `string` | `false` | no |
+| <a name="input_lb_unhealthy_threshold"></a> [lb\_unhealthy\_threshold](#input\_lb\_unhealthy\_threshold) | Unhealthy threshold for lb target group | `string` | `"2"` | no |
+| <a name="input_on_demand_base_capacity"></a> [on\_demand\_base\_capacity](#input\_on\_demand\_base\_capacity) | allows a base level of on demand when using spot | `number` | `0` | no |
+| <a name="input_public_ip"></a> [public\_ip](#input\_public\_ip) | Associate a public IP with the host instance when launching | `bool` | `false` | no |
+| <a name="input_route53_fqdn"></a> [route53\_fqdn](#input\_route53\_fqdn) | If creating a public DNS entry with this module then you may override the default constructed DNS entry by supplying a fully qualified domain name here which will be used verbatim | `string` | `""` | no |
+| <a name="input_route53_zone_id"></a> [route53\_zone\_id](#input\_route53\_zone\_id) | Route53 zoneId | `string` | `""` | no |
+| <a name="input_security_groups_additional"></a> [security\_groups\_additional](#input\_security\_groups\_additional) | additional security group IDs to attach to host instance | `list(string)` | `[]` | no |
+| <a name="input_service_name"></a> [service\_name](#input\_service\_name) | Unique name per vpc for associated resources- set to some non-default value for multiple deployments per vpc | `string` | `"bastion-service"` | no |
+| <a name="input_subnets_asg"></a> [subnets\_asg](#input\_subnets\_asg) | list of subnets for autoscaling group - availability zones must match subnets\_lb | `list(string)` | `[]` | no |
+| <a name="input_subnets_lb"></a> [subnets\_lb](#input\_subnets\_lb) | list of subnets for load balancer - availability zones must match subnets\_asg | `list(string)` | `[]` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | AWS tags that should be associated with created resources | `map(string)` | `{}` | no |
+| <a name="input_vpc"></a> [vpc](#input\_vpc) | ID for Virtual Private Cloud to apply security policy and deploy stack to | `any` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| bastion\_service\_assume\_role\_name | role created for service host asg - if created with assume role |
-| bastion\_service\_role\_name | role created for service host asg - if created without assume role |
-| bastion\_sg\_id | Security Group id of the bastion host |
-| lb\_arn | aws load balancer arn |
-| lb\_dns\_name | aws load balancer dns |
-| lb\_zone\_id | n/a |
-| policy\_example\_for\_parent\_account\_empty\_if\_not\_used | You must apply an IAM policy with trust relationship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
-| service\_dns\_entry | dns-registered url for service and host |
-| target\_group\_arn | aws load balancer target group arn |
-
+| <a name="output_bastion_service_assume_role_name"></a> [bastion\_service\_assume\_role\_name](#output\_bastion\_service\_assume\_role\_name) | role created for service host asg - if created with assume role |
+| <a name="output_bastion_service_role_name"></a> [bastion\_service\_role\_name](#output\_bastion\_service\_role\_name) | role created for service host asg - if created without assume role |
+| <a name="output_bastion_sg_id"></a> [bastion\_sg\_id](#output\_bastion\_sg\_id) | Security Group id of the bastion host |
+| <a name="output_lb_arn"></a> [lb\_arn](#output\_lb\_arn) | aws load balancer arn |
+| <a name="output_lb_dns_name"></a> [lb\_dns\_name](#output\_lb\_dns\_name) | aws load balancer dns |
+| <a name="output_lb_zone_id"></a> [lb\_zone\_id](#output\_lb\_zone\_id) | n/a |
+| <a name="output_policy_example_for_parent_account_empty_if_not_used"></a> [policy\_example\_for\_parent\_account\_empty\_if\_not\_used](#output\_policy\_example\_for\_parent\_account\_empty\_if\_not\_used) | You must apply an IAM policy with trust relationship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
+| <a name="output_service_dns_entry"></a> [service\_dns\_entry](#output\_service\_dns\_entry) | dns-registered url for service and host |
+| <a name="output_target_group_arn"></a> [target\_group\_arn](#output\_target\_group\_arn) | aws load balancer target group arn |

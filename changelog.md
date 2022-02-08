@@ -10,8 +10,6 @@
 
 **Feature:** Change from Launch Configuration to Launch Template. Includes support for spot instances. Fixes [Issue #46](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
 
-**Feature:** Allow instances to kill themselves via ASG custom health check.
-
 **Feature:** Enable setting cloudwatch metrics for autoscaling group
 
 **Feature:** Add unique target group name for bastion host elb

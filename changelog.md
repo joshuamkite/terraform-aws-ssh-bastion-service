@@ -1,14 +1,14 @@
 # 7.0
 
-**Bugfix:** Retire deprecated null-resource provider
+**Change:** Retire deprecated null-resource provider
 
-**Bugfix:** Retire deprecated template provider (required for darwin_arm64). Fixes [Issue #51](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
+**Change:** Retire deprecated template provider (required for darwin_arm64). Fixes [Issue #51](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
 
 **Feature:** Support provider default tags as well as explicit tags for all supported resources plus autoscaling group
 
-**Feature:** Update Terraform version to >/=0.15.x/1.0.0
+**Change:** Update Terraform version to >/=0.15.x/1.0.0
 
-**Feature:** Change from Launch Configuration to Launch Template. Includes support for spot instances. Fixes [Issue #46](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
+**Change/Feature:** Change from Launch Configuration to Launch Template. Includes support for spot instances. Fixes [Issue #46](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
 
 **Feature:** Enable setting cloudwatch metrics for autoscaling group
 
@@ -20,7 +20,7 @@
 
 **Bugfix:** Spellcheck readme and changelog
 
-**Feature:** Update terraform-docs outputs on documentation
+**Change:** Update terraform-docs outputs on documentation
 # 6.1 
 
 **Change:** Update readme to specify that we are targeting terraform 13

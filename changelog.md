@@ -1,26 +1,20 @@
 # 7.0
 
-**Change:** Retire deprecated null-resource provider
+**Breaking changes with existing deployments using earlier module versions**
 
-**Change:** Retire deprecated template provider (required for darwin_arm64). Fixes [Issue #51](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
+- **Change:** Retire deprecated null-resource provider
+- **Change:** Retire deprecated template provider (required for darwin_arm64). Fixes [Issue #51](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
+- **Feature:** Support provider default tags as well as explicit tags for all supported resources plus autoscaling group
+- **Change:** Update Terraform version to >/=0.15.x/1.0.0
+- **Change/Feature:** Change from Launch Configuration to Launch Template. Includes support for spot instances. Fixes [Issue #46](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
+- **Feature:** Enable setting cloudwatch metrics for autoscaling group
+- **Feature:** Add unique target group name for bastion host elb
+- **Feature:** Enable setting EBS size and name for bastion instance
+- **Bugfix:** Update formatting in readme
+- **Bugfix:** Spellcheck readme and changelog
+- **Change:** Update terraform-docs outputs on documentation
+- **Change:** Update internal filenames and references to comply with [upstream template file naming conventions](https://www.terraform.io/language/functions/templatefile); move locals to locals.tf
 
-**Feature:** Support provider default tags as well as explicit tags for all supported resources plus autoscaling group
-
-**Change:** Update Terraform version to >/=0.15.x/1.0.0
-
-**Change/Feature:** Change from Launch Configuration to Launch Template. Includes support for spot instances. Fixes [Issue #46](https://github.com/joshuamkite/terraform-aws-ssh-bastion-service/issues/51)
-
-**Feature:** Enable setting cloudwatch metrics for autoscaling group
-
-**Feature:** Add unique target group name for bastion host elb
-
-**Feature:** Enable setting EBS size and name for bastion instance
-
-**Bugfix:** Update formatting in readme
-
-**Bugfix:** Spellcheck readme and changelog
-
-**Change:** Update terraform-docs outputs on documentation
 # 6.1 
 
 **Change:** Update readme to specify that we are targeting terraform 13

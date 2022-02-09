@@ -28,8 +28,9 @@ locals {
 # Logic tests for  assume role vs same account 
 ##########################
 locals {
-  assume_role_yes = var.assume_role_arn != "" ? 1 : 0
-  assume_role_no  = var.assume_role_arn == "" ? 1 : 0
+  assume_role_yes      = var.assume_role_arn != "" ? 1 : 0
+  assume_role_no       = var.assume_role_arn == "" ? 1 : 0
+  assume_role_yes_bool = var.assume_role_arn != "" ? true : false
 }
 
 ##########################
@@ -37,9 +38,9 @@ locals {
 ##########################
 locals {
   custom_ssh_populate_no            = var.custom_ssh_populate == "" ? 1 : 0
-  custom_authorized_keys_command_no = var.custom_authorized_keys_command == "" ? 1 : 0
-  custom_docker_setup_no            = var.custom_docker_setup == "" ? 1 : 0
-  custom_systemd_no                 = var.custom_systemd == "" ? 1 : 0
+  custom_authorized_keys_command_no = var.custom_authorized_keys_command == "" ? true : false
+  custom_docker_setup_no            = var.custom_docker_setup == "" ? true : false
+  custom_systemd_no                 = var.custom_systemd == "" ? true : false
 }
 
 ##########################
@@ -66,3 +67,36 @@ locals {
   route53_name_components = "${local.bastion_host_name}-${var.service_name}.${var.dns_domain}"
 }
 
+
+############################
+# User Data Templates
+############################
+locals {
+  systemd = templatefile("${path.module}/user_data/systemd.tftpl", {
+    bastion_host_name = local.bastion_host_name
+    vpc               = var.vpc
+  })
+  ssh_populate_assume_role = templatefile("${path.module}/user_data/ssh_populate_assume_role.tftpl", {
+    "assume_role_arn" = var.assume_role_arn
+  })
+  ssh_populate_same_account = file("${path.module}/user_data/ssh_populate_same_account.tftpl")
+  docker_setup = templatefile("${path.module}/user_data/docker_setup.tftpl", {
+    "container_ubuntu_version" = var.container_ubuntu_version
+  })
+  iam_authorized_keys_command = templatefile("${path.module}/user_data/iam-authorized-keys-command.tftpl", {
+    "authorized_command_code"   = file("${path.module}/user_data/iam_authorized_keys_code/main.go")
+    "bastion_allowed_iam_group" = var.bastion_allowed_iam_group
+  })
+}
+
+####################################################
+# sample policy for parent account
+###################################################
+locals {
+  sample_policies_for_parent_account = templatefile("${path.module}/sts_assumerole_example/policy_example.tftpl", {
+    aws_profile               = var.aws_profile
+    bastion_allowed_iam_group = var.bastion_allowed_iam_group
+    assume_role_arn           = var.assume_role_arn
+    }
+  )
+}

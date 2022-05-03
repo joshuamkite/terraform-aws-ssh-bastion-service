@@ -5,12 +5,14 @@ cat << EOF > /opt/golang/src/iam-authorized-keys-command/main.go
 EOF
 DEBIAN_FRONTEND=noninteractive
 sudo apt-get install -y golang
-export GOPATH=/opt/golang
 
-COMMAND_DIR=$GOPATH/src/iam-authorized-keys-command
+export GOPATH="/root/go"
+export GOCACHE="/root/.cache/go-build"
+export GOENV="/root/.config/go/env"
 
-mkdir -p $COMMAND_DIR
-cd $COMMAND_DIR
+cd /opt/golang/src/iam-authorized-keys-command
 
-go get ./...
-go build -ldflags "-X main.iamGroup=${bastion_allowed_iam_group}" -o /opt/iam_helper/iam-authorized-keys-command ./main.go
+go mod init iam-authorized-keys-command
+go mod tidy
+
+/usr/bin/go build -ldflags "-X main.iamGroup=${bastion_allowed_iam_group}" -o /opt/iam_helper/iam-authorized-keys-command ./main.go

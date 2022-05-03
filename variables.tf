@@ -143,7 +143,7 @@ variable "bastion_vpc_name" {
 
 variable "container_ubuntu_version" {
   description = "ubuntu version to use for service container. Tested with 16.04; 18.04; 20.04"
-  default     = "20.04"
+  default     = "22.04"
 }
 
 variable "extra_user_data_content" {
@@ -220,7 +220,7 @@ variable "bastion_ebs_size" {
 
 variable "bastion_ebs_device_name" {
   description = "Name of bastion instance block device"
-  default     = "xvda"
+  default     = "/dev/sda1"
 }
 
 variable "autoscaling_group_enabled_metrics" {

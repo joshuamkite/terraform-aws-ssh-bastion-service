@@ -55,11 +55,10 @@ module "ssh-bastion-service" {
   subnets_asg                   = flatten([aws_subnet.bastion.*.id])
   subnets_lb                    = flatten([aws_subnet.bastion.*.id])
   cidr_blocks_whitelist_service = [var.everyone-cidr]
-  public_ip                     = true
   depends_on = [
     aws_vpc.bastion,
     aws_subnet.bastion,
     aws_internet_gateway.bastion,
   ]
-  bastion_instance_types = ["t2.micro"]
+  bastion_instance_types = ["t3.micro"]
 }

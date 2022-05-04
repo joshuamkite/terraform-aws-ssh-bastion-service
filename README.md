@@ -99,55 +99,11 @@ dev-ap-northeast-1-bastion-service.yourdomain.com
 
 In any event this ensures a consistent and obvious naming format for each combination of AWS account and region that does not collide if multiple vpcs are deployed per region.
 
-The container shell prompt is set similarly but with a systemd incremented counter, e.g. for 
-```terraform
-aws_user
-```
-you might see 
-```bash
-aws_user@dev-eu-west-1-vpc_12345688-172:~$
-```
-and a subsequent container might have
-```bash
-aws_user@dev-eu-west-1-vpc_12345688-180:~$
-```
-In the case that 
-```terraform
-bastion_vpc_name = ""
-```
-the service container shell prompt is set similar to 
-```bash
-you@dev-ap-northeast-1_3
-```
-
-# In use
-
-It is considered normal to see very highly incremented counters if the load balancer health checks are conducted on the service port.
+The container shell prompt is set similarly.
 
 **It is essential to limit incoming service traffic to whitelisted ports.** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
-The host is set to run the latest patch release at deployment of Debian Stretch - unless you specify a custom AMI. This Terraform has also been tested working with Ubuntu 18.04 'latest' host, e.g.:
-
-## For Ubuntu 18.04 'latest' host
-
-```bash
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-  owners = ["099720109477"] # Canonical
-}
-
-custom_ami_id = data.aws_ami.ubuntu.id
-```
-
-Debian was chosen originally because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). Both Debian 10.x 'Buster' and Ubuntu 20.04 'Focal' have breaking changes around repository/package naming and Golang behaviour - look for support for these in a future release - contributions very welcome!
+The host is set to run the latest patch release at deployment of Debian Bullseye - unless you specify a custom AMI. Debian was chosen originally because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). 
 
 The host sshd is available on port 2222 and uses standard ec2 ssh keying. **The default login username for Debian AMI's is 'admin'**. If you do not whitelist any access to this port directly from the outside world (plan default) then it may be convenient to access from a container during development, e.g. with
 
@@ -161,7 +117,6 @@ It is advised to deploy to production _without_ ec2 keys to increase security.
 If you are interested in specifying your own AMI then be aware that there are many subtle differences in systemd implementations between different versions, e.g. it is not possible to use Amazon Linux 2 because we need (from Systemd):
 
 - RunTimeMaxSec to limit the service container lifetime. This was introduced with Systemd version 229 (feb 2016) whereas Amazon Linux 2 uses version 219 (Feb 2015) This is a critical requirement.
-- Ability to pass through hostname and increment (-- hostname foo%i) from systemd to docker, which does not appear to be supported on Amazon Linux 2. Ths is a 'nice to have' feature.
 
 ## IAM user names and Linux user names
 
@@ -211,7 +166,7 @@ The following is referenced in "message of the day" on the container:
 
 ## Logging
 
-The sshd-worker container is launched with `-v /dev/log:/dev/log` This causes logging information to be recorded in the host systemd journal which is not directly accessible from the container. It is thus simple to see who logged in and when by interrogating the host, e.g.
+The sshd-worker container is launched with `-v /dev/log:/dev/log` This causes logging information to be recorded in the host systemd journal which is not directly accessible from the container. It is thus simple to see who logged in and when by interrogating the host (if you have access!), e.g.
 
 ```bash
 journalctl | grep 'Accepted publickey'
@@ -271,7 +226,7 @@ The files in question on the host deploy thus:
 
 - `golang` is the source and build directory for the go binary
 - `iam-helper` is made available as a read-only volume to the docker container as /opt.
-- `iam-authorized-keys-command` is the Go binary that gets the users and ssh public keys from aws - it is built during bastion deployment
+- `iam-authorized-keys-command` is the Go binary that gets the users and ssh public keys from aws - it is built during bastion deployment. Built directly on the host - we may look at a dockerised build in future
 - `ssh_populate.sh` is the container entry point and populates the local user accounts using the go binary
 - `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses Ubuntu 16.04/18.04 from the public Docker registry and installs additional public packages.
 
@@ -297,8 +252,8 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.71.0 |
-| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | 2.2.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | n/a |
 
 ## Modules
 
@@ -351,7 +306,7 @@ No modules.
 | <a name="input_aws_profile"></a> [aws\_profile](#input\_aws\_profile) | n/a | `string` | `""` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | n/a | `any` | n/a | yes |
 | <a name="input_bastion_allowed_iam_group"></a> [bastion\_allowed\_iam\_group](#input\_bastion\_allowed\_iam\_group) | Name IAM group, members of this group will be able to ssh into bastion instances if they have provided ssh key in their profile | `string` | `""` | no |
-| <a name="input_bastion_ebs_device_name"></a> [bastion\_ebs\_device\_name](#input\_bastion\_ebs\_device\_name) | Name of bastion instance block device | `string` | `"xvda"` | no |
+| <a name="input_bastion_ebs_device_name"></a> [bastion\_ebs\_device\_name](#input\_bastion\_ebs\_device\_name) | Name of bastion instance block device | `string` | `"/dev/sda1"` | no |
 | <a name="input_bastion_ebs_size"></a> [bastion\_ebs\_size](#input\_bastion\_ebs\_size) | Size of EBS attached to the bastion instance | `number` | `8` | no |
 | <a name="input_bastion_host_name"></a> [bastion\_host\_name](#input\_bastion\_host\_name) | The hostname to give to the bastion instance | `string` | `""` | no |
 | <a name="input_bastion_instance_types"></a> [bastion\_instance\_types](#input\_bastion\_instance\_types) | List of ec2 types for the bastion host, used by aws\_launch\_template (first from the list) and in aws\_autoscaling\_group | `list` | <pre>[<br>  "t2.small",<br>  "t2.medium",<br>  "t2.large"<br>]</pre> | no |
@@ -359,7 +314,7 @@ No modules.
 | <a name="input_bastion_vpc_name"></a> [bastion\_vpc\_name](#input\_bastion\_vpc\_name) | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc\_id' but you can pass a custom string, or an empty value to omit this | `string` | `"vpc_id"` | no |
 | <a name="input_cidr_blocks_whitelist_host"></a> [cidr\_blocks\_whitelist\_host](#input\_cidr\_blocks\_whitelist\_host) | range(s) of incoming IP addresses to whitelist for the HOST | `list(string)` | `[]` | no |
 | <a name="input_cidr_blocks_whitelist_service"></a> [cidr\_blocks\_whitelist\_service](#input\_cidr\_blocks\_whitelist\_service) | range(s) of incoming IP addresses to whitelist for the SERVICE | `list(string)` | `[]` | no |
-| <a name="input_container_ubuntu_version"></a> [container\_ubuntu\_version](#input\_container\_ubuntu\_version) | ubuntu version to use for service container. Tested with 16.04; 18.04; 20.04 | `string` | `"20.04"` | no |
+| <a name="input_container_ubuntu_version"></a> [container\_ubuntu\_version](#input\_container\_ubuntu\_version) | ubuntu version to use for service container | `string` | `"22.04"` | no |
 | <a name="input_custom_ami_id"></a> [custom\_ami\_id](#input\_custom\_ami\_id) | id for custom ami if used | `string` | `""` | no |
 | <a name="input_custom_authorized_keys_command"></a> [custom\_authorized\_keys\_command](#input\_custom\_authorized\_keys\_command) | any value excludes default Go binary iam-authorized-keys built from source from userdata | `string` | `""` | no |
 | <a name="input_custom_docker_setup"></a> [custom\_docker\_setup](#input\_custom\_docker\_setup) | any value excludes default docker installation and container build from userdata | `string` | `""` | no |

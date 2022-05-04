@@ -54,7 +54,7 @@ module "ssh-bastion-service" {
   vpc                           = aws_vpc.bastion.id
   subnets_asg                   = flatten([aws_subnet.bastion.*.id])
   subnets_lb                    = flatten([aws_subnet.bastion.*.id])
-  cidr_blocks_whitelist_service = [everyone_cidr]
+  cidr_blocks_whitelist_service = [var.everyone_cidr]
   public_ip                     = true
   depends_on = [
     aws_vpc.bastion,

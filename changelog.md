@@ -8,6 +8,7 @@
 - **Change:** Moved to go mod to build golang binary (uses go1.15.15 linux/amd64 on Debian host)
 - **Change:** Default ebs device name changed: "xvda" => "/dev/sda1"
 - **Change:** example changes from t2.micro (which does not deploy successfully) to t3.micro
+
 # 7.0
 
 **Breaking changes with existing deployments using earlier module versions**

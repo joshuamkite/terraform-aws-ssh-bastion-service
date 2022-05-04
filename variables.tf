@@ -142,7 +142,7 @@ variable "bastion_vpc_name" {
 }
 
 variable "container_ubuntu_version" {
-  description = "ubuntu version to use for service container. Tested with 16.04; 18.04; 20.04"
+  description = "ubuntu version to use for service container"
   default     = "22.04"
 }
 

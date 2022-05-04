@@ -8,15 +8,16 @@ data "aws_region" "current" {
 
 data "aws_ami" "debian" {
   most_recent = true
-
   filter {
     name   = "name"
-    values = ["debian-stretch-hvm-x86_64-*"]
+    values = ["debian-11-amd64-*"]
   }
-
-  owners = ["379101102735"] # Debian
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  owners = ["136693071363"] # Debian
 }
-
 
 ############################
 #Launch template for service host

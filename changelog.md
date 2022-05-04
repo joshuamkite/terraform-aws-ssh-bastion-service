@@ -1,3 +1,14 @@
+# 8.0
+
+- **Change:** Defaults to Debian 11 (host) and Ubuntu 22.04 (Container). Alternative combinations, distributions and non-AMD64 platforms not tested at this time. Tested using 
+  - Terraform v1.1.9
+  - hashicorp/aws v4.12.1
+  - hashicorp/cloudinit v2.2.0
+- **Change:** Hostname for container no longer increments. Sadly it wasn't possible to keep this working and the Docker team don't seem to like this practice - see (old 2015) https://stackoverflow.com/questions/43659410/docker-container-hostname-sequential-number 
+- **Change:** Moved to go mod to build golang binary (uses go1.15.15 linux/amd64 on Debian host)
+- **Change:** Default ebs device name changed: "xvda" => "/dev/sda1"
+- **Change:** example changes from t2.micro (which does not deploy successfully) to t3.micro
+
 # 7.0
 
 **Breaking changes with existing deployments using earlier module versions**

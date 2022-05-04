@@ -14,7 +14,7 @@ This example shows a complete setup for a new `bastion` service with all needed 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.73.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 
 ## Modules
 
@@ -41,7 +41,7 @@ This example shows a complete setup for a new `bastion` service with all needed 
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | Default AWS region | `string` | `"eu-west-1"` | no |
 | <a name="input_cidr-start"></a> [cidr-start](#input\_cidr-start) | Default CIDR block | `string` | `"10.50"` | no |
 | <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | n/a | `string` | `"demo"` | no |
-| <a name="input_everyone-cidr"></a> [everyone-cidr](#input\_everyone-cidr) | Everyone | `string` | `"0.0.0.0/0"` | no |
+| <a name="input_everyone_cidr"></a> [everyone\_cidr](#input\_everyone\_cidr) | Everyone | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | tags aplied to all resources | `map(string)` | `{}` | no |
 
 ## Outputs

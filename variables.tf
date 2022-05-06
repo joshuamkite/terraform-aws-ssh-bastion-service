@@ -1,6 +1,6 @@
 variable "bastion_instance_types" {
   description = "List of ec2 types for the bastion host, used by aws_launch_template (first from the list) and in aws_autoscaling_group"
-  default     = ["t2.small", "t2.medium", "t2.large"]
+  default     = ["t3.small", "t3.medium", "t3.large"]
 }
 
 variable "cidr_blocks_whitelist_host" {
@@ -37,13 +37,11 @@ variable "public_ip" {
 variable "subnets_lb" {
   type        = list(string)
   description = "list of subnets for load balancer - availability zones must match subnets_asg"
-  default     = []
 }
 
 variable "subnets_asg" {
   type        = list(string)
   description = "list of subnets for autoscaling group - availability zones must match subnets_lb"
-  default     = []
 }
 
 variable "dns_domain" {

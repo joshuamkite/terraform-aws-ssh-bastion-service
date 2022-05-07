@@ -7,7 +7,9 @@
 - **Change:** Hostname for container no longer increments. Sadly it wasn't possible to keep this working and the Docker team don't seem to like this practice - see (old 2015) https://stackoverflow.com/questions/43659410/docker-container-hostname-sequential-number 
 - **Change:** Moved to go mod to build golang binary (uses go1.15.15 linux/amd64 on Debian host)
 - **Change:** Default ebs device name changed: "xvda" => "/dev/sda1"
-- **Change:** example changes from t2.micro (which does not deploy successfully) to t3.micro
+- **Change:** /examples/full-with-public-ip instance type changed: `t2.micro` => `t3.micro`. t2.micro no longer completes healtchchecks successfully
+- **Change:** default instance types changed: `["t2.small", "t2.medium", "t2.large"]` => `["t3.small", "t3.medium", "t3.large"]`. t2 instance types no longer complete healtchchecks successfully
+- **Change:** `var.subnets_asg` and `var.subnets_lb` are now **Required** inputs. Sadly this apparently should have been the case since release 6.0 when automatic subnet selection was removed
 
 # 7.0
 

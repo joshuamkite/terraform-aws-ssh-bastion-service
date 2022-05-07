@@ -8,7 +8,7 @@ This example shows a complete setup for a new `bastion` service with all needed 
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.15 |
 
 ## Providers
 

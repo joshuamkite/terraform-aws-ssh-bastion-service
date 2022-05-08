@@ -105,11 +105,11 @@ aws_user
 ```
 you might see 
 ```bash
-aws_user@demo-eu-west-1-vpc-06ef3237ac609eb4b_0:~$ 
+aws_user@demo-eu-west-1-vpc-06ef3237ac609eb4b-0:~$ 
 ```
 and a subsequent container might have
 ```bash
-aws_user@demo-eu-west-1-vpc-06ef3237ac609eb4b_1:~$ 
+aws_user@demo-eu-west-1-vpc-06ef3237ac609eb4b-1:~$ 
 ```
 In the case that 
 ```terraform

@@ -30,7 +30,7 @@ Ivan Mesic has kindly contributed an example use of this module creating a VPC a
 
 # Custom sections:
 
-You can **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. Tested and working using Ubuntu 18.04 as an example ;)
+You can **specify a custom base AMI** to use for the service host if you wish with var.custom_ami_id. 
 
 **Userdata has been divided into sections which are individually applicable**. Each is a HEREDOC and may be excluded by assigning any non-empty value to the relevant section variable. The value given is used simply for a logic test and not passed into userdata. If you ignore all of these variables then historic/ default behaviour continues and everything is built on the host instance on first boot (allow 3 minutes on t2.medium).
 
@@ -250,7 +250,7 @@ The files in question on the host deploy thus:
 - `iam-helper` is made available as a read-only volume to the docker container as /opt.
 - `iam-authorized-keys-command` is the Go binary that gets the users and ssh public keys from aws - it is built during bastion deployment. Built directly on the host - we may look at a dockerised build in future
 - `ssh_populate.sh` is the container entry point and populates the local user accounts using the go binary
-- `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses Ubuntu 16.04/18.04 from the public Docker registry and installs additional public packages.
+- `sshd_worker/Dockerfile` is obviously the docker build configuration. It uses Ubuntu 22.04 from the public Docker registry and installs additional public packages.
 
 ## Sample policy for other accounts
 

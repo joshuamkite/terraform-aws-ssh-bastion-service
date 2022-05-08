@@ -99,8 +99,30 @@ dev-ap-northeast-1-bastion-service.yourdomain.com
 
 In any event this ensures a consistent and obvious naming format for each combination of AWS account and region that does not collide if multiple vpcs are deployed per region.
 
-The container shell prompt is set similarly.
+The container shell prompt is set similarly but with a systemd incremented counter, e.g. for 
+```bash
+aws_user
+```
+you might see 
+```bash
+aws_user@demo-eu-west-1-vpc-06ef3237ac609eb4b-0:~$ 
+```
+and a subsequent container might have
+```bash
+aws_user@demo-eu-west-1-vpc-06ef3237ac609eb4b-1:~$ 
+```
+In the case that 
+```terraform
+bastion_vpc_name = ""
+```
+the service container shell prompt is set similar to 
+```bash
+you@dev-ap-northeast-1_3
+```
 
+# In use
+
+It is considered normal to see very highly incremented counters if the load balancer health checks are conducted on the service port.
 **It is essential to limit incoming service traffic to whitelisted ports.** If you do not then internet background noise will exhaust the host resources and/ or lead to rate limiting from amazon on the IAM identity calls- resulting in denial of service.
 
 The host is set to run the latest patch release at deployment of Debian Bullseye - unless you specify a custom AMI. Debian was chosen originally because the socket activation requires systemd but Ubuntu 16.04 did not automatically set up DHCP for additional elastic network interfaces (see version 1 series). 

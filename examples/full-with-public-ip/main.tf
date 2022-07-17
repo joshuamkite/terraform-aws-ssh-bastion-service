@@ -41,11 +41,6 @@ resource "aws_route_table_association" "bastion" {
   route_table_id = aws_route_table.bastion.id
 }
 
-variable "everyone_cidr" {
-  default     = "0.0.0.0/0"
-  description = "Everyone"
-}
-
 module "ssh-bastion-service" {
   # source = "joshuamkite/ssh-bastion-service/aws"
   source                        = "../../"
@@ -56,10 +51,5 @@ module "ssh-bastion-service" {
   subnets_lb                    = flatten([aws_subnet.bastion.*.id])
   cidr_blocks_whitelist_service = [var.everyone_cidr]
   public_ip                     = true
-  depends_on = [
-    aws_vpc.bastion,
-    aws_subnet.bastion,
-    aws_internet_gateway.bastion,
-  ]
-  bastion_instance_types = ["t3.micro"]
+  bastion_instance_types        = ["t3.micro"]
 }

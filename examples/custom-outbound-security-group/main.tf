@@ -47,19 +47,14 @@ variable "everyone_cidr" {
 
 module "ssh-bastion-service" {
   # source = "joshuamkite/ssh-bastion-service/aws"
-  source                     = "../../"
-  aws_region                 = var.aws_region
-  environment_name           = var.environment_name
-  vpc                        = aws_vpc.bastion.id
-  subnets_asg                = flatten([aws_subnet.bastion.*.id])
-  subnets_lb                 = flatten([aws_subnet.bastion.*.id])
-  security_groups_additional = [aws_security_group.custom.id]
-  public_ip                  = true
-  depends_on = [
-    aws_vpc.bastion,
-    aws_subnet.bastion,
-    aws_internet_gateway.bastion,
-  ]
+  source                         = "../../"
+  aws_region                     = var.aws_region
+  environment_name               = var.environment_name
+  vpc                            = aws_vpc.bastion.id
+  subnets_asg                    = flatten([aws_subnet.bastion.*.id])
+  subnets_lb                     = flatten([aws_subnet.bastion.*.id])
+  security_groups_additional     = [aws_security_group.custom.id]
+  public_ip                      = true
   bastion_instance_types         = ["t3.small"]
   custom_outbound_security_group = true
   bastion_service_port           = var.bastion_service_port

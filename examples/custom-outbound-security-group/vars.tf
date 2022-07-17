@@ -25,5 +25,7 @@ variable "bastion_service_port" {
 }
 
 variable "custom_cidr" {
-  default = ["0.0.0.0/0"]
+  type        = list(string)
+  description = "CIDR for custom security gtoup ingress"
+  default     = ["0.0.0.0/0"]
 }

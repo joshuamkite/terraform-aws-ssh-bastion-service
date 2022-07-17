@@ -18,6 +18,11 @@ variable "tags" {
   default     = {}
 }
 
+variable "everyone_cidr" {
+  default     = "0.0.0.0/0"
+  description = "Everyone"
+}
+
 locals {
   default_tags = {
     Name = "bastion-service-${var.environment_name}"

@@ -1,13 +1,12 @@
 output "bastion_sg_id_module" {
-  description = "Security Group id of the bastion host"
+  description = "Sbuilt-in security Group id of the bastion host"
   value       = module.ssh-bastion-service.bastion_sg_id
 }
 
 output "bastion_sg_id_custom" {
-  description = "Custom Security Group id of the bastion host"
+  description = "Custom (external) Security Group id of the bastion host"
   value       = aws_security_group.custom.id
 }
-
 
 output "lb_dns_name" {
   description = "aws load balancer dns"

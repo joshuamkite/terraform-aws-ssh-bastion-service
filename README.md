@@ -260,6 +260,7 @@ The DNS entry (if created) for the service is also displayed as an output of the
 ```terraform
 name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-bastion-service.${var.dns_domain}"
 ```
+
 ## Inputs and Outputs
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
@@ -274,7 +275,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.71.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.22.0 |
 | <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | 2.2.0 |
 
 ## Modules

@@ -3,6 +3,8 @@
 - **Feature:** Make bastion service port configurable: `var.bastion_service_port` `type = number`. Historic behaviour is followed by default
 - **Feature:** Add new `examples/custom_outbound_security_group` demonstrating use of above
 - **Change:** Increment required terraform version to >= 1.2.0 since we are not testing historic versions
+- **Change:** Increment AWS provider to 4.22
+- **Change:** Remove obsolete explicit manual dependencies from examples
 
 # 8.0
 

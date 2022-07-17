@@ -78,16 +78,16 @@ locals {
     vpc                  = var.vpc
   })
   ssh_populate_assume_role = templatefile("${path.module}/user_data/ssh_populate_assume_role.tftpl", {
-    "assume_role_arn" = var.assume_role_arn
+    assume_role_arn = var.assume_role_arn
   })
   ssh_populate_same_account = file("${path.module}/user_data/ssh_populate_same_account.tftpl")
   docker_setup = templatefile("${path.module}/user_data/docker_setup.tftpl", {
-    bastion_service_port       = var.bastion_service_port
-    "container_ubuntu_version" = var.container_ubuntu_version
+    bastion_service_port     = var.bastion_service_port
+    container_ubuntu_version = var.container_ubuntu_version
   })
   iam_authorized_keys_command = templatefile("${path.module}/user_data/iam-authorized-keys-command.tftpl", {
-    "authorized_command_code"   = file("${path.module}/user_data/iam_authorized_keys_code/main.go")
-    "bastion_allowed_iam_group" = var.bastion_allowed_iam_group
+    authorized_command_code   = file("${path.module}/user_data/iam_authorized_keys_code/main.go")
+    bastion_allowed_iam_group = var.bastion_allowed_iam_group
   })
 }
 

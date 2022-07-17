@@ -5,6 +5,7 @@
 - **Change:** Increment required terraform version to >= 1.2.0 since we are not testing historic versions
 - **Change:** Increment suggested AWS provider to 4.22 (not hard enforce)
 - **Change:** Remove obsolete explicit manual dependencies from examples
+- **Change:** Remove obsolete quotes from interpolations in locals
 
 # 8.0
 

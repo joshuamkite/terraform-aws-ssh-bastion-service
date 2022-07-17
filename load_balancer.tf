@@ -18,7 +18,7 @@ resource "aws_lb" "bastion-service" {
 resource "aws_lb_listener" "bastion-service" {
   load_balancer_arn = aws_lb.bastion-service.arn
   protocol          = "TCP"
-  port              = "22"
+  port              = var.bastion_service_port
 
   default_action {
     target_group_arn = aws_lb_target_group.bastion-service.arn
@@ -46,9 +46,9 @@ resource "aws_lb_listener" "bastion-host" {
 # Target group service
 #######################################################
 resource "aws_lb_target_group" "bastion-service" {
-  name     = "${var.service_name}-${var.environment_name}-22"
+  name     = "${var.service_name}-${var.environment_name}-${var.bastion_service_port}"
   protocol = "TCP"
-  port     = 22
+  port     = var.bastion_service_port
   vpc_id   = var.vpc
 
   health_check {

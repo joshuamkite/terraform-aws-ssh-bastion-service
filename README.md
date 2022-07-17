@@ -268,14 +268,14 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.15 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
-| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.71.0 |
+| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | 2.2.0 |
 
 ## Modules
 
@@ -333,6 +333,7 @@ No modules.
 | <a name="input_bastion_host_name"></a> [bastion\_host\_name](#input\_bastion\_host\_name) | The hostname to give to the bastion instance | `string` | `""` | no |
 | <a name="input_bastion_instance_types"></a> [bastion\_instance\_types](#input\_bastion\_instance\_types) | List of ec2 types for the bastion host, used by aws\_launch\_template (first from the list) and in aws\_autoscaling\_group | `list` | <pre>[<br>  "t3.small",<br>  "t3.medium",<br>  "t3.large"<br>]</pre> | no |
 | <a name="input_bastion_service_host_key_name"></a> [bastion\_service\_host\_key\_name](#input\_bastion\_service\_host\_key\_name) | AWS ssh key *.pem to be used for ssh access to the bastion service host | `string` | `""` | no |
+| <a name="input_bastion_service_port"></a> [bastion\_service\_port](#input\_bastion\_service\_port) | Port for containerised ssh daemon | `number` | `22` | no |
 | <a name="input_bastion_vpc_name"></a> [bastion\_vpc\_name](#input\_bastion\_vpc\_name) | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc\_id' but you can pass a custom string, or an empty value to omit this | `string` | `"vpc_id"` | no |
 | <a name="input_cidr_blocks_whitelist_host"></a> [cidr\_blocks\_whitelist\_host](#input\_cidr\_blocks\_whitelist\_host) | range(s) of incoming IP addresses to whitelist for the HOST | `list(string)` | `[]` | no |
 | <a name="input_cidr_blocks_whitelist_service"></a> [cidr\_blocks\_whitelist\_service](#input\_cidr\_blocks\_whitelist\_service) | range(s) of incoming IP addresses to whitelist for the SERVICE | `list(string)` | `[]` | no |
@@ -340,6 +341,7 @@ No modules.
 | <a name="input_custom_ami_id"></a> [custom\_ami\_id](#input\_custom\_ami\_id) | id for custom ami if used | `string` | `""` | no |
 | <a name="input_custom_authorized_keys_command"></a> [custom\_authorized\_keys\_command](#input\_custom\_authorized\_keys\_command) | any value excludes default Go binary iam-authorized-keys built from source from userdata | `string` | `""` | no |
 | <a name="input_custom_docker_setup"></a> [custom\_docker\_setup](#input\_custom\_docker\_setup) | any value excludes default docker installation and container build from userdata | `string` | `""` | no |
+| <a name="input_custom_outbound_security_group"></a> [custom\_outbound\_security\_group](#input\_custom\_outbound\_security\_group) | don't create default outgoing permissive security group rule - will only work with custom AMI or if security group supplied with ports 53(UDP); 80(TCP); 443(TCP) open for 0.0.0.0/0 | `bool` | `false` | no |
 | <a name="input_custom_ssh_populate"></a> [custom\_ssh\_populate](#input\_custom\_ssh\_populate) | any value excludes default ssh\_populate script used on container launch from userdata | `string` | `""` | no |
 | <a name="input_custom_systemd"></a> [custom\_systemd](#input\_custom\_systemd) | any value excludes default systemd and hostname change from userdata | `string` | `""` | no |
 | <a name="input_delete_network_interface_on_termination"></a> [delete\_network\_interface\_on\_termination](#input\_delete\_network\_interface\_on\_termination) | if network interface created for bastion host should be deleted when instance in terminated. Setting propagated to aws\_launch\_template.network\_interfaces.delete\_on\_termination | `bool` | `true` | no |

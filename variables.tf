@@ -226,3 +226,15 @@ variable "autoscaling_group_enabled_metrics" {
   description = "A list of CloudWatch metrics to collect on the autoscaling group. Permitted values include: GroupMinSize; GroupMaxSize; GroupDesiredCapacity; GroupInServiceInstances; GroupPendingInstances; GroupStandbyInstances; GroupTerminatingInstances; GroupTotalInstances"
   default     = []
 }
+
+variable "custom_outbound_security_group" {
+  type        = bool
+  default     = false
+  description = "don't create default outgoing permissive security group rule - will only work with custom AMI or if security group supplied with ports 53(UDP); 80(TCP); 443(TCP) open for 0.0.0.0/0"
+}
+
+variable "bastion_service_port" {
+  type        = number
+  description = "Port for containerised ssh daemon"
+  default     = 22
+}

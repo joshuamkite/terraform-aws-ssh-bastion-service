@@ -46,8 +46,8 @@ variable "everyone_cidr" {
 }
 
 module "ssh-bastion-service" {
-  # source = "joshuamkite/ssh-bastion-service/aws"
-  source                         = "../../"
+  source = "joshuamkite/ssh-bastion-service/aws"
+  # source                         = "../../"
   aws_region                     = var.aws_region
   environment_name               = var.environment_name
   vpc                            = aws_vpc.bastion.id

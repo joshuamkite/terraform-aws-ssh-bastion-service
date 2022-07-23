@@ -1,4 +1,5 @@
 # 8.1
+
 - **Feature:** Make default permissive outbound security group rule creation conditional: `var.custom_outbound_security_group` `type = bool`. Historic behaviour is followed by default
 - **Feature:** Make bastion service port configurable: `var.bastion_service_port` `type = number`. Historic behaviour is followed by default
 - **Feature:** Add new `examples/custom_outbound_security_group` demonstrating use of above
@@ -6,6 +7,7 @@
 - **Change:** Increment suggested AWS provider to 4.22 (not hard enforce)
 - **Change:** Remove obsolete explicit manual dependencies from examples
 - **Change:** Remove obsolete quotes from interpolations in locals
+- **Change:** Tidy up Readme to include new options sensibly
 
 # 8.0
 

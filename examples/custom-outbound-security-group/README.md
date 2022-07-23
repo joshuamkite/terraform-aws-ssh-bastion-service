@@ -4,7 +4,7 @@ This example for more advanced use shows a complete setup for a new `bastion` se
 * private subnet(s) inside the VPC,
 * an internet gateway and route tables.
 
-Additionally a custom security group is substituted for all external IP ingress/egress permitting only:
+**Additionally** a custom security group is substituted for all external IP ingress/egress, permitting only:
 
 VPC egress ports:
 
@@ -42,7 +42,7 @@ ssh -p 443 user@load_balancer_dns_output_value
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ssh-bastion-service"></a> [ssh-bastion-service](#module\_ssh-bastion-service) | ../../ | n/a |
+| <a name="module_ssh-bastion-service"></a> [ssh-bastion-service](#module\_ssh-bastion-service) | joshuamkite/ssh-bastion-service/aws | n/a |
 
 ## Resources
 

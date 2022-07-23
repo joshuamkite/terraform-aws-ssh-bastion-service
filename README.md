@@ -1,10 +1,6 @@
 # This Terraform deploys a stateless containerised sshd bastion service on AWS with IAM based authentication:
 
-**This module requires Terraform >/=0.15/1.x.x**
-
-- Terraform 0.13.x was _previously_ supported with module version to ~> v6.1
-- Terraform 0.12.x was _previously_ supported with module version to ~> v5.0
-- Terraform 0.11.x was _previously_ supported with module version to ~> v4.0
+This module requires Terraform >/=1.2.0 Older versions were previously supported going back to Terraform 0.11.x with module version to ~> v4.0
 
 **N.B. If you are using a newer version of this module when you have an older version deployed, please review the changelog!**
 
@@ -26,7 +22,9 @@ You may find it more convenient to call it in your plan [directly from the Terra
 
 # Quick start
 
-Ivan Mesic has kindly contributed an example use of this module creating a VPC and a bastion instance within it - see `/examples`
+Ivan Mesic has kindly contributed an example use of this module creating a VPC and a bastion instance within it - see `/examples/full-with-public-ip` 
+
+`examples/custom-outbound-security-group` is for more specialist use cases demonstrating how to run the service on a different port with an external supplied security group for external ingress and egress. This would not be necessary for most users.
 
 # Custom sections:
 
@@ -47,6 +45,12 @@ The variables for these sections are:
 - **extra_user_data*** - (optional, several variables) you may supply your own user data here - appended following above sections
 
 If you exclude any section then you must replace it with equivalent functionality, either in your base AMI or `extra_user_data*` for a working service. Especially if you are not replacing all sections then be mindful that the systemd service expects docker to be installed and to be able to call the docker container as `sshd_worker`. The service container in turn references the `ssh_populate` script which calls `iam-authorized-keys` from a specific location.
+
+You can **supply list of one or more security groups to attach to the host instance launch configuration** within the module if you wish. This can be supplied together with or instead of a whitelisted range of CIDR blocks. Starting with release 8.1 it is possible to use this to also passlist egress ports if `var.custom_outbound_security_group = true` (default false). It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign either a suitable security group or whitelist then you may not be able to reach the service!
+
+ Starting with release 8.1 it is possible to **assign a custom port for the containerised ssh bastion service**, e.g. port 443. This may be useful for advanced users and must match security group ingress and egress- see `examples/custom-outbound-security-group`
+
+**Load Balancer health check port may be optionally set to either the containerised service port (by default port 22) or port 2222 (EC2 host sshd)**. Port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in response to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this healthcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthcheck on port 2222 or not.
 
 # Ability to assume a role in another account
 
@@ -205,12 +209,6 @@ Starting with release 3.8 it is possible to use the output giving the name of th
 
 - ssh keys are called only at login- if an account or ssh public key is deleted from AWS whilst a user is logged in then that session will continue until otherwise terminated.
 
-# Notes for deployment
-
-Load Balancer health check port may be optionally set to either port 22 (containerised service) or port 2222 (EC2 host sshd). Port 2222 is the default. If you are deploying a large number of bastion instances, all of them checking into the same parent account for IAM queries in response to load balancer health checks on port 22 causes IAM rate limiting from AWS. Using the modified EC2 host sshd of port 2222 avoids this issue, is recommended for larger deployments and is now default. The host sshd is set to port 2222 as part of the service setup so this healthcheck is not entirely invalid. Security group rules, target groups and load balancer listeners are conditionally created to support any combination of access/healthcheck on port 2222 or not.
-
-You can supply list of one or more security groups to attach to the host instance launch configuration within the module if you wish. This can be supplied together with or instead of a whitelisted range of CIDR blocks. It may be useful in an enterprise setting to have security groups with rules managed separately from the bastion plan but of course if you do not assign either a suitable security group or whitelist then you may not be able to reach the service!
-
 ## Components (using default userdata)
 
 **EC2 Host OS (debian) with:**
@@ -342,7 +340,7 @@ No modules.
 | <a name="input_custom_ami_id"></a> [custom\_ami\_id](#input\_custom\_ami\_id) | id for custom ami if used | `string` | `""` | no |
 | <a name="input_custom_authorized_keys_command"></a> [custom\_authorized\_keys\_command](#input\_custom\_authorized\_keys\_command) | any value excludes default Go binary iam-authorized-keys built from source from userdata | `string` | `""` | no |
 | <a name="input_custom_docker_setup"></a> [custom\_docker\_setup](#input\_custom\_docker\_setup) | any value excludes default docker installation and container build from userdata | `string` | `""` | no |
-| <a name="input_custom_outbound_security_group"></a> [custom\_outbound\_security\_group](#input\_custom\_outbound\_security\_group) | don't create default outgoing permissive security group rule - will only work with custom AMI or if security group supplied with ports 53(UDP); 80(TCP); 443(TCP) open for 0.0.0.0/0 | `bool` | `false` | no |
+| <a name="input_custom_outbound_security_group"></a> [custom\_outbound\_security\_group](#input\_custom\_outbound\_security\_group) | don't create default outgoing permissive security group rule - will only work with custom AMI or if security group supplied with ports 53(UDP); 80(TCP); 443(TCP) open for 0.0.0.0/0 egress | `bool` | `false` | no |
 | <a name="input_custom_ssh_populate"></a> [custom\_ssh\_populate](#input\_custom\_ssh\_populate) | any value excludes default ssh\_populate script used on container launch from userdata | `string` | `""` | no |
 | <a name="input_custom_systemd"></a> [custom\_systemd](#input\_custom\_systemd) | any value excludes default systemd and hostname change from userdata | `string` | `""` | no |
 | <a name="input_delete_network_interface_on_termination"></a> [delete\_network\_interface\_on\_termination](#input\_delete\_network\_interface\_on\_termination) | if network interface created for bastion host should be deleted when instance in terminated. Setting propagated to aws\_launch\_template.network\_interfaces.delete\_on\_termination | `bool` | `true` | no |
@@ -351,7 +349,7 @@ No modules.
 | <a name="input_extra_user_data_content"></a> [extra\_user\_data\_content](#input\_extra\_user\_data\_content) | Extra user-data to add to the default built-in | `string` | `""` | no |
 | <a name="input_extra_user_data_content_type"></a> [extra\_user\_data\_content\_type](#input\_extra\_user\_data\_content\_type) | What format is content in - eg 'text/cloud-config' or 'text/x-shellscript' | `string` | `"text/x-shellscript"` | no |
 | <a name="input_extra_user_data_merge_type"></a> [extra\_user\_data\_merge\_type](#input\_extra\_user\_data\_merge\_type) | Control how cloud-init merges user-data sections | `string` | `"str(append)"` | no |
-| <a name="input_lb_healthcheck_port"></a> [lb\_healthcheck\_port](#input\_lb\_healthcheck\_port) | TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222 | `string` | `"2222"` | no |
+| <a name="input_lb_healthcheck_port"></a> [lb\_healthcheck\_port](#input\_lb\_healthcheck\_port) | TCP port to conduct lb target group healthchecks. Acceptable values are 2222 or the value defined for `bastion_service_port` | `string` | `"2222"` | no |
 | <a name="input_lb_healthy_threshold"></a> [lb\_healthy\_threshold](#input\_lb\_healthy\_threshold) | Healthy threshold for lb target group | `string` | `"2"` | no |
 | <a name="input_lb_interval"></a> [lb\_interval](#input\_lb\_interval) | interval for lb target group health check | `string` | `"30"` | no |
 | <a name="input_lb_is_internal"></a> [lb\_is\_internal](#input\_lb\_is\_internal) | whether the lb will be internal | `string` | `false` | no |

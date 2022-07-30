@@ -4,7 +4,7 @@ This example for more advanced use shows a complete setup for a new `bastion` se
 * private subnet(s) inside the VPC,
 * an internet gateway and route tables.
 
-**Additionally** a custom security group is substituted for all external IP ingress/egress, permitting only:
+**Additionally** a custom external security group is substituted for that normally created by the module all external IP ingress/egress, permitting only:
 
 VPC egress ports:
 

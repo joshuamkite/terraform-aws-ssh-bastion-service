@@ -1,3 +1,14 @@
+# 8.1
+
+- **Feature:** Make default permissive outbound security group rule creation conditional: `var.custom_outbound_security_group` `type = bool`. Historic behaviour is followed by default
+- **Feature:** Make bastion service port configurable: `var.bastion_service_port` `type = number`. Historic behaviour is followed by default
+- **Feature:** Add new `examples/custom_outbound_security_group` demonstrating use of above
+- **Change:** Increment required terraform version to >= 1.2.0 since we are not testing historic versions
+- **Change:** Increment suggested AWS provider to 4.22 (not hard enforce)
+- **Change:** Remove obsolete explicit manual dependencies from examples
+- **Change:** Remove obsolete quotes from interpolations in locals
+- **Change:** Tidy up Readme to include new options sensibly
+
 # 8.0
 
 - **Change:** Defaults to Debian 11 (host) and Ubuntu 22.04 (Container). Alternative combinations, distributions and non-AMD64 platforms not tested at this time. Tested using 

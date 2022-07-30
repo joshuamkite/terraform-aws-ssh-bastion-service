@@ -18,13 +18,14 @@ variable "tags" {
   default     = {}
 }
 
-variable "everyone_cidr" {
-  default     = "0.0.0.0/0"
-  description = "Everyone"
+variable "bastion_service_port" {
+  type        = number
+  description = "Port for containerised ssh daemon"
+  default     = 443
 }
 
-locals {
-  default_tags = {
-    Name = "bastion-service-${var.environment_name}"
-  }
+variable "custom_cidr" {
+  type        = list(string)
+  description = "CIDR for custom security gtoup ingress"
+  default     = ["0.0.0.0/0"]
 }

@@ -1,4 +1,3 @@
-
 provider "aws" {
   region = var.aws_region
   default_tags {
@@ -41,15 +40,23 @@ resource "aws_route_table_association" "bastion" {
   route_table_id = aws_route_table.bastion.id
 }
 
+variable "everyone_cidr" {
+  default     = "0.0.0.0/0"
+  description = "Everyone"
+}
+
 module "ssh-bastion-service" {
   source = "joshuamkite/ssh-bastion-service/aws"
-  # source                        = "../../"
-  aws_region                    = var.aws_region
-  environment_name              = var.environment_name
-  vpc                           = aws_vpc.bastion.id
-  subnets_asg                   = flatten([aws_subnet.bastion.*.id])
-  subnets_lb                    = flatten([aws_subnet.bastion.*.id])
-  cidr_blocks_whitelist_service = [var.everyone_cidr]
-  public_ip                     = true
-  bastion_instance_types        = ["t3.micro"]
+  # source                         = "../../"
+  aws_region                     = var.aws_region
+  environment_name               = var.environment_name
+  vpc                            = aws_vpc.bastion.id
+  subnets_asg                    = flatten([aws_subnet.bastion.*.id])
+  subnets_lb                     = flatten([aws_subnet.bastion.*.id])
+  security_groups_additional     = [aws_security_group.custom.id]
+  public_ip                      = true
+  bastion_instance_types         = ["t3.small"]
+  custom_outbound_security_group = true
+  bastion_service_port           = var.bastion_service_port
 }
+

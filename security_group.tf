@@ -44,9 +44,10 @@ resource "aws_security_group_rule" "host_ssh_in_cond" {
   description       = "bastion HOST access"
 }
 
-# Permissive egress policy because we want users to be able to install their own packages 
+# Default egress policy permissive for users to be able to install their own packages - conditional
 
 resource "aws_security_group_rule" "bastion_host_out" {
+  count             = var.custom_outbound_security_group == false ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 65535

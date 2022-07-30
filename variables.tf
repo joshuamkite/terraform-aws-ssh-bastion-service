@@ -130,7 +130,7 @@ variable "assume_role_arn" {
 }
 
 variable "lb_healthcheck_port" {
-  description = "TCP port to conduct lb target group healthchecks. Acceptable values are 22 or 2222"
+  description = "TCP port to conduct lb target group healthchecks. Acceptable values are 2222 or the value defined for `bastion_service_port`"
   default     = "2222"
 }
 
@@ -225,4 +225,16 @@ variable "autoscaling_group_enabled_metrics" {
   type        = list(string)
   description = "A list of CloudWatch metrics to collect on the autoscaling group. Permitted values include: GroupMinSize; GroupMaxSize; GroupDesiredCapacity; GroupInServiceInstances; GroupPendingInstances; GroupStandbyInstances; GroupTerminatingInstances; GroupTotalInstances"
   default     = []
+}
+
+variable "custom_outbound_security_group" {
+  type        = bool
+  default     = false
+  description = "don't create default outgoing permissive security group rule - will only work with custom AMI or if security group supplied with ports 53(UDP); 80(TCP); 443(TCP) open for 0.0.0.0/0 egress"
+}
+
+variable "bastion_service_port" {
+  type        = number
+  description = "Port for containerised ssh daemon"
+  default     = 22
 }

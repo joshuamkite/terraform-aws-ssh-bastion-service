@@ -78,6 +78,7 @@ resource "aws_autoscaling_group" "bastion-service" {
   min_size            = var.asg_min
   desired_capacity    = var.asg_desired
   vpc_zone_identifier = var.subnets_asg
+  health_check_type   = var.asg_health_check_type
 
   mixed_instances_policy {
     instances_distribution {

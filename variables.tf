@@ -117,6 +117,12 @@ variable "asg_desired" {
   default     = "1"
 }
 
+variable "asg_health_check_type" {
+  type        = string
+  description = "Health check type in ASG (ELB or EC2)"
+  default     = "EC2"
+}
+
 variable "aws_region" {
 }
 

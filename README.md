@@ -263,6 +263,7 @@ name = "${var.environment_name}-${data.aws_region.current.name}-${var.vpc}-basti
 
 These have been generated with [terraform-docs](https://github.com/segmentio/terraform-docs)
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -331,6 +332,7 @@ No modules.
 | <a name="input_bastion_ebs_size"></a> [bastion\_ebs\_size](#input\_bastion\_ebs\_size) | Size of EBS attached to the bastion instance | `number` | `8` | no |
 | <a name="input_bastion_host_name"></a> [bastion\_host\_name](#input\_bastion\_host\_name) | The hostname to give to the bastion instance | `string` | `""` | no |
 | <a name="input_bastion_instance_types"></a> [bastion\_instance\_types](#input\_bastion\_instance\_types) | List of ec2 types for the bastion host, used by aws\_launch\_template (first from the list) and in aws\_autoscaling\_group | `list` | <pre>[<br>  "t3.small",<br>  "t3.medium",<br>  "t3.large"<br>]</pre> | no |
+| <a name="input_bastion_metadata_options"></a> [bastion\_metadata\_options](#input\_bastion\_metadata\_options) | Passthrough for aws\_launch\_template.metadata\_options. Keys http\_endpoint, http\_tokens, http\_put\_response\_hop\_limit, http\_protocol\_ipv6, and instance\_metadata\_tags are supported. | `map(any)` | `{}` | no |
 | <a name="input_bastion_service_host_key_name"></a> [bastion\_service\_host\_key\_name](#input\_bastion\_service\_host\_key\_name) | AWS ssh key *.pem to be used for ssh access to the bastion service host | `string` | `""` | no |
 | <a name="input_bastion_service_port"></a> [bastion\_service\_port](#input\_bastion\_service\_port) | Port for containerised ssh daemon | `number` | `22` | no |
 | <a name="input_bastion_vpc_name"></a> [bastion\_vpc\_name](#input\_bastion\_vpc\_name) | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc\_id' but you can pass a custom string, or an empty value to omit this | `string` | `"vpc_id"` | no |
@@ -378,3 +380,4 @@ No modules.
 | <a name="output_policy_example_for_parent_account_empty_if_not_used"></a> [policy\_example\_for\_parent\_account\_empty\_if\_not\_used](#output\_policy\_example\_for\_parent\_account\_empty\_if\_not\_used) | You must apply an IAM policy with trust relationship identical or compatible with this in your other AWS account for IAM lookups to function there with STS:AssumeRole and allow users to login |
 | <a name="output_service_dns_entry"></a> [service\_dns\_entry](#output\_service\_dns\_entry) | dns-registered url for service and host |
 | <a name="output_target_group_arn"></a> [target\_group\_arn](#output\_target\_group\_arn) | aws load balancer target group arn |
+<!-- END_TF_DOCS -->

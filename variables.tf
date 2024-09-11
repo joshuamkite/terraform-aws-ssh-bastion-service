@@ -238,3 +238,9 @@ variable "bastion_service_port" {
   description = "Port for containerised ssh daemon"
   default     = 22
 }
+
+variable "bastion_metadata_options" {
+  type        = map(any)
+  description = "Passthrough for aws_launch_template.metadata_options. Keys http_endpoint, http_tokens, http_put_response_hop_limit, http_protocol_ipv6, and instance_metadata_tags are supported."
+  default     = {}
+}

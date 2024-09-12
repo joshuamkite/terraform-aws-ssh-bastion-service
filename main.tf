@@ -59,16 +59,12 @@ resource "aws_launch_template" "bastion-service-host" {
     }
   }
 
-  dynamic "metadata_options" {
-    for_each = length(keys(var.bastion_metadata_options)) > 0 ? { bastion_metadata_options = var.bastion_metadata_options } : {}
-
-    content {
-      http_endpoint               = lookup(metadata_options.value, "http_endpoint", "enabled")
-      http_tokens                 = lookup(metadata_options.value, "http_tokens", "optional")
-      http_put_response_hop_limit = lookup(metadata_options.value, "http_put_response_hop_limit", 1)
-      http_protocol_ipv6          = lookup(metadata_options.value, "http_protocol_ipv6", null)
-      instance_metadata_tags      = lookup(metadata_options.value, "instance_metadata_tags", null)
-    }
+  metadata_options {
+    http_endpoint               = try(var.bastion_metadata_options.http_endpoint, null)
+    http_tokens                 = try(var.bastion_metadata_options.http_tokens, null)
+    http_put_response_hop_limit = try(var.bastion_metadata_options.http_put_response_hop_limit, null)
+    http_protocol_ipv6          = try(var.bastion_metadata_options.http_protocol_ipv6, null)
+    instance_metadata_tags      = try(var.bastion_metadata_options.instance_metadata_tags, null)
   }
 
   lifecycle {

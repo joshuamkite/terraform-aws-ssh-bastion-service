@@ -30,7 +30,7 @@ ssh -p 443 user@load_balancer_dns_output_value
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 
 ## Providers
 

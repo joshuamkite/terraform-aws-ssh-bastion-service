@@ -1,6 +1,6 @@
 # This Terraform deploys a stateless containerised sshd bastion service on AWS with IAM based authentication:
 
-This module requires Terraform >/=1.2.0 Older versions were previously supported going back to Terraform 0.11.x with module version to ~> v4.0
+This module requires Terraform >/=1.3.0 Older versions were previously supported going back to Terraform 0.11.x with module version to ~> v4.0
 
 **N.B. If you are using a newer version of this module when you have an older version deployed, please review the changelog!**
 
@@ -268,7 +268,7 @@ These have been generated with [terraform-docs](https://github.com/segmentio/ter
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 
 ## Providers
 
@@ -332,7 +332,7 @@ No modules.
 | <a name="input_bastion_ebs_size"></a> [bastion\_ebs\_size](#input\_bastion\_ebs\_size) | Size of EBS attached to the bastion instance | `number` | `8` | no |
 | <a name="input_bastion_host_name"></a> [bastion\_host\_name](#input\_bastion\_host\_name) | The hostname to give to the bastion instance | `string` | `""` | no |
 | <a name="input_bastion_instance_types"></a> [bastion\_instance\_types](#input\_bastion\_instance\_types) | List of ec2 types for the bastion host, used by aws\_launch\_template (first from the list) and in aws\_autoscaling\_group | `list` | <pre>[<br>  "t3.small",<br>  "t3.medium",<br>  "t3.large"<br>]</pre> | no |
-| <a name="input_bastion_metadata_options"></a> [bastion\_metadata\_options](#input\_bastion\_metadata\_options) | Passthrough for aws\_launch\_template.metadata\_options. Keys http\_endpoint, http\_tokens, http\_put\_response\_hop\_limit, http\_protocol\_ipv6, and instance\_metadata\_tags are supported. | `map(any)` | `{}` | no |
+| <a name="input_bastion_metadata_options"></a> [bastion\_metadata\_options](#input\_bastion\_metadata\_options) | Passthrough for aws\_launch\_template.metadata\_options. | <pre>object({<br>    http_endpoint               = optional(string)<br>    http_tokens                 = optional(string)<br>    http_put_response_hop_limit = optional(number)<br>    http_protocol_ipv6          = optional(string)<br>    instance_metadata_tags      = optional(string)<br>  })</pre> | `{}` | no |
 | <a name="input_bastion_service_host_key_name"></a> [bastion\_service\_host\_key\_name](#input\_bastion\_service\_host\_key\_name) | AWS ssh key *.pem to be used for ssh access to the bastion service host | `string` | `""` | no |
 | <a name="input_bastion_service_port"></a> [bastion\_service\_port](#input\_bastion\_service\_port) | Port for containerised ssh daemon | `number` | `22` | no |
 | <a name="input_bastion_vpc_name"></a> [bastion\_vpc\_name](#input\_bastion\_vpc\_name) | define the last part of the hostname, by default this is the vpc ID with magic default value of 'vpc\_id' but you can pass a custom string, or an empty value to omit this | `string` | `"vpc_id"` | no |

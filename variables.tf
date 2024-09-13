@@ -240,7 +240,13 @@ variable "bastion_service_port" {
 }
 
 variable "bastion_metadata_options" {
-  type        = map(any)
-  description = "Passthrough for aws_launch_template.metadata_options. Keys http_endpoint, http_tokens, http_put_response_hop_limit, http_protocol_ipv6, and instance_metadata_tags are supported."
+  type = object({
+    http_endpoint               = optional(string)
+    http_tokens                 = optional(string)
+    http_put_response_hop_limit = optional(number)
+    http_protocol_ipv6          = optional(string)
+    instance_metadata_tags      = optional(string)
+  })
+  description = "Passthrough for aws_launch_template.metadata_options."
   default     = {}
 }

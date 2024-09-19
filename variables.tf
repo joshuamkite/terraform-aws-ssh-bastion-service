@@ -247,6 +247,6 @@ variable "bastion_metadata_options" {
     http_protocol_ipv6          = optional(string)
     instance_metadata_tags      = optional(string)
   })
-  description = "Passthrough for aws_launch_template.metadata_options."
+  description = "Passthrough for aws_launch_template.metadata_options. **Don't** apply `http_*` options if you're not sure what you're doing!"
   default     = {}
 }

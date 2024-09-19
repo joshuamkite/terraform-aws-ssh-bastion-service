@@ -1,4 +1,4 @@
-# TBD
+# 8.2
 
 - **Feature:** EC2 instances can be supplied metadata options through `var.bastion_metadata_options`
 - **Change:** Increment required terraform version to >= 1.3.0

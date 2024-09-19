@@ -3,3 +3,6 @@ terraform.tfstate.backup
 .gitignore
 .vscode/
 to_do.md
+.pluralith/
+.terraform/
+.terraform.lock.hcl

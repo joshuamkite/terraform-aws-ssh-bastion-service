@@ -6,8 +6,8 @@ I generally try to avoid breaking changes and changes to default behaviour excep
 
 All proposed code changes must be tested before submission! I don't have a formal test suite so I'm afraid it is a case of testing changes manually with deployment, log in successfully, etc. I will generally test with Open Tofu current version as a starting point using the `/examples` here with varioations to test any conditional logic.
 
-examples will need module version incrementing with new version and deploying to check validity - I will expect to handle this but would welcome suggestions with P/Rs!
-
 If the feature change is significant then it may be worth considering adding another example deployment to test it.
+
+Please also update `changelog.md` with `TBD`
 
 Thanks
